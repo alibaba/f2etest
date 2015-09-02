@@ -1,0 +1,5 @@
+{
+  "name" : "f2etest",
+  "script" : "app.js",
+  "cwd" : "/usr/local/f2etest/"
+}

@@ -1,0 +1,78 @@
+
+------------------------------------------------------------
+ About this README
+------------------------------------------------------------
+
+This README is intended to provide quick and to-the-point documentation for
+technical users intending to compile parts of Guacamole themselves.
+
+Distribution-specific packages are available from the files section of the main
+project page:
+ 
+    http://sourceforge.net/projects/guacamole/files/
+
+Distribution-specific documentation is provided on the Guacamole wiki:
+
+    http://guac-dev.org/
+
+
+------------------------------------------------------------
+ What is guacamole-common-js?
+------------------------------------------------------------
+
+guacamole-common-js is the core JavaScript library used by the Guacamole web
+application.
+
+guacamole-common-js provides an efficient HTTP tunnel for transporting
+protocol data between JavaScript and the web application, as well as an
+implementation of a Guacamole protocol client and abstract synchronized
+drawing layers. 
+
+
+------------------------------------------------------------
+ Compiling and installing guacamole-common-js
+------------------------------------------------------------
+
+guacamole-common-js is built using Maven. Note that this is JavaScript code
+and not actually compiled. "Building" guacamole-common-js actually simply
+packages it into a redistributable .zip file. This .zip file can be easily
+included and expanded into other Maven-based projects (like Guacamole).
+
+Note that prebuilt versions of guacamole-common-js are available from the
+main guac-dev.org Maven repository which is referenced in all Maven
+projects in Guacamole. Unless you want to make changes to guacamole-common-js
+or you want to use a newer, unreleased version (such as the unstable branch),
+you do not need to build this manually. You can let Maven download it for
+you when you build Guacamole.
+
+1) Run mvn package
+
+    $ mvn package
+
+    Maven will download any needed dependencies for building the .zip file.
+    Once all dependencies have been downloaded, the .zip file will be
+    created in the target/ subdirectory of the current directory.
+
+2) Run mvn install
+
+    $ mvn install
+
+    DO NOT RUN THIS AS ROOT!
+
+    Maven will install guacamole-common-js to your user's local Maven
+    repository where it can be used in future builds. It will not install
+    into a system-wide repository and does not require root privileges.
+
+    Once installed, building other Maven projects that depend on
+    guacamole-common-js (such as Guacamole) will be possible.
+
+
+------------------------------------------------------------
+ Reporting problems
+------------------------------------------------------------
+
+Please report any bugs encountered by opening a new ticket at the Trac system
+hosted at:
+    
+    http://guac-dev.org/trac/
+

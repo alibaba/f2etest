@@ -1,0 +1,178 @@
+[
+    {
+        "id": "hostsshare",
+        "name": "hosts",
+        "server": "f2etest-ie11",
+        "program": "c:\\app\\hostsshare.bat"
+    },
+    {
+        "id": "ie6",
+        "name": "IE 6",
+        "server": "f2etest-ie6",
+        "program": "c:\\app\\ie6.bat"
+    },
+    {
+        "id": "ie7",
+        "name": "IE 7",
+        "server": "f2etest-ie7",
+        "program": "c:\\app\\ie7.bat"
+    },
+    {
+        "id": "ie8",
+        "name": "IE 8",
+        "server": "f2etest-ie8",
+        "program": "c:\\app\\ie8.bat"
+    },
+    {
+        "id": "ie9",
+        "name": "IE 9",
+        "server": "f2etest-ie9",
+        "program": "c:\\app\\ie9.bat"
+    },
+    {
+        "id": "ie10",
+        "name": "IE 10",
+        "server": "f2etest-ie10",
+        "program": "c:\\app\\ie10.bat"
+    },
+    {
+        "id": "ie11",
+        "name": "IE 11",
+        "server": "f2etest-ie11",
+        "program": "c:\\app\\ie11.bat"
+    },
+    {
+        "id": "chrome",
+        "name": "Chrome",
+        "server": "f2etest-ie6",
+        "program": "c:\\app\\chrome.bat"
+    },
+    {
+        "id": "firefox",
+        "name": "Firefox",
+        "server": "f2etest-ie6",
+        "program": "c:\\app\\firefox.bat"
+    },
+    {
+        "id": "opera",
+        "name": "Opera",
+        "server": "f2etest-ie6",
+        "program": "c:\\app\\opera.bat"
+    },
+    {
+        "id": "360se",
+        "name": "360浏览器",
+        "shortname": "360",
+        "server": "f2etest-ie7",
+        "program": "c:\\app\\360se.bat"
+    },
+    {
+        "id": "360chrome",
+        "name": "360极速浏览器",
+        "shortname": "360极速",
+        "server": "f2etest-ie7",
+        "program": "c:\\app\\360chrome.bat"
+    },
+    {
+        "id": "liebao",
+        "name": "猎豹浏览器",
+        "shortname": "猎豹",
+        "server": "f2etest-ie6",
+        "program": "c:\\app\\liebao.bat"
+    },
+    {
+        "id": "maxthon",
+        "name": "傲游浏览器",
+        "shortname": "傲游",
+        "server": "f2etest-ie6",
+        "program": "c:\\app\\maxthon.bat"
+    },
+    {
+        "id": "qqbrowser",
+        "name": "QQ浏览器",
+        "shortname": "QQ",
+        "server": "f2etest-ie6",
+        "program": "c:\\app\\qqbrowser.bat"
+    },
+    {
+        "id": "ucbrowser",
+        "name": "UC浏览器",
+        "shortname": "UC",
+        "server": "f2etest-ie6",
+        "program": "c:\\app\\ucbrowser.bat"
+    },
+    {
+        "id": "sogou",
+        "name": "搜狗浏览器",
+        "shortname": "搜狗",
+        "server": "f2etest-ie6",
+        "program": "c:\\app\\sogou.bat"
+    },
+    {
+        "id": "2345",
+        "name": "2345浏览器",
+        "shortname": "2345",
+        "server": "f2etest-ie6",
+        "program": "c:\\app\\2345.bat"
+    },
+    {
+        "id": "theworld",
+        "name": "世界之窗",
+        "server": "f2etest-ie6",
+        "program": "c:\\app\\theworld.bat"
+    },
+    {
+        "id": "notepadplus",
+        "name": "Notepad++",
+        "shortname": "Note++",
+        "server": "f2etest-ie11",
+        "program": "c:\\app\\notepadplus.bat"
+    },
+    {
+        "id": "navicat",
+        "name": "Navicat",
+        "server": "f2etest-ie11",
+        "program": "c:\\app\\navicat.bat"
+    },
+    {
+        "id": "word",
+        "name": "Word 2013",
+        "shortname": "Word",
+        "server": "f2etest-ie11",
+        "program": "c:\\app\\word.bat"
+    },
+    {
+        "id": "excel",
+        "name": "Excel 2013",
+        "shortname": "Excel",
+        "server": "f2etest-ie11",
+        "program": "c:\\app\\excel.bat"
+    },
+    {
+        "id": "powerpoint",
+        "name": "PowerPoint 2013",
+        "shortname": "PowerPoint",
+        "server": "f2etest-ie11",
+        "program": "c:\\app\\powerpoint.bat"
+    },
+    {
+        "id": "access",
+        "name": "Access 2013",
+        "shortname": "Access",
+        "server": "f2etest-ie11",
+        "program": "c:\\app\\access.bat"
+    },
+    {
+        "id": "xmind",
+        "name": "XMind 6",
+        "shortname": "XMind",
+        "server": "f2etest-ie11",
+        "program": "c:\\app\\xmind.bat"
+    },
+    {
+        "id": "desktop",
+        "name": "我的桌面",
+        "shortname": "桌面",
+        "server": "f2etest-ie10"
+    }
+]

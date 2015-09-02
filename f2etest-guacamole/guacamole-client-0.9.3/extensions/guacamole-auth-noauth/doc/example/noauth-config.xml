@@ -1,0 +1,6 @@
+<configs>
+    <config name="myconfig" protocol="rdp">
+        <param name="hostname" value="rdp-server" />
+        <param name="port" value="3389" />
+    </config>
+</configs>

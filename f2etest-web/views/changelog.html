@@ -1,0 +1,36 @@
+
+<!DOCTYPE HTML>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title><%=siteName + ' - ' + siteAbout%></title>
+    <link rel="icon" type="image/icon" href="<%=siteIcon%>">
+    <link rel="stylesheet" type="text/css" href="css/index.css" />
+    <script type="text/javascript" src="js/jquery-1.8.3.min.js"></script>
+</head>
+<body>
+    <div id="header">
+        <div id="logo"><a href="/"><img src="/imgs/f2etest.png" alt="f2etest" width="24" height="24"><span class="sitename">「<%=siteName%>」</span></a><span class="sitever"><a href="/changelog" target="_blank">v<%=appVersion%></a></span></div>
+        <div id="options">
+            <span id="username"><%=username%></span> | <a href="/logout"><%=__('Logout')%></a> | <span class="cur"><%=__('Help')%></span> | <a href="/download" class="recommend"><%=__('Download')%></a> | <a href="/stat"><%=__('Statistics')%></a> | <a href="/api">API</a>
+        </div>
+    </div>
+    <div id="doc-container">
+        <div id="doc-bg"></div>
+        <div id="doc-area">
+            <h3>v1.0.1 (2015-04-03)</h3>
+            <ol>
+                <li>web版本支持剪切板双向直通，完美打通本地和服务器之间的剪切板交换</li>
+                <li>hostsShare支持分组管理，右键即可方便的进行切换</li>
+            </ol>
+            <h3>v1.0.0 (2015-03-17)</h3>
+            <ol>
+                <li>代码进行完全重构，基于Guacamole及TSWF Schema协议，极大提升了用户体验</li>
+                <li>UI也进行了重构，仿桌面的UI，用起来爽爽的</li>
+            </ol>
+
+        </div>
+    </div>
+    <% include footer.html %>
+</body>
+</html>

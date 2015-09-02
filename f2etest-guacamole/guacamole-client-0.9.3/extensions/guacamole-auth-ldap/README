@@ -1,0 +1,101 @@
+
+------------------------------------------------------------
+ About this README
+------------------------------------------------------------
+
+This README is intended to provide quick and to-the-point documentation for
+technical users intending to compile parts of Guacamole themselves.
+
+Distribution-specific packages are available from the files section of the main
+project page:
+ 
+    http://sourceforge.net/projects/guacamole/files/
+
+Distribution-specific documentation is provided on the Guacamole wiki:
+
+    http://guac-dev.org/
+
+
+------------------------------------------------------------
+ What is guacamole-auth-ldap?
+------------------------------------------------------------
+
+guacamole-auth-ldap is a Java library for use with the Guacamole web
+application to provide LDAP based authentication.
+
+guacamole-auth-ldap provides an authentication provider which can be
+set in guacamole.properties to allow LDAP authentication of Guacamole
+users. Additional properties are required to configure the LDAP
+connection and search parameters.
+
+Schema files are provided to create the required object classes in your
+LDAP directory.
+
+
+------------------------------------------------------------
+ Compiling and installing guacamole-auth-ldap
+------------------------------------------------------------
+
+guacamole-auth-ldap is built using Maven. Building guacamole-auth-ldap
+compiles all classes and packages them into a redistributable .jar file. This
+.jar file can be installed in the library directory configured in
+guacamole.properties such that the authentication provider is available.
+
+1) Run mvn package
+
+    $ mvn package
+
+    Maven will download any needed dependencies for building the .jar file.
+    Once all dependencies have been downloaded, the .jar file will be
+    created in the target/ subdirectory of the current directory.
+
+2) Copy the .jar file into the library directory specified in your
+   guacamole.properties
+
+    You will likely need to do this as root.
+
+    If you do not have a library directory configured in your
+    guacamole.properties, you will need to specify one. The directory
+    is specified using the "lib-directory" property.
+
+3) Set up your LDAP server to authenticate Guacamole users
+
+    Schema files are provided in the doc directory for creating
+    the "guacConfig" object class required.
+
+    You must add guacConfig objects to your LDAP directory. Each
+    guacConfig represents a connection configuration, which is made
+    up of a protocol and any number of protocol-specific parameters.
+
+4) Configure guacamole.properties for LDAP
+
+    There are additional properties required by the LDAP authentication
+    provider which must be added/changed in your guacamole.properties:
+
+    # Use LDAP authentication
+    auth-provider: net.sourceforge.guacamole.net.auth.ldap.LDAPAuthenticationProvider
+
+    # Configuration for LDAP connection
+    ldap-hostname:           LDAP_SERVER_HOSTNAME
+    ldap-port:               389
+
+    # The attribute which uniquely identifies users
+    ldap-username-attribute: uid
+
+    # The base DN which, when appended to the user identifier attribute,
+    # produces the full DN of the user being authenticated.
+    ldap-user-base-dn:       ou=people,dc=example,dc=net
+
+    # The base DN within which all guacConfig objects can be found.
+    ldap-config-base-dn:     dc=example,dc=net
+
+
+------------------------------------------------------------
+ Reporting problems
+------------------------------------------------------------
+
+Please report any bugs encountered by opening a new ticket at the Trac system
+hosted at:
+    
+    http://guac-dev.org/trac/
+

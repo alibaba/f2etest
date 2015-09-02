@@ -1,0 +1,76 @@
+
+------------------------------------------------------------
+ About this README
+------------------------------------------------------------
+
+This README is intended to provide quick and to-the-point documentation for
+technical users intending to compile parts of Guacamole themselves.
+
+Distribution-specific packages are available from the files section of the main
+project page:
+ 
+    http://sourceforge.net/projects/guacamole/files/
+
+Distribution-specific documentation is provided on the Guacamole wiki:
+
+    http://guac-dev.org/
+
+
+------------------------------------------------------------
+ What is guacamole-common?
+------------------------------------------------------------
+
+guacamole-common is the core Java library used by the Guacamole web
+application.
+
+guacamole-common provides abstract means of connecting to guacd, interfacing
+with the JavaScript client and tunnel provided by guacamole-common-js, and
+reading configuration from a standard location (guacamole.properties).
+
+
+------------------------------------------------------------
+ Compiling and installing guacamole-common
+------------------------------------------------------------
+
+guacamole-common is built using Maven. Building guacamole-common
+compiles all classes and packages them into a redistributable .jar file. This
+.jar file can be easily included in other Maven-based projects (like Guacamole).
+
+Note that prebuilt versions of guacamole-common are available from the
+main guac-dev.org Maven repository which is referenced in all Maven
+projects in Guacamole. Unless you want to make changes to guacamole-common
+or you want to use a newer, unreleased version (such as the unstable branch),
+you do not need to build this manually. You can let Maven download it for
+you when you build Guacamole.
+
+1) Run mvn package
+
+    $ mvn package
+
+    Maven will download any needed dependencies for building the .jar file.
+    Once all dependencies have been downloaded, the .jar file will be
+    created in the target/ subdirectory of the current directory.
+
+2) Run mvn install
+
+    $ mvn install
+
+    DO NOT RUN THIS AS ROOT!
+
+    Maven will install guacamole-common to your user's local Maven
+    repository where it can be used in future builds. It will not install
+    into a system-wide repository and does not require root privileges.
+
+    Once installed, building other Maven projects that depend on
+    guacamole-common (such as Guacamole) will be possible.
+
+
+------------------------------------------------------------
+ Reporting problems
+------------------------------------------------------------
+
+Please report any bugs encountered by opening a new ticket at the Trac system
+hosted at:
+    
+    http://guac-dev.org/trac/
+

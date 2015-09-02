@@ -1,0 +1,11 @@
+
+dn: cn=Example Config,dc=guac-dev,dc=org
+objectClass: guacConfigGroup
+objectClass: groupOfNames
+cn: Example Config
+guacConfigProtocol: vnc
+guacConfigParameter: hostname=localhost
+guacConfigParameter: port=5900
+guacConfigParameter: password=secret
+member: cn=user1,dc=example,dc=com
+member: cn=user2,dc=example,dc=com

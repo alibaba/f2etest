@@ -1,0 +1,18 @@
+2012-10-15 Michael Jumper <zhangmaike@users.sourceforge.net>
+
+	* Updated to latest guacamole-common
+
+2012-08-11 Michael Jumper <zhangmaike@users.sourceforge.net>
+
+	* Improved documentation
+
+2012-05-04 Michael Jumper <zhangmaike@users.sourceforge.net>
+
+	* Renamed to guacamole-ext
+	* Generic HTTP-based Credentials object
+	* Added support for listeners and hooks
+
+2011-12-11 Michael Jumper <zhangmaike@users.sourceforge.net>
+
+	* Initial release
+

@@ -1,0 +1,14 @@
+{
+    "port": 3000,
+    "name": "F2eTest",
+    "about": "浏览器云测平台",
+    "icon": "/favicon.ico",
+    "dbHost": "x.x.x.x",
+    "dbUser": "xxx",
+    "dbPass": "xxx",
+    "dbTable": "f2etest",
+    "clientApiKey":"xxxx",
+    "guacamoleApi": "http://f2etest-link.xxxx.com/guacamole/client.xhtml",
+    "footer": "",
+    "statNav" : "<a href=\"/stat\">标准统计</a> | <a href=\"/statuser\">个人统计</a>"
+}

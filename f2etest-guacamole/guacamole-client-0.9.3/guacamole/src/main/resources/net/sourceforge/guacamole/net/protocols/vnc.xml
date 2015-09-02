@@ -1,0 +1,28 @@
+<protocol name="vnc" title="VNC">
+
+    <param name="hostname"    type="text"     title="Hostname"/>
+    <param name="port"        type="numeric"  title="Port"/>
+    <param name="password"    type="password" title="Password"/>
+
+    <param name="read-only"     type="boolean" title="Read-only"                value="true"/>
+    <param name="swap-red-blue" type="boolean" title="Swap red/blue components" value="true"/>
+
+    <param name="cursor" type="enum" title="Cursor">
+        <option value="local">Local</option>
+        <option value="remote">Remote</option>
+    </param>
+
+    <param name="color-depth" type="enum" title="Color depth">
+        <option value="8">256 color</option>
+        <option value="16">Low color (16-bit)</option>
+        <option value="24">True color (24-bit)</option>
+        <option value="32">True color (32-bit)</option>
+    </param>
+
+    <param name="dest-host" type="text"    title="Repeater destination host"/>
+    <param name="dest-port" type="numeric" title="Repeater destination port"/>
+
+    <param name="enable-audio" type="boolean" title="Enable audio" value="true"/>
+    <param name="audio-servername" type="text" title="Audio server name"/>
+
+</protocol>

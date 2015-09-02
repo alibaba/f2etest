@@ -1,0 +1,626 @@
+/*
+ * Copyright (C) 2013 Glyptodon LLC
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in
+ * all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+ * THE SOFTWARE.
+ */
+
+@import url('animation.css');
+ 
+* {
+    -webkit-tap-highlight-color: rgba(0,0,0,0);
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    box-sizing: border-box;
+}
+
+input[type=checkbox], input[type=number], input[type=text], input[type=radio], label, textarea {
+    -webkit-tap-highlight-color: rgba(128,192,128,0.5);
+}
+
+input[type=submit], button {
+    -webkit-appearance: none;
+}
+
+div.location, input[type=text], input[type=number], input[type=password], textarea {
+    border: 1px solid #777;
+    -moz-border-radius: 0.2em;
+    -webkit-border-radius: 0.2em;
+    -khtml-border-radius: 0.2em;
+    border-radius: 0.2em;
+    width: 100%;
+    max-width: 16em;
+    padding: 0.25em;
+    font-size: 10pt;
+    background: white;
+    cursor: text;
+}
+
+textarea {
+    max-width: none;
+    width: 30em;
+    height: 10em;
+    white-space: nowrap;
+    overflow: auto;
+}
+
+input[type="submit"], button {
+
+    background-color: #3C3C3C;
+
+    border: 1px solid rgba(0, 0, 0, 0.4);
+    -moz-border-radius: 0.25em;
+    -webkit-border-radius: 0.25em;
+    -khtml-border-radius: 0.25em;
+    border-radius: 0.25em;
+
+    color: white;
+    text-shadow: -1px -1px rgba(0, 0, 0, 0.3);
+    font-size: 1em;
+
+    box-shadow: inset -1px -1px 0.1em rgba(0, 0, 0, 0.25),
+                inset 1px 1px 0.1em rgba(255, 255, 255, 0.25),
+                -1px -1px 0.1em rgba(0, 0, 0, 0.25),
+                1px 1px 0.1em rgba(255, 255, 255, 0.25);
+    
+    padding: 0.35em;
+    padding-right: 1em;
+    padding-left: 1em;
+    min-width: 5em;
+
+}
+
+input[type="submit"]:hover, button:hover {
+    background-color: #5A5A5A;
+}
+
+input[type="submit"]:active, button:active {
+
+    background-color: #2C2C2C;
+    
+    box-shadow: 
+                inset 1px 1px 0.25em rgba(0, 0, 0, 0.25),
+                -1px -1px 0.25em rgba(0, 0, 0, 0.25),
+                1px 1px 0.25em rgba(255, 255, 255, 0.25);
+}
+
+button.danger {
+    background: #A43;
+}
+
+button.danger:hover {
+    background: #C54;
+}
+
+button.danger:active {
+    background: #932;
+}
+
+body {
+    background: #EEE;
+    font-family: FreeSans, Helvetica, Arial, sans-serif;
+    padding: 0;
+    margin: 0;
+}
+
+img {
+    border: none;
+    vertical-align: middle;
+}
+
+h1 {
+    
+    margin: 0;
+    padding: 0.5em;
+
+    font-size: 2em;
+    vertical-align: middle;
+    text-align: center;
+
+}
+
+h2 {
+
+    border-top: 1px solid #AAA;
+    border-bottom: 1px solid #AAA;
+    background: rgba(0, 0, 0, 0.07);
+
+    padding: 0.5em;
+    margin: 0;
+    font-size: 1.5em;
+
+    font-weight: lighter;
+    text-shadow: 1px 1px white;
+
+}
+
+div.section {
+    margin: 0;
+    padding: 1em;
+}
+
+/*
+ * Dialogs
+ */
+
+.dialog-container {
+    position: fixed;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    right: 0;
+    background: rgba(0, 0, 0, 0.5);
+    padding: 1em;
+}
+
+.dialog {
+
+    max-width: 100%;
+    width: 8in;
+    margin-left: auto;
+    margin-right: auto;
+    max-height: 100%;
+    overflow: auto;
+
+    border: 1px solid rgba(0, 0, 0, 0.5);
+    background: #E7E7E7;
+
+    -moz-border-radius: 0.2em;
+    -webkit-border-radius: 0.2em;
+    -khtml-border-radius: 0.2em;
+    border-radius: 0.2em;
+
+    box-shadow: 0.1em 0.1em 0.2em rgba(0, 0, 0, 0.6);
+    
+}
+
+.dialog > * {
+    margin: 1em;
+}
+
+.dialog .header {
+    margin: 0;
+}
+
+.dialog td {
+    position: relative;
+}
+
+.dialog .overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    right: 0;
+    z-index: 1;
+}
+
+.dialog .dropdown {
+
+    position: absolute;
+    z-index: 2;
+    margin-top: -1px;
+
+    width: 3in;
+    max-height: 2in;
+    overflow: auto;
+
+    border: 1px solid rgba(0, 0, 0, 0.5);
+    background: white;
+
+    font-size: 10pt;
+
+}
+
+.dialog .footer {
+    text-align: center;
+}
+
+/*
+ * List elements
+ */
+
+.list-item {
+
+    display: block;
+    text-align: left;
+    cursor: pointer;
+
+    position: relative;
+
+}
+
+.icon {
+    width: 24px;
+    height: 24px;
+    background-size: 16px 16px;
+    -moz-background-size: 16px 16px;
+    -webkit-background-size: 16px 16px;
+    -khtml-background-size: 16px 16px;
+    background-repeat: no-repeat;
+    background-position: center center;
+    opacity: 0.5;
+    display: inline-block;
+    vertical-align: middle;
+}
+
+.list-item * {
+    vertical-align: middle;
+}
+
+.list-item .caption {
+    padding: 0.1em;
+}
+
+.list-item .name {
+    color: black;
+    font-weight: normal;
+    padding: 0.1em;
+    margin-left: 0.25em;
+}
+
+.list-item .usage {
+    float: right;
+    font-style: italic;
+    color: gray;
+}
+
+.list-item.in-use {
+    opacity: 0.5;
+}
+
+.choice .list-item .usage {
+    display: none;
+}
+
+.choice .list-item.in-use {
+    opacity: 1;
+}
+
+/*
+ * List element styling
+ */
+
+.list-item.selected {
+    background: #DEB;
+}
+
+.list-item.selected > .icon {
+    opacity: 1.0;
+}
+
+.list-item:not(.selected) .caption:hover {
+    background: #CDA;
+}
+
+.choice .list-item {
+    display: inline-block;
+}
+
+.choice input[type='checkbox'] {
+    vertical-align: top;
+    height: 24px;
+    padding: 0;
+    margin: 0;
+}
+
+.disabled .list-item:not(.selected) {
+    opacity: 0.25;
+}
+
+.disabled .list-item:not(.selected):hover {
+    background: inherit;
+}
+
+/*
+ * List element fields (editing)
+ */
+
+/*
+.form {
+
+    position: absolute;
+    display: inline-block;
+    vertical-align: middle;
+    z-index: 1;
+
+    border: 1px solid rgba(0, 0, 0, 0.5);
+    background: #E7E7E7;
+    padding: 0;
+    margin: 0.25em;
+
+    -moz-border-radius: 0.2em;
+    -webkit-border-radius: 0.2em;
+    -khtml-border-radius: 0.2em;
+    border-radius: 0.2em;
+
+    box-shadow: 0.1em 0.1em 0.2em rgba(0, 0, 0, 0.6);
+
+}
+*/
+
+.form .fields th,
+.form .permissions th {
+    font-weight: normal;
+    vertical-align: middle;
+    text-align: left;
+}
+
+.form h2 {
+    border-top: none;
+}
+
+.form h3 {
+    font-size: 1em;
+    margin-bottom: 0.25em;
+}
+
+.form {
+    cursor: auto;
+    animation-name: fadein;
+    -webkit-animation-name: fadein;
+    animation-duration: 0.125s;
+    -webkit-animation-duration: 0.125s;
+}
+
+.object-buttons {
+
+    text-align: right;
+
+    border-top: 1px solid rgba(0, 0, 0, 0.1);
+    padding-top: 0.5em;
+    margin: 0.5em;
+
+}
+
+/*
+ * List element icons
+ */
+
+.icon.user {
+    background-image: url('../images/user-icons/guac-user.png');
+}
+
+.icon.user.add {
+    background-image: url('../images/action-icons/guac-user-add.png');
+}
+
+.icon.connection {
+    background-image: url('../images/protocol-icons/guac-plug.png');
+}
+
+.icon.connection.add {
+    background-image: url('../images/action-icons/guac-monitor-add.png');
+}
+
+.protocol {
+    display: inline-block;
+}
+
+.protocol .icon {
+    width: 24px;
+    height: 24px;
+    background-image: url('../images/protocol-icons/guac-plug.png');
+    background-size: 16px 16px;
+    -moz-background-size: 16px 16px;
+    -webkit-background-size: 16px 16px;
+    -khtml-background-size: 16px 16px;
+    background-repeat: no-repeat;
+    background-position: center center;
+    opacity: 0.5;
+}
+
+.protocol .icon.ssh,
+.protocol .icon.telnet {
+    background-image: url('../images/protocol-icons/guac-text.png');
+}
+
+.protocol .icon.vnc,
+.protocol .icon.rdp {
+    background-image: url('../images/protocol-icons/guac-monitor.png');
+}
+
+.connection .thumbnail {
+    display: none;
+}
+
+/*
+ * Groups
+ */
+
+.group > .children {
+    margin-left: 13px;
+    padding-left: 6px;
+    display: none;
+}
+ 
+.group.expanded > .children {
+    display: block;
+    border-left: 1px dotted rgba(0, 0, 0, 0.25);
+}
+
+.group > .caption .icon.type {
+    display: none;
+}
+
+.group.balancer > .caption .icon.type {
+    display: inline-block;
+    background-image: url('../images/protocol-icons/guac-monitor.png');
+}
+
+.group > .caption .icon.group {
+    opacity: 0.75;
+    background-image: url('../images/group-icons/guac-closed.png');
+}
+
+.group.expanded > .caption .icon.group {
+    background-image: url('../images/group-icons/guac-open.png');
+}
+
+.group.empty > .caption .icon.group {
+    opacity: 0.25;
+    background-image: url('../images/group-icons/guac-open.png');
+}
+
+.group.empty.balancer > .caption .icon.group {
+    display: none;
+}
+
+/*
+ * Settings formatting
+ */
+
+.form dt,
+.settings dt {
+    border-bottom: 1px dotted #AAA;
+    padding-bottom: 0.25em;
+}
+
+.form dd,
+.settings dd {
+    margin: 1.5em;
+    margin-left: 2.5em;
+    font-size: 0.75em;
+}
+
+#connections input.name,
+#users input.name {
+    max-width: 80%;
+    width: 20em;
+}
+
+#connection-list,
+#user-list {
+    border: 1px solid rgba(0, 0, 0, 0.25);
+    min-height: 20em;
+    -moz-border-radius: 0.2em;
+    -webkit-border-radius: 0.2em;
+    -khtml-border-radius: 0.2em;
+    border-radius: 0.2em;
+}
+
+#connections #add-connection,
+#connections #add-connection-group,
+#users #add-user {
+    font-size: 0.8em;
+}
+
+#connection-add-form,
+#user-add-form {
+    margin-bottom: 0.5em;
+}
+
+body:not(.manage-connections) .require-manage-connections,
+body:not(.manage-users) .require-manage-users {
+    display: none;
+}
+
+body:not(.add-connections) #add-connection,
+body:not(.add-connection-groups) #add-connection-group,
+body:not(.add-users) #user-add-form {
+    display: none;
+    display: none;
+}
+
+div#logout-panel {
+    padding: 0.45em;
+    text-align: right;
+    float: right;
+}
+
+.history th,
+.history td {
+    padding-left: 1em;
+    padding-right: 1em;
+}
+
+.first-page,
+.prev-page,
+.set-page,
+.next-page,
+.last-page {
+    cursor: pointer;
+    vertical-align: middle;
+}
+
+.first-page.disabled,
+.prev-page.disabled,
+.set-page.disabled,
+.next-page.disabled,
+.last-page.disabled {
+    cursor: auto;
+    opacity: 0.25;
+}
+
+.set-page,
+.more-pages {
+    display: inline-block;
+    padding: 0.25em;
+    text-align: center;
+    min-width: 1.25em;
+}
+
+.set-page {
+    text-decoration: underline;
+}
+
+.set-page.current {
+    cursor: auto;
+    text-decoration: none;
+    font-weight: bold;
+    background: rgba(0, 0, 0, 0.1);
+    border: 1px solid rgba(0, 0, 0, 0.1);
+    -moz-border-radius: 0.2em;
+    -webkit-border-radius: 0.2em;
+    -khtml-border-radius: 0.2em;
+    border-radius: 0.2em;
+}
+
+.icon.first-page {
+    background-image: url('../images/action-icons/guac-first-page.png');
+}
+
+.icon.prev-page {
+    background-image: url('../images/action-icons/guac-prev-page.png');
+}
+
+.icon.next-page {
+    background-image: url('../images/action-icons/guac-next-page.png');
+}
+
+.icon.last-page {
+    background-image: url('../images/action-icons/guac-last-page.png');
+}
+
+.buttons,
+.list-pager-buttons {
+    text-align: center;
+    margin: 1em;
+}
+
+button#logout {
+
+    background-image: url('../images/action-icons/guac-logout.png');
+    background-repeat: no-repeat;
+    background-size: 1em;
+    background-position: 0.5em 0.45em;
+
+    padding-left: 1.8em;
+
+}
+

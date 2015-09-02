@@ -1,0 +1,22 @@
+{
+  "main": "index.html",
+  "name": "hostsShare client",
+  "description": "Client for hostsShare.",
+  "version": "1.0.0",
+  "keywords": [
+    "hosts",
+    "share",
+    "node-webkit"
+  ],
+  "window": {
+    "icon": "img/icon.png",
+    "toolbar": false,
+    "frame": true,
+    "width": 800,
+    "height": 500,
+    "position": "center"
+  },
+  "dependencies": {
+    "request": "^2.53.0"
+  }
+}

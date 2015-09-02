@@ -1,0 +1,32 @@
+<!--
+
+<!DOCTYPE keyboard PUBLIC
+    "-//Guacamole/Guacamole Onscreen Keyboard DTD 0.6.0//EN"
+        "http://guac-dev.org/pub/dtd/guacamole-osk-0.6.0.dtd">
+
+-->
+
+<!ELEMENT keyboard ((row|column)*)>
+    <!ATTLIST keyboard size CDATA #REQUIRED>
+    <!ATTLIST keyboard lang CDATA #REQUIRED>
+    <!ATTLIST keyboard layout CDATA #REQUIRED>
+
+<!ELEMENT column (row*)>
+    <!ATTLIST column align (left|center|right) "left">
+
+<!ELEMENT row ((column|gap|key)*)>
+
+<!ELEMENT gap EMPTY>
+    <!ATTLIST gap size CDATA #IMPLIED>
+
+<!ELEMENT key (cap*)>
+    <!ATTLIST key size CDATA #IMPLIED>
+    <!ATTLIST key class CDATA #IMPLIED>
+
+<!ELEMENT cap ANY>
+    <!ATTLIST cap if CDATA #IMPLIED>
+    <!ATTLIST cap modifier CDATA #IMPLIED>
+    <!ATTLIST cap keysym CDATA #IMPLIED>
+    <!ATTLIST cap sticky (true|false) "false">
+    <!ATTLIST cap class CDATA #IMPLIED>
+

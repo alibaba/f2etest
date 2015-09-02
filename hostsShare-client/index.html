@@ -1,0 +1,28 @@
+﻿<!DOCTYPE html>
+<html>
+    <head>
+        <title>hostsShare</title>
+        <link rel="stylesheet" type="text/css" href="css/index.css" />
+        <link rel="stylesheet" type="text/css" href="css/codemirror.css" />
+        <link rel="stylesheet" type="text/css" href="css/codemirror-dialog.css" />
+    </head>
+    <body>
+        <div id="divHostsMode"></div>
+        <div id="divProxyMode">
+            <p>代理服务器：<input type="input" id="forwardHost" value="" /></p>
+            <p>代理端口号：<input type="input" id="forwardPort" value="" /></p>
+            <p><button id="saveProxy">保存并立即生效</button></p>
+            <p id="proxytip">提示：代理服务器请使用机器名，可自动代理最新IP</p>
+        </div>
+        <div id="workTip">当前模式：<span id="wordMode">hosts模式</span> （点击切换）</div>
+		<script src="js/jquery-1.7.2.min.js"></script>
+        <script src="js/common.js"></script>
+        <script src="js/settings.js"></script>
+        <script src="js/codemirror.js"></script>
+        <script src="js/codemirror-hosts.js"></script>
+        <script src="js/codemirror-dialog.js"></script>
+        <script src="js/codemirror-searchcursor.js"></script>
+        <script src="js/codemirror-search.js"></script>
+        <script src="js/appinit.js"></script>
+  </body>
+</html>

@@ -1,0 +1,55 @@
+
+<!DOCTYPE HTML>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title><%=siteName + ' - ' + siteAbout%></title>
+    <link rel="icon" type="image/icon" href="<%=siteIcon%>">
+    <link rel="stylesheet" type="text/css" href="css/index.css" />
+    <script type="text/javascript" src="js/jquery-1.8.3.min.js"></script>
+</head>
+<body>
+    <div id="header">
+        <div id="logo"><a href="/"><img src="/imgs/f2etest.png" alt="f2etest" width="24" height="24"><span class="sitename">「<%=siteName%>」</span></a><span class="sitever"><a href="/changelog" target="_blank">v<%=appVersion%></a></span></div>
+        <div id="options">
+            <span id="username"><%=username%></span> | <a href="/logout"><%=__('Logout')%></a> | <a href="/help"><%=__('Help')%></a> | <a href="/download" class="recommend"><%=__('Download')%></a> | <a href="/stat"><%=__('Statistics')%></a> | <span class="cur">API</span>
+        </div>
+    </div>
+    <div id="doc-container">
+        <div id="doc-bg"></div>
+        <div id="doc-area">
+            <h3>使用F2etest中的浏览器打开指定URL</h3>
+            <ul>
+                <li>DEMO地址：<a href="http://<%=host%>/openapp?id=ie8&amp;url=http://www.alibaba.com/" target="_blank">http://<%=host%>/openapp?id=ie8&amp;url=http://www.alibaba.com/</a></li>
+                <li>此接口支持以下参数：
+                    <ol>
+                        <li>id: 浏览器ID，例如：ie6, ie7, ie8, ie9, ie10, ie11, chrome, firefox</li>
+                        <li>url: 需要打开的目标URL地址</li>
+                        <li>noproxy: 是否禁用代理，设置1为禁用，禁用后即访问线上</li>
+                        <li>proxyurl: 代理服务器pac地址，可利用代理服务器实现自定义hosts绑定功能</li>
+                    </ol>
+                </li>
+            </ul>
+            <h3>获取所有浏览器列表</h3>
+            <ul>
+                <li>DEMO地址：<a href="http://<%=host%>/getAllBrowsers?callback=cbfunc" target="_blank">http://<%=host%>/getAllBrowsers?callback=cbfunc</a></li>
+                <li>此接口支持以下参数：
+                    <ol>
+                        <li>callback: jsonp的回调函数</li>
+                    </ol>
+                </li>
+            </ul>
+            <h3>为当前用户初始化远程服务器账号</h3>
+            <ul>
+                <li>DEMO地址：<a href="http://<%=host%>/initRemoteUser?callback=cbfunc" target="_blank">http://<%=host%>/initRemoteUser?callback=cbfunc</a></li>
+                <li>此接口支持以下参数：
+                    <ol>
+                        <li>callback: jsonp的回调函数</li>
+                    </ol>
+                </li>
+            </ul>
+        </div>
+    </div>
+    <% include footer.html %>
+</body>
+</html>

@@ -1,0 +1,177 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html>
+
+<!--
+   Copyright (C) 2013 Glyptodon LLC
+
+   Permission is hereby granted, free of charge, to any person obtaining a copy
+   of this software and associated documentation files (the "Software"), to deal
+   in the Software without restriction, including without limitation the rights
+   to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+   copies of the Software, and to permit persons to whom the Software is
+   furnished to do so, subject to the following conditions:
+
+   The above copyright notice and this permission notice shall be included in
+   all copies or substantial portions of the Software.
+
+   THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+   IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+   FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+   AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+   LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+   OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+   THE SOFTWARE.
+-->
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+
+    <head>
+        <link rel="icon" type="image/png" href="images/guacamole-logo-64.png"/>
+        <link rel="stylesheet" type="text/css" href="styles/ui.css"/>
+        <link rel="stylesheet" type="text/css" href="styles/client.css"/>
+        <link rel="stylesheet" type="text/css" href="styles/keyboard.css"/>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0, user-scalable=no, target-densitydpi=medium-dpi"/>
+        <meta name="apple-mobile-web-app-capable" content="yes"/>
+        <title>Guacamole 0.9.3</title>
+    </head>
+
+    <body>
+
+        <div id="main">
+
+            <!-- Display -->
+            <div class="displayOuter">
+                <div class="displayMiddle">
+                    <div id="display">
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- Text input target -->
+        <div id="text-input" class="open"><div id="text-input-field"><div id="sent-history"></div><div id="input-container"><span></span><textarea rows="1" id="target"></textarea></div></div><div id="text-input-buttons"><button class="key" data-keysym="0xFFE3" data-sticky="true">Ctrl</button><button class="key" data-keysym="0xFFE9" data-sticky="true">Alt</button><button class="key" data-keysym="0xFF1B">Esc</button></div></div>
+        <div id="clipboard-panel"><textarea id="clipboard" wrap="soft" spellcheck="false"></textarea></div>
+
+        <!-- Dimensional clone of viewport -->
+        <div id="viewportClone"/>
+
+        <!-- Notification area -->
+        <div id="notificationArea"/>
+
+        <!-- Menu -->
+        <div id="menu">
+            <h2 id="menu-title">Guacamole 0.9.3</h2>
+
+            <h3>Clipboard</h3>
+            <div class="content" id="clipboard-settings">
+                <p class="description">Text copied/cut within Guacamole will appear here. Changes to the text below will affect the remote clipboard.</p>
+                <textarea rows="10" cols="40" id="clipboardold"></textarea>
+            </div>
+
+            <h3>Input method</h3>
+            <div class="content" id="keyboard-settings">
+
+                <!-- No IME -->
+                <div class="choice">
+                    <label><input name="input-method" type="radio" value="ime-none" checked="checked" id="ime-none"/> None</label>
+                    <p class="caption"><label for="ime-none">No input method is used. Keyboard input is accepted from
+                            a connected, physical keyboard.</label></p>
+                </div>
+
+                <!-- Text input -->
+                <div class="choice">
+                    <div class="figure"><label for="ime-text"><img src="images/settings/tablet-keys.png" alt=""/></label></div>
+                    <label><input name="input-method" type="radio" value="ime-text" id="ime-text"/> Text input</label>
+                    <p class="caption"><label for="ime-text">
+                            Allow typing of text, and emulate keyboard events based on the
+                            typed text. This is necessary for devices such as mobile phones that lack a physical keyboard.</label></p>
+                </div>
+
+                <!-- Guac OSK -->
+                <div class="choice">
+                    <label><input name="input-method" type="radio" value="ime-osk" id="ime-osk"/> On-screen keyboard</label>
+                    <p class="caption"><label for="ime-osk">Display and accept input from the built-in Guacamole on-screen
+                            keyboard. The on-screen keyboard allows typing of key combinations that may otherwise be impossible
+                            (such as Ctrl-Alt-Del).</label></p>
+                </div>
+
+            </div>
+
+            <h3>Mouse emulation mode</h3>
+            <div class="content" id="mouse-settings">
+                <p class="description">Determines how the remote mouse behaves with respect to touches.</p>
+
+                <!-- Touchscreen -->
+                <div class="choice">
+                    <input name="mouse-mode" type="radio" value="absolute" checked="checked" id="absolute"/>
+                    <div class="figure">
+                        <label for="absolute"><img src="images/settings/touchscreen.png" alt=""/></label>
+                        <p class="caption"><label for="absolute">Tap to click. The click occurs at the location of the touch.</label></p>
+                    </div>
+                </div>
+
+                <!-- Touchpad -->
+                <div class="choice">
+                    <input name="mouse-mode" type="radio" value="relative" id="relative"/>
+                    <div class="figure">
+                        <label for="relative"><img src="images/settings/touchpad.png" alt=""/></label>
+                        <p class="caption"><label for="relative">Drag to move the mouse pointer and tap to click. The click occurs at the location of the pointer.</label></p>
+                    </div>
+                </div>
+
+            </div>
+
+            <h3>Display</h3>
+            <div class="content">
+                <div id="zoom-settings">
+                    <div id="zoom-out"><img src="images/settings/zoom-out.png" alt="-"/></div>
+                    <div id="zoom-state">100%</div>
+                    <div id="zoom-in"><img src="images/settings/zoom-in.png" alt="+"/></div>
+                </div>
+                <div><label><input type="checkbox" id="auto-fit" checked="checked"/> Automatically fit to browser window</label></div>
+            </div>
+
+        </div>
+        
+        <!-- Images which should be preloaded -->
+        <div id="preload">
+            <img src="images/action-icons/guac-close.png"/>
+            <img src="images/progress.png"/>
+        </div>
+        
+        <script type="text/javascript" src="scripts/lib/blob/blob.js"></script>
+        <script type="text/javascript" src="scripts/lib/filesaver/filesaver.js"></script>
+
+        <!-- guacamole-common-js -->
+        <script type="text/javascript" src="guacamole-common-js/all.min.js"></script>
+
+        <!-- guacamole-default-webapp scripts -->
+        <script type="text/javascript" src="scripts/session.js"></script>
+        <script type="text/javascript" src="scripts/history.js"></script>
+        <script type="text/javascript" src="scripts/service.js"></script>
+        <script type="text/javascript" src="scripts/guac-ui.js"></script>
+        <script type="text/javascript" src="scripts/client-ui.js"></script>
+
+        <!-- Init -->
+        <script type="text/javascript"> /* <![CDATA[ */
+
+            // Sanity check Guacamole JavaScript API version
+            if (Guacamole.API_VERSION !== "0.9.3")
+                GuacUI.Client.showStatus("Clear Your Cache", "An older version of Guacamole has been cached by your browser. Please clear your browser's cache and try again.");
+
+            // Start connect after control returns from onload (allow browser
+            // to consider the page loaded).
+            else
+                window.onload = function() {
+                    window.setTimeout(GuacUI.Client.connect, 10);
+                };
+
+        /* ]]> */ </script>
+
+        <span id="cnzz_stat_icon_1000122287"></span>
+        <script src="http://w.cnzz.com/q_stat.php?id=1000122287" type="text/javascript"></script>
+
+    </body>
+
+</html>

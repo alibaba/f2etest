@@ -1,0 +1,23 @@
+<assembly>
+    <baseDirectory>guacamole-common-js</baseDirectory>
+    <id>guacamole-common-js</id>
+    <formats>
+        <format>zip</format>
+    </formats>
+    <fileSets>
+        <fileSet>
+            <directory>src/main/webapp/modules/</directory>
+            <includes>
+                <include>*.js</include>
+            </includes>
+            <outputDirectory>modules/</outputDirectory>
+        </fileSet>
+        <fileSet>
+            <directory>target/${project.name}-${project.version}/</directory>
+            <includes>
+                <include>*.js</include>
+            </includes>
+            <outputDirectory></outputDirectory>
+        </fileSet>
+    </fileSets>
+</assembly>

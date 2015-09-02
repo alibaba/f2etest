@@ -1,0 +1,117 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+
+    <modelVersion>4.0.0</modelVersion>
+    <groupId>org.glyptodon.guacamole</groupId>
+    <artifactId>guacamole-ext</artifactId>
+    <packaging>jar</packaging>
+    <version>0.9.3</version>
+    <name>guacamole-ext</name>
+    <url>http://guac-dev.org/</url>
+
+    <description>
+        The Java API for extending the main Guacamole web application. This
+        is not needed for authoring a new Guacamole-based web application.
+    </description>
+
+    <!-- All applicable licenses -->
+    <licenses>
+        <license>
+            <name>The MIT License</name>
+            <url>http://www.opensource.org/licenses/mit-license.php</url>
+            <distribution>repo</distribution>
+        </license>
+    </licenses>
+
+    <!-- Git repository -->
+    <scm>
+        <url>https://github.com/glyptodon/guacamole-client</url>
+        <connection>scm:git:git://github.com/glyptodon/guacamole-client.git</connection>
+    </scm>
+
+    <!-- Developers -->
+    <developers>
+        <developer>
+            <id>mike.jumper</id>
+            <name>Michael Jumper</name>
+            <email>mike.jumper@guac-dev.org</email>
+        </developer>
+        <developer>
+            <id>james.muehlner</id>
+            <name>James Muehlner</name>
+            <email>james.muehlner@guac-dev.org</email>
+        </developer>
+    </developers>
+
+    <properties>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    </properties>
+
+    <build>
+        <plugins>
+
+            <!-- Written for 1.6 -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <configuration>
+                    <source>1.6</source>
+                    <target>1.6</target>
+                </configuration>
+            </plugin>
+
+            <!-- Attach source jar -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-source-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>attach-sources</id>
+                        <goals>
+                            <goal>jar</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+
+            <!-- Attach JavaDoc jar -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-javadoc-plugin</artifactId>
+                <configuration>
+                    <detectOfflineLinks>false</detectOfflineLinks>
+                </configuration>
+                <executions>
+                    <execution>
+                        <id>attach-javadocs</id>
+                        <goals>
+                            <goal>jar</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+
+        </plugins>
+    </build>
+
+    <dependencies>
+
+        <!-- Java servlet API -->
+        <dependency>
+            <groupId>javax.servlet</groupId>
+            <artifactId>servlet-api</artifactId>
+            <version>2.5</version>
+            <scope>provided</scope>
+        </dependency>
+
+        <!-- Guacamole Java API -->
+        <dependency>
+            <groupId>org.glyptodon.guacamole</groupId>
+            <artifactId>guacamole-common</artifactId>
+            <version>0.9.3</version>
+            <scope>compile</scope>
+        </dependency>
+
+    </dependencies>
+
+</project>

@@ -1,0 +1,171 @@
+
+------------------------------------------------------------
+ About this README
+------------------------------------------------------------
+
+This README is intended to provide quick and to-the-point documentation for
+technical users intending to compile parts of Guacamole themselves.
+
+Distribution-specific packages are available from the files section of the main
+project page:
+ 
+    http://sourceforge.net/projects/guacamole/files/
+
+Distribution-specific documentation is provided on the Guacamole wiki:
+
+    http://guac-dev.org/
+
+
+------------------------------------------------------------
+ What is guacamole-auth-mysql?
+------------------------------------------------------------
+
+guacamole-auth-ldap is a Java library for use with the Guacamole web
+application to provide MySQL based authentication.
+
+guacamole-auth-mysql provides an authentication provider which can be
+set in guacamole.properties to allow MySQL authentication of Guacamole
+users. Additional properties are required to configure the mysql
+connection parameters.
+
+A schema file are provided to create the required tables in your
+mysql database.
+
+
+------------------------------------------------------------
+ Compiling and installing guacamole-auth-mysql
+------------------------------------------------------------
+
+guacamole-auth-mysql is built using Maven. Building guacamole-auth-mysql
+compiles all classes and packages them into a redistributable .jar file. This
+.jar file can be installed in the library directory configured in
+guacamole.properties such that the authentication provider is available.
+
+1) Set up a MySQL database with the Guacamole schema.
+
+    When guacamole-auth-mysql is compiling, it needs to generate source
+    based on a database schema. Because the source generator uses a
+    connection to an actual database to do this, you must have a MySQL
+    database running with the Guacamole schema set up.
+
+    First, create a database. For the sake of these instructions, we will
+    call the database "guacamole", and will run all scripts as the root user:
+
+    $ mysql -u root -p
+    Enter password:
+    mysql> CREATE DATABASE guacamole;
+    Query OK, 1 row affected (0.00 sec)
+
+    mysql> exit
+    Bye
+
+    The schema files are in the schema/ subdirectory of the source. If run
+    in order, they will create the schema and a default user:
+
+    $ cat schema/*.sql | mysql -u root -p guacamole
+
+2) Set up your ~/.m2/settings.xml
+
+    Once the database is set up, Maven will need to have the credentials
+    required to connect to it and query the schema. This information is
+    specified in properties inside your ~/.m2/settings.xml file. If this
+    file does not exist yet, simply create it.
+
+    For ease of compilation, we've included an example settings.xml
+    defining the required properties in doc/example/settings.xml. You can
+    simply copy this file into ~/.m2 and edit as necessary.
+
+    If you wish to write the file yourself, the file should look like this in
+    general:
+
+    <settings>
+        <profiles>
+            ...profiles...
+        </profiles>
+    </settings>
+
+    We need to add a profile which defines the required properties by
+    placing a section like the following within the "profiles" section of your
+    settings.xml:
+
+    <profile>
+        <id>guacamole-mybatis</id>
+        <properties>
+            <guacamole.database.catalog>DATABASE</guacamole.database.catalog>
+            <guacamole.database.user>USERNAME</guacamole.database.user>
+            <guacamole.database.password>PASSWORD</guacamole.database.password>
+        </properties>
+    </profile>
+
+    Obviously, the DATABASE, USERNAME, and PASSWORD placeholders above must
+    be replaced with the appropriate values for your system.
+
+    Finally, to make the profile available to the build, it must be activated.
+    Place a section like the following at the bottom of your settings.xml,
+    right after the profiles section:
+
+    <activeProfiles>
+        <activeProfile>guacamole-mybatis</activeProfile>
+    </activeProfiles>
+
+    Maven's documentation has more details on writing the settings.xml file
+    if you have different needs or the above directions are not clear.
+
+3) Run mvn package
+
+    $ mvn package
+
+    Maven will download any needed dependencies for building the .jar file.
+    Once all dependencies have been downloaded, the .jar file will be
+    created in the target/ subdirectory of the current directory.
+
+    If this process fails, check the build errors, and verify that the
+    contents of your settings.xml file is correct.
+
+4) Extract the .tar.gz file now present in the target/ directory, and
+   place the .jar files in the extracted lib/ subdirectory in the library 
+   directory specified in guacamole.properties.
+
+    You will likely need to do this as root.
+
+    If you do not have a library directory configured in your
+    guacamole.properties, you will need to specify one. The directory
+    is specified using the "lib-directory" property.
+
+5) Set up your MySQL database to authenticate Guacamole users
+
+    A schema file is provided in the schema directory for creating
+    the guacamole authentication tables in your MySQL database.
+
+    Additionally, a script is provided to create a default admin user
+    with username 'guacadmin' and password 'guacadmin'. This user can 
+    be used to set up any other connections and users.
+
+6) Configure guacamole.properties for MySQL
+
+    There are additional properties required by the MySQL JDBC driver
+    which must be added/changed in your guacamole.properties:
+
+    # Configuration for MySQL connection
+    mysql-hostname:           mysql.host.name
+    mysql-port:               3306
+    mysql-database:           guacamole.database.name
+    mysql-username:           user
+    mysql-password:           pass
+
+    Optionally, the authentication provider can be configured
+    not to allow multiple users to use the same connection
+    at the same time:
+
+    mysql-disallow-simultaneous-connections: true
+
+
+------------------------------------------------------------
+ Reporting problems
+------------------------------------------------------------
+
+Please report any bugs encountered by opening a new ticket at the Trac system
+hosted at:
+    
+    http://guac-dev.org/trac/
+

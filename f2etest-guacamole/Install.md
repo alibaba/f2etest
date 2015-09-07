@@ -88,6 +88,12 @@
 	> yum install cairo-devel libpng-devel uuid-devel freerdp* libvncserver-devel openssl-devel
 
 	> ln -s /usr/local/lib/freerdp/guacsnd.so /usr/lib64/freerdp/
+
+	> ln -s /usr/local/lib/freerdp/guacdr.so /usr/lib64/freerdp/
+
+	> mkdir -p /home/guacdshare
+
+	> chmod 777 /home/guacdshare
 		
 	> tar -xzf guacamole-server-0.9.3.tar.gz
 

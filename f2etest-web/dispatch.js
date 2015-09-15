@@ -18,7 +18,7 @@ cluster.on('online', function (worker) {
 
 cluster.on('listening', function (worker, addr) {
     console.log('[%s] [worker:%d] #%s worker listening on %s:%s:%s',
-        new Date(), worker.process.pid, worker.id, addr.address, addr.port, addr.addressType);
+        new Date(), worker.process.pid, worker.id, addr.address?addr.address:'*', addr.port, addr.addressType);
 });
 
 cluster.on('disconnect', function (worker) {
@@ -29,10 +29,8 @@ cluster.on('disconnect', function (worker) {
 
 cluster.on('exit', function (worker, code, signal) {
     var exitCode = worker.process.exitCode;
-    var err = new Error(util.format('#%s worker:%s died (code: %s, signal: %s)',
-        worker.id, worker.process.pid, exitCode, signal));
-    err.name = 'WorkerDiedError';
-    console.error(err);
+    console.error('#%s worker:%s died (code: %s, signal: %s)',
+        worker.id, worker.process.pid, exitCode, signal);
 });
 
 for (var i = 0; i < cpuCount; i++) {

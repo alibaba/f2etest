@@ -6,17 +6,13 @@ var APP_ACCOUNT = 'f2etest';
 var CLIENT_VERSION = pkg.version;
 
 // login接口
-var LOGIN_URL = SSO_SERVER + '/ssoLogin.htm?APP_NAME=' + encodeURIComponent(APP_ACCOUNT) +
-    '&CLIENT_VERSION=' + encodeURIComponent(CLIENT_VERSION) +
-    '&CONTEXT_PATH=/';
+var LOGIN_URL = SSO_SERVER + '/ssoLogin.htm';
 
 // logout接口
-var LOGOUT_URL = SSO_SERVER + '/ssoLogout.htm?APP_NAME=' + encodeURIComponent(APP_ACCOUNT) +
-    '&CLIENT_VERSION=' + encodeURIComponent(CLIENT_VERSION) +
-    '&CONTEXT_PATH=/';
+var LOGOUT_URL = SSO_SERVER + '/ssoLogout.htm';
 
 // TOKEN校验接口
-var AUTH_URL = SSO_SERVER + '/rpc/sso/communicate.json?RETURN_USER=true';
+var AUTH_URL = SSO_SERVER + '/getSSOUser.htm';
 
 // 需要强制登录的URL
 var reRequireLoginUrl = /^\/($|initRemoteUser|openapp|help|download|stat|statteam|statuser|changelog|api|install\.bat|getAllBrowsers)/;

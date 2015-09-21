@@ -2,17 +2,15 @@ var pkg = require('./package.json');
 var request = require('request');
 
 var SSO_SERVER = 'https://login.xxxx.com';
-var APP_ACCOUNT = 'f2etest';
-var CLIENT_VERSION = pkg.version;
 
 // login接口
-var LOGIN_URL = SSO_SERVER + '/ssoLogin.htm';
+var LOGIN_URL = SSO_SERVER + '/doLogin';
 
 // logout接口
-var LOGOUT_URL = SSO_SERVER + '/ssoLogout.htm';
+var LOGOUT_URL = SSO_SERVER + '/doLogout';
 
 // TOKEN校验接口
-var AUTH_URL = SSO_SERVER + '/getSSOUser.htm';
+var AUTH_URL = SSO_SERVER + '/getSSOUser';
 
 // 需要强制登录的URL
 var reRequireLoginUrl = /^\/($|initRemoteUser|openapp|help|download|stat|statteam|statuser|changelog|api|install\.bat|getAllBrowsers)/;
@@ -71,10 +69,10 @@ module.exports = function(app) {
                     var content = body.content;
                     try{
                         content = JSON.parse(content);
-                        // 返回userid和lastName
+                        // 返回userid和姓名
                         user = {
-                            userid: content.emailPrefix,
-                            username: content.lastName
+                            userid: content.userid,
+                            username: content.username
                         }
                     }
                     catch(e){

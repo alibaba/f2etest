@@ -30,9 +30,9 @@ F2etest是一个面向前端、测试、产品等岗位的多浏览器兼容性�
 产品截图
 ===================
 
-![imgs/screenshot1.png](imgs/screenshot1.png)
+![imgs/screenshot1.jpg](imgs/screenshot1.jpg)
 
-![imgs/screenshot2.png](imgs/screenshot2.png)
+![imgs/screenshot2.jpg](imgs/screenshot2.jpg)
 
 安全风险警示(非常重要)
 ==================

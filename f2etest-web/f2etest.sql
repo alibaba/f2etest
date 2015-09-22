@@ -13,7 +13,7 @@ CREATE TABLE `appLogs` (
   PRIMARY KEY (`logId`),
   KEY `UserId` (`LogTime`,`UserId`) USING BTREE,
   KEY `appOrder` (`LogTime`,`appId`) USING BTREE
-) ENGINE=InnoDB AUTO_INCREMENT=26594 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=0 DEFAULT CHARSET=utf8;
 
 -- ----------------------------
 -- Table structure for appUsers
@@ -26,10 +26,5 @@ CREATE TABLE `appUsers` (
   `LastTime` datetime DEFAULT NULL,
   `LastIp` varchar(50) DEFAULT NULL,
   PRIMARY KEY (`UserId`),
-  KEY `ActiveTime` (`ActiveTime`) USING BTREE,
-  KEY `Company` (`Company`),
-  KEY `Location` (`Location`),
-  KEY `Department` (`Department`),
-  KEY `Job` (`Job`),
-  KEY `Gender` (`Gender`)
+  KEY `ActiveTime` (`ActiveTime`) USING BTREE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;

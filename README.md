@@ -31,6 +31,13 @@ F2etest是一个面向前端、测试、产品等岗位的多浏览器兼容性�
 2. Windows Server: Server版Windows，最大化复用机器资源
 3. hostsShare: 跨浏览器，跨服务器的hosts共享
 
+成功案例
+===================
+
+[![imgs/alibaba.png](imgs/alibaba.png)](http://www.alibabagroup.com/)
+
+如果您使用了我们的解决方案，请联系我们添加在此处。
+
 产品截图
 ===================
 
@@ -246,7 +253,7 @@ F2etest是一个面向前端、测试、产品等岗位的多浏览器兼容性�
 
     桌面方式基于TSWF Schema协议实现的分发，目前Windows和MAC下都有完美的协议实现软件。
 
-    Win7天然就支持远程TSWF分发技术，Mac下仅需安装[Microsoft Remote Desktop](https://itunes.apple.com/us/app/microsoft-remote-desktop/id715768417)，也可完美支持TSWF。
+    Win7天然就支持远程TSWF分发技术，Mac下仅需安装[Microsoft Remote Desktop](https://itunes.apple.com/us/app/microsoft-remote-desktop/id715768417)，也可完美支持TSWF，注意此软件需要使用英文市场下的id才能安装。
 
     无论是Win7还是Mac，目前都已经完美支持Remote APP技术，实现远程应用本地化的完美体验。
 

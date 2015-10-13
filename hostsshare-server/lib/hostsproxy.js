@@ -50,7 +50,7 @@ HostsProxyServerPrototype.setHosts = function(strHosts){
     var mapHosts = {};
     var arrLines = strHosts.split(/\r?\n/);
     arrLines.forEach(function(line){
-        var match = line.match(/^\s*([^\s#]+)\s+([^#]+)/);
+        var match = line.match(/^\s*([\da-z\-\.]{3,})\s+([^#]+)/i);
         if(match){
             match[2].trim().split(/\s+/).forEach(function(domain){
                 domain = domain.toLowerCase();

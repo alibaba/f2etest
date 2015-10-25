@@ -6,7 +6,7 @@ var session = require('cookie-session');
 var ejs = require('ejs');
 var i18n = require('i18n');
 var request = require('request');
-var sso = require('./sso.js');
+var sso = require('./lib/sso.js');
 
 var env = process.env.NODE_ENV || 'development'
 
@@ -30,7 +30,7 @@ config.arrServerList.forEach(function(serverInfo){
 });
 config.mapServerList = mapServerList;
 
-var pool =require('./db.js');
+var pool =require('./lib/db.js');
 
 var app = express()
 
@@ -38,7 +38,10 @@ app.use(session({
     keys: ['f2etest']
 }));
 app.use(express.static(__dirname + '/public', { maxAge: 180000 }));
-app.use(bodyParser.urlencoded({ extended: true }));
+app.use(bodyParser.urlencoded({
+    extended: true,
+    limit: '50mb'
+}));
 app.engine('html', ejs.renderFile);
 app.set('views', __dirname + '/views');
 app.set('view engine', 'html');
@@ -80,10 +83,11 @@ app.use(function(req ,res, next){
             userid: userid,
             username: username
         };
-        pool.query('select RemotePassword from appUsers where UserId = ?;', userid, function(err, rows){
+        pool.query('select RemotePassword,ApiKey from appUsers where UserId = ?;', userid, function(err, rows){
             if(rows.length > 0){
                 var remotePassword = rows[0].RemotePassword;
                 user.remotePassword = remotePassword;
+                user.apiKey = rows[0].ApiKey;
                 req.viewData.remoteInited = remotePassword?true:false;
                 pool.query('update appUsers set LastTime = now(),LastIp = ? where UserId = ?', [req.ip,userid]);
                 next();

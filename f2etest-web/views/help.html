@@ -12,7 +12,7 @@
     <div id="header">
         <div id="logo"><a href="/"><img src="/imgs/f2etest.png" alt="f2etest" width="24" height="24"><span class="sitename">「<%=siteName%>」</span></a><span class="sitever"><a href="/changelog" target="_blank">v<%=appVersion%></a></span></div>
         <div id="options">
-            <span id="username"><%=username%></span> | <a href="/logout"><%=__('Logout')%></a> | <span class="cur"><%=__('Help')%></span> | <a href="/download" class="recommend"><%=__('Download')%></a> | <a href="/stat"><%=__('Statistics')%></a> | <a href="/api">API</a>
+            <span id="username"><%=username%></span> | <a href="/logout"><%=__('Logout')%></a> | <span class="cur"><%=__('Help')%></span> | <a href="/install" class="recommend"><%=__('Install')%></a> | <a href="/local"><%=__('Proxy to local')%></a> | <a href="/stat"><%=__('Statistics')%></a> | <a href="/api">API</a>
         </div>
     </div>
     <div id="doc-container">
@@ -25,15 +25,14 @@
             </ol>
             <h3>如何共享我本机的hosts绑定？</h3>
             <ol>
-                <li>本机安装好代理服务器软件，类似：<strong>ccproxy</strong>, <strong>nproxy</strong>等等，任何代理服务器软件均可</li>
-                <li>打开桌面上的 <a href="/openapp?id=hostsshare" target="_blank"><strong>hosts</strong></a> 图标，鼠标点击右下角的：<strong>当前模式</strong>，切换为：<strong>“代理模式”</strong></li>
-                <li>输入本机的：<strong>IP地址</strong>、<strong>端口号</strong>，并点击 <kbd>保存并立即生效</kbd> 按钮，对于Windows用户，强烈建议输入<strong>机器名</strong>，可解决办公网IP经常变的问题</li>
-                <li>经过以上设置后，f2etest环境下所有浏览器的hosts绑定均共享本地绑定</li>
+                <li>请查看详细帮助：<a href="/local">代理到本地</a></li>
             </ol>
             <h3>如何使用Fiddle或Charles调试浏览器？</h3>
             <ol>
                 <li>Fiddle和Charles本质上都是代理服务器，只需在本机打开Fiddle或Charles软件</li>
-                <li>参考上面共享本机hosts绑定教程，端口号使用Fiddle和Charles的端口号，默认端口号：<strong>8888</strong></li>
+                <li>打开桌面上的 <a href="/openapp?id=hostsshare" target="_blank"><strong>hosts</strong></a> 图标，鼠标点击右下角的：<strong>当前模式</strong>，切换为：<strong>“代理模式”</strong></li>
+                <li>输入本机的：<strong>IP地址</strong>、<strong>端口号</strong>，并点击 <kbd>保存并立即生效</kbd> 按钮</li>
+                <li>经过以上设置后，f2etest环境下所有浏览器的请求均会被反射代理到本机的Fiddle或Charles，就可以开始调试了</li>
             </ol>
             <h3>如何打开我本地的html文件？</h3>
             <ol>
@@ -48,7 +47,7 @@
             </ol>
             <h3>如何把所有浏览器的快捷方式下载到桌面？</h3>
             <ol>
-                <li>在当前页面的右上角有教程入口，请点击：<a href="/download">下载到桌面</a></li>
+                <li>在当前页面的右上角有教程入口，请点击：<a href="/install">安装到电脑</a></li>
             </ol>
             <h3>如何上传文件到远程中？</h3>
             <ol>

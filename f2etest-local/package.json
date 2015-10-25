@@ -1,0 +1,29 @@
+{
+  "name": "f2etest-local",
+  "version": "0.9.4",
+  "description": "Local proxy for F2etest",
+  "main": "./index",
+  "dependencies": {
+    "colors": "1.1.2",
+    "commander": "2.9.0",
+    "request": "2.65.0"
+  },
+  "devDependencies": {},
+  "bin": {
+    "f2etest-local": "./bin/f2etest-local"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git@github.com:alibaba/f2etest.git"
+  },
+  "bugs": {
+    "url": "https://github.com/alibaba/f2etest/issues"
+  },
+  "keywords": [
+    "f2etest",
+    "local",
+    "proxy"
+  ],
+  "author": "Yanis Wang",
+  "license": "MIT"
+}

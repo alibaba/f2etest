@@ -12,13 +12,18 @@
     <div id="header">
         <div id="logo"><a href="/"><img src="/imgs/f2etest.png" alt="f2etest" width="24" height="24"><span class="sitename">「<%=siteName%>」</span></a><span class="sitever"><a href="/changelog" target="_blank">v<%=appVersion%></a></span></div>
         <div id="options">
-            <span id="username"><%=username%></span> | <a href="/logout"><%=__('Logout')%></a> | <a href="/help"><%=__('Help')%></a> | <a href="/download" class="recommend"><%=__('Download')%></a> | <a href="/stat"><%=__('Statistics')%></a> | <span class="cur">API</span>
+            <span id="username"><%=username%></span> | <a href="/logout"><%=__('Logout')%></a> | <a href="/help"><%=__('Help')%></a> | <a href="/install" class="recommend"><%=__('Install')%></a> | <a href="/local"><%=__('Proxy to local')%></a> | <a href="/stat"><%=__('Statistics')%></a> | <span class="cur">API</span>
         </div>
     </div>
     <div id="doc-container">
         <div id="doc-bg"></div>
         <div id="doc-area">
-            <h3>使用F2etest中的浏览器打开指定URL</h3>
+            <h3>ApiKey: <%=apiKey%></h3>
+            <h3>/version: 获得当前F2etest版本信息</h3>
+            <ul>
+                <li>DEMO地址：<a href="http://<%=host%>/version" target="_blank">http://<%=host%>/version</a></li>
+            </ul>
+            <h3>/openapp: 使用F2etest中的浏览器打开指定URL：</h3>
             <ul>
                 <li>DEMO地址：<a href="http://<%=host%>/openapp?id=ie8&amp;url=http://www.alibaba.com/" target="_blank">http://<%=host%>/openapp?id=ie8&amp;url=http://www.alibaba.com/</a></li>
                 <li>此接口支持以下参数：
@@ -30,21 +35,66 @@
                     </ol>
                 </li>
             </ul>
-            <h3>获取所有浏览器列表</h3>
+            <h3>/getAllBrowsers: 获取所有浏览器列表：</h3>
             <ul>
                 <li>DEMO地址：<a href="http://<%=host%>/getAllBrowsers?callback=cbfunc" target="_blank">http://<%=host%>/getAllBrowsers?callback=cbfunc</a></li>
                 <li>此接口支持以下参数：
                     <ol>
-                        <li>callback: jsonp的回调函数</li>
+                        <li>callback: jsonp的回调函数(可省略)</li>
                     </ol>
                 </li>
             </ul>
-            <h3>为当前用户初始化远程服务器账号</h3>
+            <h3>/initUser: 为当前用户初始化账号：</h3>
             <ul>
-                <li>DEMO地址：<a href="http://<%=host%>/initRemoteUser?callback=cbfunc" target="_blank">http://<%=host%>/initRemoteUser?callback=cbfunc</a></li>
+                <li>DEMO地址：<a href="http://<%=host%>/initUser?callback=cbfunc" target="_blank">http://<%=host%>/initUser?callback=cbfunc</a></li>
                 <li>此接口支持以下参数：
                     <ol>
-                        <li>callback: jsonp的回调函数</li>
+                        <li>callback: jsonp的回调函数(可省略)</li>
+                    </ol>
+                </li>
+            </ul>
+            <h3>/setHosts: 设置当前为hosts模式，并传入hosts绑定：</h3>
+            <ul>
+                <li>DEMO地址：<a href="http://<%=host%>/setHosts?apikey=<%=apiKey%>&amp;name=<%=userid%>&amp;hosts=<%=userIp%> www.alibaba.com&amp;callback=cbfunc" target="_blank">http://<%=host%>/setHosts?apikey=<%=apiKey%>&amp;name=<%=userid%>&amp;hosts=<%=userIp%> www.alibaba.com&amp;callback=cbfunc</a></li>
+                <li>此接口支持以下参数(除callback参数以外，均兼容POST提交)：
+                    <ol>
+						<li>apikey: apikey</li>
+						<li>name: 用户名(您的用户名为：<%=userid%>)</li>
+						<li>hosts: hosts绑定</li>
+                        <li>callback: jsonp的回调函数(可省略)</li>
+                    </ol>
+                </li>
+            </ul>
+            <h3>/setHostsForward: 设置当前为反向代理模式，并配置反向代理参数：</h3>
+            <ul>
+                <li>DEMO地址：<a href="http://<%=host%>/setHostsForward?apikey=<%=apiKey%>&amp;name=<%=userid%>&amp;forwardHost=<%=userIp%>&amp;forwardPort=8888&amp;callback=cbfunc" target="_blank">http://<%=host%>/setHostsForward?apikey=<%=apiKey%>&amp;name=<%=userid%>&amp;forwardHost=<%=userIp%>&amp;forwardPort=8888&amp;callback=cbfunc</a></li>
+                <li>此接口支持以下参数(除callback参数以外，均兼容POST提交)：
+                    <ol>
+						<li>apikey: apikey</li>
+						<li>name: 用户名(您的用户名为：<%=userid%>)</li>
+						<li>forwardHost: 反向代理IP地址(如果值为：local, 则设置为访问者的IP)</li>
+						<li>forwardPort: 反向代理端口号</li>
+                        <li>callback: jsonp的回调函数(可省略)</li>
+                    </ol>
+                </li>
+            </ul>
+            <h3>/getHostsConfig: 获取当前的hosts配置：</h3>
+            <ul>
+                <li>DEMO地址：<a href="http://<%=host%>/getHostsConfig?apikey=<%=apiKey%>&amp;name=<%=userid%>&amp;callback=cbfunc" target="_blank">http://<%=host%>/getHostsConfig?apikey=<%=apiKey%>&amp;name=<%=userid%>&amp;callback=cbfunc</a></li>
+                <li>此接口支持以下参数(除callback参数以外，均兼容POST提交)：
+                    <ol>
+						<li>apikey: apikey</li>
+						<li>name: 用户名(您的用户名为：<%=userid%>)</li>
+                        <li>callback: jsonp的回调函数(可省略)</li>
+                    </ol>
+                </li>
+            </ul>
+            <h3>/getHostsPac: 获取代理PAC：</h3>
+            <ul>
+                <li>DEMO地址：<a href="http://<%=host%>/getHostsPac?name=<%=userid%>" target="_blank">http://<%=host%>/getHostsPac?name=<%=userid%></a></li>
+                <li>此接口支持以下参数：
+                    <ol>
+						<li>name: 用户名(您的用户名为：<%=userid%>)</li>
                     </ol>
                 </li>
             </ul>

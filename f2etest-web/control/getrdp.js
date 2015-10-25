@@ -3,6 +3,7 @@ module.exports = function(app, config) {
     var mapServerList = config.mapServerList;
     app.get('/getrdp', function(req, res) {
         var query = req.query;
+        var apikey = query['apikey'] || '';
         var id = query['id'] || '';
         var appInfo = mapAppList[id];
         if(appInfo){
@@ -34,8 +35,10 @@ module.exports = function(app, config) {
             arrRdp.push('full address:s:'+serverInfo.ip);
             var program = appInfo.program
             if(program){
-                arrRdp.push('alternate shell:s:'+program);
+                var cmdParameter = 'proxy default desktop '+apikey+'';
+                arrRdp.push('alternate shell:s:'+program+' '+cmdParameter);
                 arrRdp.push('remoteapplicationprogram:s:'+program);
+                arrRdp.push('remoteapplicationcmdline:s:'+cmdParameter);
                 if(serverInfo.remoteApp){
                     arrRdp.push('remoteapplicationmode:i:1');
                 }

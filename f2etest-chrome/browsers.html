@@ -1,0 +1,104 @@
+﻿<!DOCTYPE HTML>
+<html lang="en-US">
+<head>
+	<meta charset="UTF-8">
+	<title></title>
+    <style>
+    body{
+        margin: 0;
+        padding: 20px;
+        width: 300px;
+    }
+    #message{
+        font-size: 18px;
+    }
+    #message a{
+        color: blue;
+    }
+    #browsers{
+        display: none;
+    }
+    #list-container{
+        margin: 0;
+        padding: 0;
+    }
+    #list-container li{
+        float: left;
+        text-align:center;
+        padding: 5px;
+        width: 50px;
+        height: 60px;
+        position: relative;
+        display: none;
+    }
+    #list-container a span{
+        display: block;
+    }
+    #list-container a{
+        color: #666;
+        text-decoration: none;
+    }
+    #list-container a:hover{
+        color: #FF8925;
+    }
+    #list-container .select, #list-container.more li{
+        display: block;
+    }
+    .selmark{
+        display: none;
+    }
+    #list-container.more .select .selmark{
+        display: block;
+        position: absolute;
+        right: 2px;
+        top: 2px;
+        color: green;
+        font-size: 16px;
+    }
+    .tip{
+        color: #999;
+        font-size: 11px;
+        padding-top: 10px;
+    }
+    .button {
+        min-width: 60px;
+        color: #567;
+        display: inline-block;
+        cursor: pointer;
+        text-align: center;
+        padding: 6px;
+        border: solid 1px #abc;
+        border-radius: 2px;
+        background: -webkit-gradient(linear, left top, left bottom, color-stop(0, #fff), color-stop(0.4, hsl(0, 0%, 96%)), color-stop(0.41, hsl(0, 0%, 92%)));
+        -webkit-box-shadow: 0 1px 2px #ddd;
+        text-decoration: none;
+    }
+
+    .button.bold {
+        font-weight: bold;
+    }
+
+    .button:hover {
+        background: -webkit-gradient(linear, left top, left bottom, color-stop(0, #fff), color-stop(0.4, hsl(215, 67%, 96%)), color-stop(0.41, hsl(213, 48%, 92%)));
+    }
+
+    .button:active {
+        background: -webkit-gradient(linear, left top, left bottom, color-stop(0, #e0e9f4), color-stop(1, #f5f9f4));
+    }
+
+    .button img {
+        vertical-align: text-bottom;;
+    }
+    </style>
+</head>
+<body>
+    <div id="message"><img src="img/loading.gif"> Loading...</div>
+    <div id="browsers">
+        <ul id="list-container"></ul>
+        <div style="clear:both;padding: 5px 0;"><span style="float:left" class="tip">Tip: 按住Ctrl(Cmd)打开多个浏览器</span><span style="float:right;"><a href="#" class="button" id="btnMore">选择更多</a></span><br style="clear:both" /></div>
+    </div>
+    <script type="text/javascript" src="js/jquery-1.8.3.min.js"></script>
+    <script type="text/javascript" src="js/util.js"></script>
+    <script type="text/javascript" src="js/browsers.js"></script>
+</body>
+</html>

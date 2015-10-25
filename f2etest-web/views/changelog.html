@@ -1,4 +1,3 @@
-
 <!DOCTYPE HTML>
 <html>
 <head>
@@ -12,12 +11,19 @@
     <div id="header">
         <div id="logo"><a href="/"><img src="/imgs/f2etest.png" alt="f2etest" width="24" height="24"><span class="sitename">「<%=siteName%>」</span></a><span class="sitever"><a href="/changelog" target="_blank">v<%=appVersion%></a></span></div>
         <div id="options">
-            <span id="username"><%=username%></span> | <a href="/logout"><%=__('Logout')%></a> | <span class="cur"><%=__('Help')%></span> | <a href="/download" class="recommend"><%=__('Download')%></a> | <a href="/stat"><%=__('Statistics')%></a> | <a href="/api">API</a>
+            <span id="username"><%=username%></span> | <a href="/logout"><%=__('Logout')%></a> | <span class="cur"><%=__('Help')%></span> | <a href="/install" class="recommend"><%=__('Install')%></a> | <a href="/local"><%=__('Proxy to local')%></a> | <a href="/stat"><%=__('Statistics')%></a> | <a href="/api">API</a>
         </div>
     </div>
     <div id="doc-container">
         <div id="doc-bg"></div>
         <div id="doc-area">
+            <h3>v1.0.2 (2015-10-18)</h3>
+            <ol>
+                <li>添加API：/version, /setHosts, /getHostsConfig /setHostsForward /getHostsPac</li>
+                <li>增加apiKey支持，以暴露hosts接口给用户自行调用</li>
+                <li>增加f2etest-local，实现自动代理到本地</li>
+				<li>增加f2etest-chrome，在chrome浏览器中高效的利用F2etest系统中的多浏览器打开当前URL</li>
+            </ol>
             <h3>v1.0.1 (2015-04-03)</h3>
             <ol>
                 <li>web版本支持剪切板双向直通，完美打通本地和服务器之间的剪切板交换</li>

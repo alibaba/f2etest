@@ -1,4 +1,4 @@
-var pool =require('../db.js');
+var pool =require('../lib/db.js');
 var async = require('async');
 
 module.exports = function(app, config) {

@@ -12,6 +12,7 @@ module.exports = function(app, config) {
             var user = req.session.user;
             var userid = user.userid;
             var remotePassword = user.remotePassword;
+            var apiKey = user.apiKey;
             var baseUrl = 'http://'+req.headers.host+req._parsedUrl.pathname.replace(/\/[^\/]+$/,'\/');
             var icon = baseUrl+'imgs/app/'+appInfo.id+'.png';
             var guacamoleUrl = siteInfo.guacamoleApi + '?id=c%2F'+appInfo.server+'&username='+encodeURIComponent(userid)+'&password='+encodeURIComponent(remotePassword)+'&title='+encodeURIComponent(appInfo.name)+'&icon='+encodeURIComponent(icon);
@@ -20,6 +21,7 @@ module.exports = function(app, config) {
                 program += ' '+(noproxy==='1'?'noproxy':'proxy');
                 program += ' "'+(proxyurl?proxyurl:'default')+'"';
                 program += ' "'+(url?url:'about:blank')+'"';
+                program += ' '+apiKey;
                 guacamoleUrl += '&program='+encodeURIComponent(program);
             }
             res.status(302).redirect(guacamoleUrl);

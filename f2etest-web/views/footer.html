@@ -18,7 +18,7 @@
         }
         if(remoteInited === false){
             showInitTip();
-            $.getJSON('/initRemoteUser', function(res){
+            $.getJSON('/initUser', function(res){
                 if(res && !res.error){
                     hideInitTip();
                 }

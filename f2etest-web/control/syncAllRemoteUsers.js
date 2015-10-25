@@ -1,6 +1,6 @@
 var async = require('async');
 var request = require('request');
-var pool =require('../db.js');
+var pool =require('../lib/db.js');
 
 module.exports = function(app, config) {
     var siteInfo = config.siteInfo;

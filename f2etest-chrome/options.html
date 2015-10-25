@@ -1,0 +1,94 @@
+﻿<!DOCTYPE HTML>
+<html lang="en-US">
+<head>
+	<meta charset="UTF-8">
+	<title>设置F2etest client</title>
+    <style type="text/css">
+    body{
+        padding: 10px;
+        margin: 0;
+    }
+    #container{
+        margin: auto;
+        width: 800px;
+    }
+    .pannel{
+        text-shadow: #ccc 1px 1px 3px;
+        border: solid 1px #abc;
+        border-radius: 6px;
+        padding: 10px;
+        margin-bottom: 10px;
+        background-color: #eaeeff;
+        background: -webkit-gradient(linear, left top, left bottom, color-stop(0, #fff), color-stop(0.48, hsl(217, 73%, 97%)), color-stop(0.51, hsl(217, 62%, 95%)));
+        -webkit-box-shadow: 0 1px 2px #ddd;
+    }
+    .button {
+        min-width: 120px;
+        color: #567;
+        display: inline-block;
+        cursor: pointer;
+        text-align: center;
+        padding: 6px;
+        border: solid 1px #abc;
+        border-radius: 2px;
+        background: -webkit-gradient(linear, left top, left bottom, color-stop(0, #fff), color-stop(0.4, hsl(0, 0%, 96%)), color-stop(0.41, hsl(0, 0%, 92%)));
+        -webkit-box-shadow: 0 1px 2px #ddd;
+    }
+
+    .button.bold {
+        font-weight: bold;
+    }
+
+    .button:hover {
+        background: -webkit-gradient(linear, left top, left bottom, color-stop(0, #fff), color-stop(0.4, hsl(215, 67%, 96%)), color-stop(0.41, hsl(213, 48%, 92%)));
+    }
+
+    .button:active {
+        background: -webkit-gradient(linear, left top, left bottom, color-stop(0, #e0e9f4), color-stop(1, #f5f9f4));
+    }
+
+    .button img {
+        vertical-align: text-bottom;;
+    }
+    .tip{
+        padding: 5px;
+        font-size: 12px;
+        color: #999;
+    }
+    #header{
+        font-size: 30px;
+    }
+    #header img{
+        vertical-align: middle;
+    }
+    #setting{
+        font-size: 18px;
+    }
+    #setting input[type='text']{
+        width: 500px;
+        color: #4e607d;
+        padding: 5px;
+    }
+    #buttonArea{
+        text-align: right;
+    }
+    </style>
+</head>
+<body>
+	<div id="container">
+        <div id="header" class="pannel"><img src="img/icon-64.png" width="50"> F2etest client 选项：</div>
+        <div id="setting" class="pannel">
+            <ul>
+                <li>
+                    F2etest Url: <input type="text" id="f2etestUrl" placeholder="http://f2etest.xxx.com">
+                    <p class="tip">Tip: 请输入F2etest站点的URL，例如：http://f2etest.xxx.com</p>
+                </li>
+            </ul>
+            <div id="buttonArea"><input type="button" value="保存" class="button" id="btnSave"></div>
+        </div>
+    </div>
+    <script type="text/javascript" src="js/jquery-1.8.3.min.js"></script>
+    <script type="text/javascript" src="js/util.js"></script>
+    <script type="text/javascript" src="js/options.js"></script>
+</body>
+</html>

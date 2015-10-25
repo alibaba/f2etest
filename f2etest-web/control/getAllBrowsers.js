@@ -1,7 +1,7 @@
 var crypto = require('crypto');
 var async = require('async');
 var request = require('request');
-var pool =require('../db.js');
+var pool =require('../lib/db.js');
 
 module.exports = function(app, config) {
     app.get('/getAllBrowsers', function(req, res) {
@@ -34,6 +34,6 @@ module.exports = function(app, config) {
             res.type('json'); 
         }
 
-        res.send(result);
+        res.end(result);
     });
 };

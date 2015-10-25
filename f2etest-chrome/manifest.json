@@ -1,0 +1,17 @@
+{
+   "manifest_version": 2,
+   "name": "F2etest client",
+   "description": "F2etest client for chrome",
+   "version": "1.0.3",
+   "browser_action": {
+      "default_icon": "img/icon.png",
+      "default_popup": "browsers.html"
+   },
+   "icons": {
+      "16": "img/icon.png",
+      "64": "img/icon-64.png",
+      "128": "img/icon-128.png"
+   },
+   "options_page": "options.html",
+   "permissions": ["tabs", "\u003Call_urls\u003E"]
+}

@@ -22,6 +22,7 @@ DROP TABLE IF EXISTS `appUsers`;
 CREATE TABLE `appUsers` (
   `UserId` varchar(100) NOT NULL,
   `RemotePassword` varchar(64) DEFAULT NULL,
+  `ApiKey` varchar(64) DEFAULT NULL,
   `ActiveTime` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
   `LastTime` datetime DEFAULT NULL,
   `LastIp` varchar(50) DEFAULT NULL,

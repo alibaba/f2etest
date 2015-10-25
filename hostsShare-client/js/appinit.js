@@ -12,14 +12,16 @@ app.bHide = false;
 
 var hostsShareApi = '';
 var username = 'test';
+var apiKey = '';
 var argv = appGui.App.argv;
 if(argv.length > 0){
     hostsShareApi = argv[0];
     username = argv[1];
+    apiKey = argv[2];
 }
 
 var config = {};
-var workMode = 'hosts';
+var workMode = '';
 
 app.initHostsMode = function(){
     var keyMaps = {};
@@ -33,6 +35,8 @@ app.initHostsMode = function(){
         app.addNewGroup();
     }
     keyMaps[ctrlKey+'-S'] = app.setHosts;
+    keyMaps['Shift'+'-'+ctrlKey+'-F'] = app.formatHosts;
+    
     var jDivHostsMode = $('#divHostsMode');
     codeMirror = CodeMirror(jDivHostsMode[0], {
         lineNumbers: true,
@@ -45,26 +49,34 @@ app.initHostsMode = function(){
     // 右键菜单
     var contextMenu = new appGui.Menu();
     var cutMenu = new appGui.MenuItem({
-        label: '剪切',
+        label: '剪切 (Ctrl+X)',
         click: function () {
             document.execCommand('cut');
         }
     });
+    contextMenu.append(cutMenu);
     var copyMenu = new appGui.MenuItem({
-        label: '复制',
+        label: '复制 (Ctrl+C)',
         click: function () {
             document.execCommand('copy');
         }
     });
+    contextMenu.append(copyMenu);
     var pasteMenu = new appGui.MenuItem({
-        label: '粘贴',
+        label: '粘贴 (Ctrl+V)',
         click: function () {
             document.execCommand('paste');
         }
     });
-    contextMenu.append(cutMenu);
-    contextMenu.append(copyMenu);
     contextMenu.append(pasteMenu);
+    contextMenu.append(new appGui.MenuItem({ type: 'separator' }));
+    var formatMenu = new appGui.MenuItem({
+        label: '格式化 (Ctrl+Shift+F)',
+        click: function () {
+            app.formatHosts();
+        }
+    });
+    contextMenu.append(formatMenu);
     jDivHostsMode.on('contextmenu', function (e) {
         e.preventDefault();
         var selectionType = window.getSelection().type.toUpperCase();
@@ -112,7 +124,7 @@ app.updateGroupMenu = function(contextMenu){
     var menuitem;
     for (var i = contextMenu.items.length-1; i >-1 ; i--) {
         menuitem = contextMenu.items[i];
-        if(menuitem.label === '粘贴'){
+        if(/格式化/.test(menuitem.label)){
             break;
         }
         contextMenu.remove(menuitem);
@@ -201,6 +213,22 @@ app.setGroup = function(name, bOn, data){
     }
 }
 
+app.formatHosts = function(){
+    codeMirror.eachLine(function(lineInfo){
+        var lineNumber = codeMirror.getLineNumber(lineInfo);
+        var text = lineInfo.text;
+        text = text.replace(/^\s*(#!?)?\s*([^\s]+)\s+(.+)/, function(all, comment, ip, others){
+            if(isIp(ip)){
+                var ipLen = /:/.test(ip) ? 39: 15;
+                var space = new Array(ipLen-ip.length+2).join(' ');
+                return (comment?comment+' ':'') + ip + space + others;
+            }
+            return all;
+        });
+        codeMirror.setLine(lineNumber, text);
+    });
+}
+
 var groupId = 1;
 app.addNewGroup = function(){
     var fromLine = codeMirror.getCursor(true).line, strLine;
@@ -264,43 +292,86 @@ app.initForwardMode = function(){
     });
 }
 
-app.setWorkMode = function(mode){
+app.setWorkMode = function(mode, saveRemote){
     var jDivHostsMode = $('#divHostsMode'),
         jDivProxyMode = $('#divProxyMode');
     var jSpanWordMode = $('#wordMode');
     if(mode === 'forward'){
-        workMode = 'forward';
         jSpanWordMode.text('代理模式');
-        app.setForward();
         menuHostsMode.checked = false;
         menuProxyMode.checked = true;
         jDivHostsMode.hide();
         jDivProxyMode.css('display', 'table-cell');
-        $('#forwardHost')[0].focus();
+        var jTxtForwardHost = $('#forwardHost');
+        var jTxtForwardPort = $('#forwardPort');
+        jTxtForwardHost.val(config.forwardHost || '');
+        jTxtForwardPort.val(config.forwardPort || '');
+        if(mode !== workMode){
+            $('#forwardHost')[0].focus();
+        }
+        if(saveRemote){
+            app.setForward();
+        }
+        workMode = 'forward';
     }
     else{
-        workMode = 'hosts';
         jSpanWordMode.text('hosts模式');
-        app.setHosts();
         menuHostsMode.checked = true;
         menuProxyMode.checked = false;
         jDivHostsMode.show();
         jDivProxyMode.hide();
-        codeMirror.focus();
+        var newHosts =config.hosts || '';
+        if(newHosts != codeMirror.getValue()){
+            codeMirror.setValue(newHosts);
+        }
+        if(mode !== workMode){
+            codeMirror.focus();
+        }
+        if(saveRemote){
+            app.setHosts();
+        }
+        workMode = 'hosts';
     }
 }
 
 app.setHosts = function(){
-    var hosts = codeMirror.getValue();
+    var hosts = codeMirror.getValue();    
     // 设置hosts模式
-    request(hostsShareApi + 'sethosts?name='+encodeURIComponent(username)+'&hosts='+encodeURIComponent(hosts));
+    request.post({
+        url: hostsShareApi + 'setHosts?apikey='+encodeURIComponent(apiKey)+'&name='+encodeURIComponent(username),
+        json: true,
+        form: {
+            hosts: hosts
+        }
+    }, function(error, response, body){
+        if (!error) {
+            if(body.error){
+                alert(body.error);
+            }
+        }
+        else{
+            alert('hostsSahre API连接失败');
+        }
+    });
 }
 
 app.setForward = function(){
     var forwardHost = $('#forwardHost').val();
     var forwardPort = $('#forwardPort').val();
     // 设置forward模式
-    request(hostsShareApi + 'setforward?name='+encodeURIComponent(username)+'&forwardHost='+encodeURIComponent(forwardHost)+'&forwardPort='+encodeURIComponent(forwardPort));
+    request({
+        url: hostsShareApi + 'setHostsForward?apikey='+encodeURIComponent(apiKey)+'&name='+encodeURIComponent(username)+'&forwardHost='+encodeURIComponent(forwardHost)+'&forwardPort='+encodeURIComponent(forwardPort),
+        json: true
+    }, function(error, response, body){
+        if (!error) {
+            if(body.error){
+                alert(body.error);
+            }
+        }
+        else{
+            alert('hostsSahre API连接失败');
+        }
+    });
 }
 
 app.hide = function(){
@@ -313,20 +384,22 @@ app.show = function(){
     app.bHide = false;
 }
 
-app.initConfig = function(){
-    request(hostsShareApi+'getconfig?name='+encodeURIComponent(username), function(error, response, body){
-        if (!error && response.statusCode == 200) {
-            try{
-                var config = JSON.parse(body);
-                codeMirror.setValue(config.hosts || '');
-                var jTxtForwardHost = $('#forwardHost');
-                var jTxtForwardPort = $('#forwardPort');
-                jTxtForwardHost.val(config.forwardHost || '');
-                jTxtForwardPort.val(config.forwardPort || '');
-                workMode = config.mode;
-                app.setWorkMode(workMode);
+app.getConfig = function(){
+    request({
+        url: hostsShareApi+'getHostsConfig?apikey='+encodeURIComponent(apiKey)+'&name='+encodeURIComponent(username),
+        json: true
+    }, function(error, response, body){
+        if (!error) {
+            if(!body.error){
+                config = body.message;
+                app.setWorkMode(config.mode);
             }
-            catch(e){}
+            else{
+                alert(body.error);
+            }
+        }
+        else{
+            alert('hostsSahre API连接失败');
         }
     });
 }
@@ -340,12 +413,12 @@ var menuTray = new appGui.Menu();
  
 menuHostsMode = new MenuItem({ type:'checkbox', label: 'hosts模式' });
 menuHostsMode.on('click', function(){
-    app.setWorkMode('hosts');
+    app.setWorkMode('hosts', true);
 });
 
 menuProxyMode = new MenuItem({ type:'checkbox', label: '代理模式' });
 menuProxyMode.on('click', function(){
-    app.setWorkMode('forward');
+    app.setWorkMode('forward', true);
 });
 
 var menuExit = new MenuItem({ label: '退出' });
@@ -374,10 +447,12 @@ app.initHostsMode();
 
 app.initForwardMode();
 
-app.initConfig();
+app.getConfig();
+setInterval(app.getConfig, 30000);
 
 appWin.maximize();
 
+// 切换hosts模式
 $('#workTip').click(function(){
-    app.setWorkMode(workMode === 'hosts' ? 'forward' : 'hosts');
+    app.setWorkMode(workMode === 'hosts' ? 'forward' : 'hosts', true);
 });

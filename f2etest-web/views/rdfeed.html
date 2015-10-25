@@ -10,7 +10,7 @@
                 </Icons>
                 <HostingTerminalServers>
                     <HostingTerminalServer>
-                        <ResourceFile FileExtension=".rdp" URL="/getrdp?id=<%=arrAppList[i].id%>" />
+                        <ResourceFile FileExtension=".rdp" URL="/getrdp?id=<%=arrAppList[i].id%>&amp;apikey=<%=apikey%>" />
                         <TerminalServerRef Ref="<%=arrAppList[i].server%>" />
                     </HostingTerminalServer>
                 </HostingTerminalServers>

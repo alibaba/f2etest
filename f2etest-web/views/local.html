@@ -1,0 +1,41 @@
+
+<!DOCTYPE HTML>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title><%=siteName + ' - ' + siteAbout%></title>
+    <link rel="icon" type="image/icon" href="<%=siteIcon%>">
+    <link rel="stylesheet" type="text/css" href="css/index.css" />
+    <script type="text/javascript" src="js/jquery-1.8.3.min.js"></script>
+</head>
+<body>
+    <div id="header">
+        <div id="logo"><a href="/"><img src="/imgs/f2etest.png" alt="f2etest" width="24" height="24"><span class="sitename">「<%=siteName%>」</span></a><span class="sitever"><a href="/changelog" target="_blank">v<%=appVersion%></a></span></div>
+        <div id="options">
+            <span id="username"><%=username%></span> | <a href="/logout"><%=__('Logout')%></a> | <a href="/help"><%=__('Help')%></a> | <a href="/install" class="recommend"><%=__('Install')%></a> | <span class="cur"><%=__('Proxy to local')%></span> | <a href="/stat"><%=__('Statistics')%></a> | <a href="/api">API</a>
+        </div>
+    </div>
+    <div id="doc-container">
+        <div id="doc-bg"></div>
+        <div id="doc-area">
+            <h3>为什么要代理到本地？</h3>
+            <p>F2etest标准的hosts绑定方式是在<a href="/openapp?id=hostsshare" target="_blank"><strong>hosts</strong></a>中进行编辑，但是代理到本地后，将可以获得以下额外优点：</p>
+            <ol>
+                <li>复用本地的hosts绑定，一次绑定，F2etest中所有浏览器同时生效，保持两边一致，提高开发测试效率</li>
+                <li>解决办公网本机IP地址经常变动的问题，仅需将此组件设置为开机自动启动即可</li>
+                <li>可以在本地灵活的切换DNS，以方便切换公共环境</li>
+                <li>本地也可以绑定此代理，可彻底解决浏览器DNS缓存不生效问题，任何本地的hosts变更，都可以即时生效</li>
+            </ol>
+            <h3>如何代理到本地？</h3>
+            <ol>
+                <li>安装NodeJs：<a href="https://nodejs.org/" target="_blank">https://nodejs.org/</a></li>
+                <li>安装组件：npm install f2etest-local -g</li>
+                <li>开启代理：f2etest-local start --port 1080 --server http://<%=host%>/ --name <%=userid%> --apikey <%=apiKey%></li>
+                <li>关闭代理：f2etest-local stop</li>
+            </ol>
+            <p><strong>f2etest-local</strong>详细介绍：<a href="https://www.npmjs.com/package/f2etest-local" target="_blank">https://www.npmjs.com/package/f2etest-local</a></p>
+        </div>
+    </div>
+    <% include footer.html %>
+</body>
+</html>

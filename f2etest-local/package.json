@@ -1,6 +1,6 @@
 {
   "name": "f2etest-local",
-  "version": "0.9.4",
+  "version": "0.9.5",
   "description": "Local proxy for F2etest",
   "main": "./index",
   "dependencies": {

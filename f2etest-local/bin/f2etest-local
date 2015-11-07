@@ -37,7 +37,9 @@ var runCommand = program.command('run')
                 fs.watchFile(pidFile, {interval: 100},function(curr){
                     if(curr.size > 0 && fs.readFileSync(pidFile).toString() === 'kill'){
                         f2etestLocal.stop(function(){
-                            fs.unlinkSync(pidFile);
+                            if(fs.existsSync(pidFile)){
+                                fs.unlinkSync(pidFile);
+                            }
                             process.exit();
                         });
                     }
@@ -62,7 +64,9 @@ var runCommand = program.command('run')
             // 关闭时，停止代理，取消注册
             process.on('SIGINT', function() {
                 f2etestLocal.stop(function(){
-                    fs.unlinkSync(pidFile);
+                    if(fs.existsSync(pidFile)){
+                        fs.unlinkSync(pidFile);
+                    }
                     process.exit();
                 });
             });
@@ -99,6 +103,7 @@ var startCommand = program.command('start')
                 }
                 if(count++ >= 30){
                     clearInterval(_timer);
+                    process.exit();
                 }
             }, 100);
         });
@@ -142,7 +147,7 @@ function killOldProxy(callback){
             fs.unwatchFile(pidFile);
             fs.unlinkSync(pidFile);
             callback && callback();
-        }, 1000);
+        }, 3000);
     }
     else{
         callback && callback();

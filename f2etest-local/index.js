@@ -4,6 +4,7 @@ require('colors');
 
 var proxy;
 var server, name, apikey, port;
+var _timer;
 
 function startProxy(options, onFinish, onError){
     server = options.server;
@@ -26,11 +27,12 @@ function startProxy(options, onFinish, onError){
         if(server && name && apikey){
             regToF2etest(function(error){
                 if(error){
-                    console.log(error.red);
+                    console.log('f2etest server connect failed.'.red);
+                    tryConnectF2etest(name);
                 }
                 else{
                     console.log('Your f2etest account '.green+name.cyan+' is now set proxy to local.'.green);
-                    doHeartBeatToF2etest();
+                    doHeartBeatToF2etest(true);
                 }
                 onFinish(msg);
             });
@@ -47,14 +49,41 @@ function stopProxy(callback){
     unregToF2etest(function(){
         callback && callback();
     });
+    if(_timer){
+        clearInterval(_timer);
+    }
+}
+
+// 不断尝试连接f2etest
+function tryConnectF2etest(name){
+    _timer = setInterval(function(){
+        regToF2etest(function(error){
+            if(error){
+                console.log('f2etest server connect failed.'.red);
+            }
+            else{
+                console.log('Your f2etest account '.green+name.cyan+' is now set proxy to local.'.green);
+                clearInterval(_timer);
+                doHeartBeatToF2etest(true);
+            }
+        });
+    }, 30000);
 }
 
 // 保持心跳，以保证IP有效性，解决IP变化的问题
-function doHeartBeatToF2etest(){
+function doHeartBeatToF2etest(isConnected){
     setInterval(function(){
         getF2etestConfig(function(error, ret){
             if(ret && ret.message && ret.message.mode === 'forward'){
+                if(isConnected === false){
+                    isConnected = true;
+                    console.log('f2etest server reconnect successed.'.green);
+                }
                 regToF2etest();
+            }
+            else if(isConnected === true){
+                isConnected = false;
+                console.log('f2etest server disconnected.'.red);
             }
         });
     }, 30000)
@@ -108,7 +137,8 @@ function unregToF2etest(callback){
 function getJson(url, callback){
     request({
         url: url,
-        json: true
+        json: true,
+        timeout: 2000
     }, function(error, response, data){
         callback(error?error.toString():null, data);
     });

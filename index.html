@@ -22,7 +22,7 @@
       <h1>
 <a id="f2etest" class="anchor" href="#f2etest" aria-hidden="true"><span class="octicon octicon-link"></span></a>F2etest</h1>
 
-<p><img src="https://github.com/alibaba/f2etest/raw/master/imgs/logo.png" alt="imgs/logo.png"></p>
+<p><img src="imgs/logo.png" alt="imgs/logo.png"></p>
 
 <p>F2etest是一个面向前端、测试、产品等岗位的多浏览器兼容性测试整体解决方案。</p>
 
@@ -63,16 +63,28 @@
 <h1>
 <a id="成功案例" class="anchor" href="#%E6%88%90%E5%8A%9F%E6%A1%88%E4%BE%8B" aria-hidden="true"><span class="octicon octicon-link"></span></a>成功案例</h1>
 
-<p><a href="http://www.alibabagroup.com/"><img src="https://github.com/alibaba/f2etest/raw/master/imgs/alibaba.png" alt="imgs/alibaba.png"></a></p>
+<p><a href="http://www.alibabagroup.com/"><img src="imgs/alibaba.png" alt="imgs/alibaba.png"></a></p>
 
 <p>如果您使用了我们的解决方案，请联系我们添加在此处。</p>
 
 <h1>
 <a id="产品截图" class="anchor" href="#%E4%BA%A7%E5%93%81%E6%88%AA%E5%9B%BE" aria-hidden="true"><span class="octicon octicon-link"></span></a>产品截图</h1>
 
-<p><img src="https://github.com/alibaba/f2etest/raw/master/imgs/screenshot1.jpg" alt="imgs/screenshot1.jpg"></p>
+<p><img src="imgs/screenshot1.jpg" alt="imgs/screenshot1.jpg"></p>
 
-<p><img src="https://github.com/alibaba/f2etest/raw/master/imgs/screenshot2.jpg" alt="imgs/screenshot2.jpg"></p>
+<p><img src="imgs/screenshot2.jpg" alt="imgs/screenshot2.jpg"></p>
+
+<p>Chrome插件:</p>
+
+<p><img src="imgs/chrome.png" alt="imgs/chrome.png"></p>
+
+<p>Windows:</p>
+
+<p><img src="imgs/windows.jpg" alt="imgs/windows.jpg"></p>
+
+<p>Mac:</p>
+
+<p><img src="imgs/mac.jpg" alt="imgs/mac.jpg"></p>
 
 <h1>
 <a id="安全风险警示非常重要" class="anchor" href="#%E5%AE%89%E5%85%A8%E9%A3%8E%E9%99%A9%E8%AD%A6%E7%A4%BA%E9%9D%9E%E5%B8%B8%E9%87%8D%E8%A6%81" aria-hidden="true"><span class="octicon octicon-link"></span></a>安全风险警示(非常重要)</h1>
@@ -106,47 +118,28 @@
 <p>clone后，会发现以下几个目录：</p>
 
 <ol>
-<li>f2etest-guacamole: 这是我们定制过的开源版本，方便f2etest进行调用</li>
-<li>f2etest-web: f2etest的WEB站点，用来提供f2etest服务</li>
-<li>f2etest-client: f2etest的执行机客户端站点，主要提供API给f2etest-web使用</li>
-<li>hostsshare-server: 实现跨浏览器跨系统的hosts服务器</li>
-<li>hostsShare-client: 安装在f2etest远程环境中的客户端，用来修改hostsShare上的hosts绑定</li>
+<li>
+<code>f2etest-web</code>: f2etest的WEB站点，用来提供f2etest服务，用户最终就是访问这个站点使用f2etest</li>
+<li>
+<code>f2etest-guacamole</code>: 这是我们定制过的开源版本，方便f2etest进行调用</li>
+<li>
+<code>f2etest-client</code>: f2etest的执行机客户端站点，主要提供API给f2etest-web使用，用来同步用户账号</li>
+<li>
+<code>hostsShare-client</code>: 安装在f2etest远程环境中的客户端，用来修改f2etest-web上的hosts绑定</li>
+<li>
+<code>f2etest-local</code>: 用来在本机安装代理服务器，并将f2etest所有访问反向代理到本地，以共享本机的hosts绑定，本组件已发布至npm，无需安装，详细使用请至系统内查看帮助</li>
+<li>
+<code>f2etest-chrome</code>: chrome浏览器下的客户端，无需打开f2etest网站，即可访问f2etest中的所有APP，本组件已发布至chrome官方市场，无需安装，详细使用请至系统内查看帮助</li>
 </ol>
 
-<p>下面会分别针对以上5个组件，会有针对性的安装教程。</p>
+<p>下面分别针对前4个组件，会有针对性的安装教程。</p>
 
-<p>我们建议将1，2，4组件安装在同一台Linux服务器上，建议使用CentOs系统。</p>
+<p>我们建议将1，2组件安装在同一台Linux服务器上，操作系统为CentOs。</p>
 </li>
 <li>
 <p>安装f2etest-guacamole</p>
 
-<p>f2etest-guacamole是定制版本的guacamole，安装方法请查看：<a href="https://github.com/alibaba/f2etest/blob/master/f2etest-guacamole/Install.md">Install Guacamole</a></p>
-</li>
-<li>
-<p>安装hostsShare-server</p>
-
-<p>hostsShare是为了实现跨浏览器的hosts共享，一次修改，所有浏览器同时生效。</p>
-
-<p>由于我们使用的是Windows Server操作系统，并且基于多用户实现的机器资源复用，存在一个严重的缺陷。</p>
-
-<p>那就是hosts是系统级共享的，任何一个用户修改hosts文件，都会影响所有别的用户。</p>
-
-<p>因此hostsShare正是为了解决这个问题而开发，同时也让hosts实现了跨浏览器跨服务器成为现实。</p>
-
-<p>安装方法：</p>
-
-<pre><code>cd hostsshare-server
-npm install
-node app
-</code></pre>
-
-<p>启动成功后，会发现shostsShare默认工作在：4000端口号</p>
-
-<p>小建议：</p>
-
-<ol>
-<li>建议使用pm2或forever等组件实现系统开机自动运行。</li>
-</ol>
+<p>f2etest-guacamole是定制版本的guacamole，安装方法请查看：<a href="./f2etest-guacamole/Install.md">Install Guacamole</a></p>
 </li>
 <li>
 <p>安装mysql</p>
@@ -197,7 +190,7 @@ npm install
 <p>这里的server必需为server.json中已配置的id。program为可选参数，如果不填则直接连接桌面。</p>
 </blockquote>
 
-<p>修改<code>sso.js</code>：</p>
+<p>修改<code>lib/sso.js</code>：</p>
 
 <blockquote>
 <p>由于f2etest系统要求必需是登录用户才能访问，因此必需要对接SSO系统才能工作。</p>
@@ -207,7 +200,7 @@ npm install
 
 <p>启动f2etest-web服务：</p>
 
-<pre><code>node dispatch.js
+<pre><code>node app.js
 </code></pre>
 
 <p>启动成功后，可以发现WEB服务默认工作在：3000端口号</p>
@@ -215,7 +208,7 @@ npm install
 <p>小建议：</p>
 
 <ol>
-<li>为了方便用户使用，建议安装nginx等软件做反向代理，将端口号隐藏掉。</li>
+<li>为了方便用户使用，建议安装nginx等软件做反向代理，将80端口反向到3000端口，以将3000端口号隐藏起来。</li>
 <li>建议使用pm2或forever等组件实现系统开机自动运行。</li>
 </ol>
 </li>
@@ -231,7 +224,9 @@ npm install
 <li>6号机：Server 2008: IE11</li>
 </ul>
 
-<p>将来如果出现IE12，可以即时增加新的服务器，用来部署新浏览器或软件。</p>
+<p>将来如果出现新的浏览器，可以即时增加新的服务器，用来部署新浏览器或软件。</p>
+
+<p>如果在现有运行一段时间的系统中部署新服务器，请访问以下URL来同步所有账号：<code>http://f2etest.xxx.com/syncAllRemoteUsers</code></p>
 
 <p>由于Server 2008可安装的最低IE版本是8，因此IE6和IE7只能安装在Server 2003系统中。</p>
 
@@ -243,7 +238,7 @@ npm install
 <li>IIS：用来部署f2etest-client，由于我们的脚本使用asp编写，因此请安装asp相关支持组件</li>
 <li>设置当前主机每天凌晨自动重启：防止开机久了，系统出现不稳定</li>
 <li>用户组配置：请将Authenticated Users添加到Remote Desktop Users，允许普通用户可以登录远程</li>
-<li>安装curl: 将curl的路径添加到PATH路径中，以供APP快捷方式调用</li>
+<li>安装curl: 将curl的路径添加到系统变量的PATH路径中，以供APP快捷方式调用</li>
 <li>配置Remote App：如果是2008操作系统，需要将被远程的程序添加到Remote App，否则无法远程，添加快捷方式时请选择：允许任何命令行参数</li>
 <li>安装周边软件：输入法，Flash等</li>
 </ol>
@@ -253,7 +248,7 @@ npm install
 <ol>
 <li>chrome由于和远程桌面有点小冲突，必需安装在2003操作系统中</li>
 <li>使用频率比较低的浏览器，建议硬件配置可以适当降低</li>
-<li>2008如果默认安装的是IE10浏览器，可以从安装补丁上卸载，从而降级到IE8</li>
+<li>2008如果默认安装的是IE10浏览器，可以从安装补丁上卸载，从而降级到IE8，但是没办法降级到IE6或IE7</li>
 <li>建议在任务计划程序中添加每周磁盘碎片整理，以保持最高工作性能</li>
 </ol>
 
@@ -294,11 +289,15 @@ npm install
 <li>远程桌面连接时，需要打开指定的浏览器或软件，并统计相应软件的使用次数</li>
 </ol>
 
-<p>bat文件中需要修改两处地方：</p>
+<p>请根据需要选择合适的bat模板，模板中需要修改3处地方：</p>
 
 <ol>
-<li>代理服务器pac地址：修改为hostsShare服务所在的Ip地址</li>
-<li>最后一行修改为当前服务的部署域名，用来统计用户的应用使用情况</li>
+<li>
+<code>f2etestDomain</code>: 修改为内部部署的f2etest域名</li>
+<li>
+<code>appid</code>: 修改为f2etest-web中配置的相同应用id</li>
+<li>
+<code>打开应用</code>： 替换为应用的程序路径</li>
 </ol>
 
 <p>由于需要在当前系统中添加新用户，f2etest-web站点必需设置为administrator权限，否则无法工作</p>
@@ -314,9 +313,9 @@ npm install
 
 <p>hostsShare-client基于node-webkit开发，默认已经提供了一个编译版本在build目录中，可以直接部署使用。</p>
 
-<p>建议选择IE11所在机器上部署hostsShare-client。</p>
+<p>本应用使用频率较高，建议选择CPU比较空闲的机器上部署。</p>
 
-<p>hostsShare-client的bat在f2etest-client中的app中：hostsshare.bat</p>
+<p>hostsShare-client的bat可直接复制f2etest-client/app/中的：<code>禁用代理.bat</code></p>
 </li>
 </ol>
 

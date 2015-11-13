@@ -36,28 +36,28 @@ F2etest是一个面向前端、测试、产品等岗位的多浏览器兼容性�
 成功案例
 ===================
 
-[![https://raw.githubusercontent.com/alibaba/f2etest/master/imgs/alibaba.png](imgs/alibaba.png)](http://www.alibabagroup.com/)
+[![imgs/alibaba.png](https://raw.githubusercontent.com/alibaba/f2etest/master/imgs/alibaba.png)](http://www.alibabagroup.com/)
 
 如果您使用了我们的解决方案，请联系我们添加在此处。
 
 产品截图
 ===================
 
-![https://raw.githubusercontent.com/alibaba/f2etest/master/imgs/screenshot1.jpg](imgs/screenshot1.jpg)
+![imgs/screenshot1.jpg](https://raw.githubusercontent.com/alibaba/f2etest/master/imgs/screenshot1.jpg)
 
-![https://raw.githubusercontent.com/alibaba/f2etest/master/imgs/screenshot2.jpg](imgs/screenshot2.jpg)
+![imgs/screenshot2.jpg](https://raw.githubusercontent.com/alibaba/f2etest/master/imgs/screenshot2.jpg)
 
 Chrome插件:
 
-![https://raw.githubusercontent.com/alibaba/f2etest/master/imgs/chrome.png](imgs/chrome.png)
+![imgs/chrome.png](https://raw.githubusercontent.com/alibaba/f2etest/master/imgs/chrome.png)
 
 Windows:
 
-![https://raw.githubusercontent.com/alibaba/f2etest/master/imgs/windows.jpg](imgs/windows.jpg)
+![imgs/windows.jpg](https://raw.githubusercontent.com/alibaba/f2etest/master/imgs/windows.jpg)
 
 Mac:
 
-![https://raw.githubusercontent.com/alibaba/f2etest/master/imgs/mac.jpg](imgs/mac.jpg)
+![imgs/mac.jpg](https://raw.githubusercontent.com/alibaba/f2etest/master/imgs/mac.jpg)
 
 安全风险警示(非常重要)
 ==================

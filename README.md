@@ -1,7 +1,7 @@
 F2etest
 ===================
 
-![imgs/logo.png](imgs/logo.png)
+![imgs/logo.png](https://raw.githubusercontent.com/alibaba/f2etest/master/imgs/logo.png)
 
 F2etest是一个面向前端、测试、产品等岗位的多浏览器兼容性测试整体解决方案。
 

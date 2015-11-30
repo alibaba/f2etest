@@ -20,9 +20,9 @@ module.exports = function(app) {
     app.use(function(req ,res, next){
         var session = req.session;
         var query = req.query;
-        var url = req.url;
+        var path = req.path;
         var backUrl;
-        if(url.indexOf('/logout') === 0){
+        if(path.indexOf('/logout') === 0){
             // 清空本地登录态
             session.user = null;
             // 清除远程登录态
@@ -45,7 +45,7 @@ module.exports = function(app) {
                     }
                 });
             }
-            else if(reRequireLoginUrl.test(url) === true){ // 未登录，跳转SSO登录页面
+            else if(reRequireLoginUrl.test(path) === true){ // 未登录，跳转SSO登录页面
                 // 跳转SSO登录页
                 backUrl = req.protocol+'://'+req.headers.host + (req.originalUrl || req.url);
                 return res.status(302).redirect(LOGIN_URL+'&BACK_URL='+encodeURIComponent(backUrl));

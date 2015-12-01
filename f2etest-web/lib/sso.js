@@ -1,19 +1,19 @@
 var pkg = require('../package.json');
 var request = require('request');
 
-var SSO_SERVER = 'https://login.xxx.com';
+var SSO_SERVER = ''; // 留空使用内置匿名SSO，否则请设置为外部SSO
 
 // login接口
-var LOGIN_URL = SSO_SERVER + '/doLogin';
+var LOGIN_URL = SSO_SERVER + 'login?ver=1';
 
 // logout接口
-var LOGOUT_URL = SSO_SERVER + '/doLogout';
+var LOGOUT_URL = SSO_SERVER + 'logout?ver=1';
 
 // TOKEN校验接口
-var AUTH_URL = SSO_SERVER + '/getSSOUser';
+var AUTH_URL = SSO_SERVER + 'getUser?ver=1';
 
 // 需要强制登录的URL
-var reRequireLoginUrl = /^\/($|initUser|openapp|help|install|stat|statteam|statuser|changelog|api|local|install\.bat|getAllBrowsers)/;
+var reRequireLoginUrl = /^\/($|initUser|openapp|help|install|stat|changelog|api|local|install\.bat|getAllBrowsers)/;
 
 module.exports = function(app) {
 
@@ -22,6 +22,13 @@ module.exports = function(app) {
         var query = req.query;
         var path = req.path;
         var backUrl;
+        if(SSO_SERVER === ''){
+            // 留空使用内置匿名SSO
+            SSO_SERVER = 'http://'+req.headers['host']+'/anonymousSso/'
+            LOGIN_URL = SSO_SERVER + 'login?ver=1';
+            LOGOUT_URL = SSO_SERVER + 'logout?ver=1';
+            AUTH_URL = SSO_SERVER + 'getUser?ver=1';
+        }
         if(path.indexOf('/logout') === 0){
             // 清空本地登录态
             session.user = null;
@@ -31,7 +38,7 @@ module.exports = function(app) {
         }
         else if(!session.user){// 未登录状态
             var SSO_TOKEN = query['SSO_TOKEN'];
-            if(SSO_TOKEN){// 登录成功返回
+            if(SSO_TOKEN && /\/anonymousSso\//.test(path) === false){// 登录成功返回
                 // 校验登录态有效性
                 return checkToken(SSO_TOKEN, function(err, user){
                     if(!err){

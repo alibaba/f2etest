@@ -2,6 +2,7 @@ var cluster = require('cluster');
 var fs = require('fs');
 var express = require('express');
 var bodyParser = require('body-parser');
+var cookieParser = require('cookie-parser');
 var session = require('cookie-session');
 var ejs = require('ejs');
 var i18n = require('i18n');
@@ -38,6 +39,7 @@ app.use(session({
     keys: ['f2etest']
 }));
 app.use(express.static(__dirname + '/public', { maxAge: 180000 }));
+app.use(cookieParser());
 app.use(bodyParser.urlencoded({
     extended: true,
     limit: '50mb'

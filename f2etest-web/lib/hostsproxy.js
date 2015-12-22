@@ -107,7 +107,7 @@ HostsProxyServerPrototype.listen = function(port, callback){
             self.emit('error', err);
         });
     });
-    portSever.listen(port, function() { 
+    portSever.listen(port, '0.0.0.0', function() { 
         var workPort = self.workPort =portSever.address().port;
         self.emit('ready', {
             port: workPort
@@ -156,7 +156,7 @@ HostsProxyServerPrototype.listen = function(port, callback){
     httpServer.on('error', function(err){
         self.emit('error', err);
     });
-    httpServer.listen(0, function() {
+    httpServer.listen(0, '0.0.0.0', function() {
         var httpPort = self.httpPort = httpServer.address().port;
         self.emit('httpReady', {
             port: httpPort

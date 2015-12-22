@@ -94,8 +94,8 @@ HostsProxyServerPrototype.listen = function(port, callback){
     var portSever = self._portSever = net.createServer(function(client) {
         var forwardPort = self.forwardPort || self.httpPort;
         var forwardHost = self.forwardHost || '127.0.0.1';
-        var forwardServer = net.connect(forwardPort, forwardHost, function() { 
-            forwardServer.pipe(client);        
+        var forwardServer = net.connect(forwardPort, forwardHost, function() {
+            forwardServer.pipe(client);
         });
         client.pipe(forwardServer);
         forwardServer.on('error', function(err){
@@ -107,7 +107,7 @@ HostsProxyServerPrototype.listen = function(port, callback){
             self.emit('error', err);
         });
     });
-    portSever.listen(port, function() { 
+    portSever.listen(port, '0.0.0.0', function() {
         var workPort = self.workPort =portSever.address().port;
         self.emit('ready', {
             port: workPort
@@ -119,7 +119,7 @@ HostsProxyServerPrototype.listen = function(port, callback){
     // create http proxy
     var httpServer = self._httpServer = http.createServer(function (clientRequest, clientResponse) {
         var urlInfo = url.parse(clientRequest.url);
-        var userIp = clientRequest.connection.remoteAddress || 
+        var userIp = clientRequest.connection.remoteAddress ||
             clientRequest.socket.remoteAddress ||
             clientRequest.connection.socket.remoteAddress;
         clientRequest.headers['X-Forwarded-For'] = userIp;
@@ -156,7 +156,7 @@ HostsProxyServerPrototype.listen = function(port, callback){
     httpServer.on('error', function(err){
         self.emit('error', err);
     });
-    httpServer.listen(0, function() {
+    httpServer.listen(0, '0.0.0.0', function() {
         var httpPort = self.httpPort = httpServer.address().port;
         self.emit('httpReady', {
             port: httpPort

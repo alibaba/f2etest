@@ -16,21 +16,29 @@ module.exports = function(app, config) {
             before3Month = before3Month.getFullYear()+'-'+(before3Month.getMonth()+1)+'-'+before3Month.getDate();
             // 使用次数 / 日
             arrTasks.push(function(callback){
-                pool.query('select date_format(LogTime,"%m%d") as name,count(0) as value from appLogs where LogTime >= ? group by name order by name;', before30Day, function(err, rows){
+                pool.query('select date_format(LogTime,"%Y%m%d") as name,count(0) as value from appLogs where LogTime >= ? group by name order by name;', before30Day, function(err, rows){
+                    rows = rows.filter(function(row){
+                        row.name = row.name.substr(4);
+                        return row;
+                    });
                     callback(null, rows);
                 });
             });
             // 使用人数 / 日
             arrTasks.push(function(callback){
-                pool.query('select date_format(LogTime,"%m%d") as name,count(DISTINCT UserId) as value from appLogs where LogTime >= ? group by name order by name;', before30Day, function(err, rows){
+                pool.query('select date_format(LogTime,"%Y%m%d") as name,count(DISTINCT UserId) as value from appLogs where LogTime >= ? group by name order by name;', before30Day, function(err, rows){
+                    rows = rows.filter(function(row){
+                        row.name = row.name.substr(4);
+                        return row;
+                    });
                     callback(null, rows);
                 });
             });
             // 新增会员 / 日
             arrTasks.push(function(callback){
-                pool.query('select date_format(ActiveTime,"%m%d") as ActiveDay,count(0) as value from appUsers where ActiveTime >= ? group by ActiveDay order by ActiveDay;', before30Day, function(err, rows){
+                pool.query('select date_format(ActiveTime,"%Y%m%d") as ActiveDay,count(0) as value from appUsers where ActiveTime >= ? group by ActiveDay order by ActiveDay;', before30Day, function(err, rows){
                     rows.forEach(function(row){
-                        row.name = row.ActiveDay;
+                        row.name = row.ActiveDay.substr(4);
                     });
                     callback(null, rows);
                 });

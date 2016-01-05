@@ -14,9 +14,9 @@ module.exports = function(app, config) {
             var arrTasks = [];
             // 次数统计 / 日
             arrTasks.push(function(callback){
-                pool.query('select date_format(LogTime,"%m%d") as LogDay,count(0) as value from appLogs where LogTime >= ? and UserId = ? group by LogDay order by LogDay;', [before30Day, userid], function(err, rows){
+                pool.query('select date_format(LogTime,"%Y%m%d") as LogDay,count(0) as value from appLogs where LogTime >= ? and UserId = ? group by LogDay order by LogDay;', [before30Day, userid], function(err, rows){
                     rows.forEach(function(row){
-                        row.name = row.LogDay;
+                        row.name = row.LogDay.substr(4);
                     });
                     callback(null, rows);
                 });

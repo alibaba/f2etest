@@ -222,7 +222,7 @@ Mac:
     2. `appid`: 修改为f2etest-web中配置的相同应用id
     3. `打开应用`： 替换为应用的程序路径
 
-    由于需要在当前系统中添加新用户，f2etest-web站点必需设置为administrator权限，否则无法工作
+    由于需要在当前系统中添加新用户，f2etest-client站点必需设置为administrator权限，否则无法工作
 
     修改setuser.asp中的apiKey，保持和f2etest-web中一致。
 

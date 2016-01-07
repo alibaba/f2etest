@@ -115,4 +115,4 @@ files.forEach(function(file){
     require('./control/'+file)(app, config);
 });
 
-app.listen(config.siteInfo.port);
+app.listen(config.siteInfo.port, '0.0.0.0');

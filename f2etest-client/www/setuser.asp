@@ -12,7 +12,13 @@ password = request.QueryString("password")
 
 if apiKey <> "" and key = apiKey and username <> "" then
     setUserPassword username,password
-    response.write "ok"
+    if err <> 0 then
+        response.write "set user failed"
+    else
+        response.write "ok"
+    end if
+else
+    response.write "api error"
 end if
 
 function setUserPassword(username, password)
@@ -24,6 +30,7 @@ function setUserPassword(username, password)
     Set oUser=oSystem.GetObject("user",username)
 
     if err <> 0 then
+        err = 0
         ' 增加新用户
         Set oUser=oSystem.Create("user",username)
         oUser.SetPassword password

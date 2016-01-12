@@ -230,6 +230,10 @@ Mac:
 
     重要安全说明：f2etest-client的www目录必需要设置为仅管理员有权限，否则任何人都可以查看到setuser.asp中的apiKey，会有严重的安全风险
 
+    如何确定f2etest-client安装成功？
+
+    请确保在服务器上访问以下URL(key改为配置好的key)，返回值是ok：[http:/127.0.0.1/setuser.asp?username=test&password=hello123&key=xxx](http:/127.0.0.1/setuser.asp?username=test&password=hello123&key=xxx)
+
 8. 安装hostsShare-client
 
     hostsShare-client基于node-webkit开发，默认已经提供了一个编译版本在build目录中，可以直接部署使用。

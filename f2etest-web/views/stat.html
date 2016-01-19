@@ -3,7 +3,7 @@
 <html>
 <head>
     <meta charset="UTF-8">
-    <meta name="renderer" content="webkit">
+	<meta name="renderer" content="webkit"> 
     <title><%=siteName + ' - ' + siteAbout%></title>
     <link rel="icon" type="image/icon" href="<%=siteIcon%>">
     <link rel="stylesheet" type="text/css" href="css/index.css" />
@@ -25,12 +25,24 @@
                 <div class="panel-body" id="logTimeDay"></div>
             </div>
             <div class="panel">
+                <h3 class="panel-title">使用次数 / 月</h3>
+                <div class="panel-body" id="logTimeMonth"></div>
+            </div>
+            <div class="panel">
                 <h3 class="panel-title">使用人数 / 日</h3>
                 <div class="panel-body" id="logUserDay"></div>
             </div>
             <div class="panel">
+                <h3 class="panel-title">使用人数 / 月</h3>
+                <div class="panel-body" id="logUserMonth"></div>
+            </div>
+            <div class="panel">
                 <h3 class="panel-title">新增会员 / 日</h3>
                 <div class="panel-body" id="newUserDay"></div>
+            </div>
+            <div class="panel">
+                <h3 class="panel-title">新增会员 / 月</h3>
+                <div class="panel-body" id="newUserMonth"></div>
             </div>
             <div class="panel">
                 <h3 class="panel-title">活跃App排名 (30天)</h3>
@@ -164,8 +176,11 @@
             window.open('https://work.alibaba-inc.com/work/search?type=person&keywords='+encodeURIComponent(UserId));
         }
         showBar('logTimeDay', 'column', <%-JSON.stringify(arrLogTimeDay)%>, '次数', '次');
+        showBar('logTimeMonth', 'column', <%-JSON.stringify(arrLogTimeMonth)%>, '次数', '次');
         showBar('logUserDay', 'column', <%-JSON.stringify(logUserDay)%>, '人数', '人');
+        showBar('logUserMonth', 'column', <%-JSON.stringify(logUserMonth)%>, '人数', '人');
         showBar('newUserDay', 'column', <%-JSON.stringify(newUserDay)%>, '人数', '人');
+        showBar('newUserMonth', 'column', <%-JSON.stringify(newUserMonth)%>, '人数', '人');
         showBar('appOrderDay', 'column', <%-JSON.stringify(appOrderDay)%>, '次数', '次');
     </script>
     <% include footer.html %>

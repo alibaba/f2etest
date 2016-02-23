@@ -17,7 +17,7 @@ module.exports = function(app, config) {
             userInfo.username = Userid;
         }
         userInfo.login = true;
-        res.cookie('ssoUserInfo', JSON.stringify(userInfo));
+        res.cookie('ssoUserInfo', JSON.stringify(userInfo), { maxAge: 315360000000});
         var SSO_TOKEN = userInfo.userid;
         if(BACK_URL){
             var backUrlInfo = url.parse(BACK_URL);
@@ -35,7 +35,7 @@ module.exports = function(app, config) {
         if(userInfo !== ''){
             userInfo = JSON.parse(userInfo);
             userInfo.login = false;
-            res.cookie('ssoUserInfo', JSON.stringify(userInfo));
+            res.cookie('ssoUserInfo', JSON.stringify(userInfo), { maxAge: 315360000000});
         }
         if(BACK_URL){
             res.redirect(BACK_URL);

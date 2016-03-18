@@ -1,0 +1,26 @@
+{
+  "name": "f2etest-webdriver",
+  "version": "0.9.3",
+  "description": "WebDriver client for f2etest",
+  "main": "./index",
+  "dependencies": {
+    "co": "4.6.0",
+    "jwebdriver": "1.0.2",
+    "request": "2.69.0"
+  },
+  "devDependencies": {},
+  "repository": {
+    "type": "git",
+    "url": "git@github.com:alibaba/f2etest.git"
+  },
+  "bugs": {
+    "url": "https://github.com/alibaba/f2etest/issues"
+  },
+  "keywords": [
+    "f2etest",
+    "webdriver",
+    "client"
+  ],
+  "author": "Yanis Wang",
+  "license": "MIT"
+}

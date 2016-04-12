@@ -133,6 +133,7 @@ if(server && userid && apikey && browsers && url){
             allTestFailed += testFailed;
             var testCount = testSummary && testSummary.all || 0;
             allTestCount += testCount;
+            var testRatio = testCount > 0 ? getFixed(testPassed/testCount*100) : 0;
             var testDuration = testSummary.duration;
             var coverResult = result.coverResult;
             var coverSummary = coverResult && coverResult.summary;
@@ -166,7 +167,7 @@ if(server && userid && apikey && browsers && url){
                 symbol = symbols.err;
             }
             testTitle = '    ' + browserName + (browserVersion?' '+browserVersion:'') + ':'
-            testMessage = '        '+symbol.bold+' Test passed: '+String(getFixed(testPassed/testCount*100)+'%').bold+' ('+testPassed+'/'+testCount+') in '+testDuration+' ms\r\n';
+            testMessage = '        '+symbol.bold+' Tests passed: '+String(testRatio+'%').bold+' ('+testPassed+'/'+testCount+') in '+testDuration+' ms\r\n';
             testMessage += '        Line covered: '+String(lineRatio+'%').bold+' ('+lineCovered+'/'+lineCount+'), Branch covered: '+branchRatio+'% ('+branchCovered+'/'+branchCount+'), Function covered: '+functionRatio+'% ('+functionCovered+'/'+functionCount+')\r\n';
             testMessage += '        More info: '+server+'jsunit_result?id='+taskId;
             console.log(testTitle[color].bold);
@@ -175,7 +176,7 @@ if(server && userid && apikey && browsers && url){
             console.log('');
         }
         if(isEnd){
-            var allTestRatio = getFixed(allTestPassed/allTestCount*100);
+            var allTestRatio = allTestCount > 0 ? getFixed(allTestPassed/allTestCount*100) : 0;
             var allLineRatio = allLineCount > 0 ? getFixed(allLineCovered/allLineCount*100) : 0;
             var allBrandRatio = allBranchCount > 0 ? getFixed(allBranchCovered/allBranchCount*100) : 0;
             var allFunctionRatio = allFunctionCount > 0 ? getFixed(allFunctionCovered/allFunctionCount*100) : 0;
@@ -190,7 +191,7 @@ if(server && userid && apikey && browsers && url){
             }
             var message;
             if(allTestCount > 0){
-                message = '    '+symbol.bold+' Test passed: '+String(allTestRatio+'%').bold+' ('+allTestPassed+'/'+allTestCount+') in '+(new Date().getTime()-startTime)+' ms\r\n';
+                message = '    '+symbol.bold+' Tests passed: '+String(allTestRatio+'%').bold+' ('+allTestPassed+'/'+allTestCount+') in '+(new Date().getTime()-startTime)+' ms\r\n';
                 message += '    Line covered: '+String(allLineRatio+'%').bold+' ('+allLineCovered+'/'+allLineCount+'), Branch covered: '+allBrandRatio+'% ('+allBranchCovered+'/'+allBranchCount+'), Function covered: '+allFunctionRatio+'% ('+allFunctionCovered+'/'+allFunctionCount+')';
             }
             else{

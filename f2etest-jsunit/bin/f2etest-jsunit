@@ -72,6 +72,15 @@ var coveragebeautify = program.coveragebeautify || config.coveragebeautify;
 var timeout = program.timeout || config.timeout;
 var append = program.append || config.append;
 
+var symbols = {
+  ok: '✓',
+  err: '✖'
+};
+if (process.platform === 'win32') {
+  symbols.ok = '\u221A';
+  symbols.err = '\u00D7';
+}
+
 if(server && userid && apikey && browsers && url){
     console.log('');
     console.log('  ==========================================================================================================================================='.green);
@@ -147,9 +156,17 @@ if(server && userid && apikey && browsers && url){
                 allFunctionCovered += functionCovered;
                 functionRatio = coverSummary.functionRatio;
             }
-            var color = testFailed > 0 ? 'red' : 'green';
+            var color, symbol;
+            if(testCount > 0 && testFailed === 0){
+                color = 'green';
+                symbol = symbols.ok;
+            }
+            else{
+                color = 'red';
+                symbol = symbols.err;
+            }
             testTitle = '    ' + browserName + (browserVersion?' '+browserVersion:'') + ':'
-            testMessage = '        Test passed: '+String(getFixed(testPassed/testCount*100)+'%').bold+' ('+testPassed+'/'+testCount+') in '+testDuration+' ms, Line covered: '+lineRatio+'% ('+lineCovered+'/'+lineCount+'), Branch covered: '+branchRatio+'% ('+branchCovered+'/'+branchCount+'), Function covered: '+functionRatio+'% ('+functionCovered+'/'+functionCount+')\r\n';
+            testMessage = '        '+symbol.bold+' Test passed: '+String(getFixed(testPassed/testCount*100)+'%').bold+' ('+testPassed+'/'+testCount+') in '+testDuration+' ms, Line covered: '+String(lineRatio+'%').bold+' ('+lineCovered+'/'+lineCount+'), Branch covered: '+branchRatio+'% ('+branchCovered+'/'+branchCount+'), Function covered: '+functionRatio+'% ('+functionCovered+'/'+functionCount+')\r\n';
             testMessage += '        More info: '+server+'jsunit_result?id='+taskId;
             console.log(testTitle[color].bold);
             console.log('    -----------------------------------------------------------------------------------------------------------------------------------------'[color])
@@ -161,14 +178,22 @@ if(server && userid && apikey && browsers && url){
             var allLineRatio = allLineCount > 0 ? getFixed(allLineCovered/allLineCount*100) : 0;
             var allBrandRatio = allBranchCount > 0 ? getFixed(allBranchCovered/allBranchCount*100) : 0;
             var allFunctionRatio = allFunctionCount > 0 ? getFixed(allFunctionCovered/allFunctionCount*100) : 0;
+            var color, symbol;
+            if(allTestCount > 0 && allTestFailed === 0){
+                color = 'green';
+                symbol = symbols.ok;
+            }
+            else{
+                color = 'red';
+                symbol = symbols.err;
+            }
             var message;
             if(allTestCount > 0){
-                message = '    Test passed: '+String(allTestRatio+'%').bold+' ('+allTestPassed+'/'+allTestCount+') in '+(new Date().getTime()-startTime)+' ms, Line covered: '+allLineRatio+'% ('+allLineCovered+'/'+allLineCount+'), Branch covered: '+allBrandRatio+'% ('+allBranchCovered+'/'+allBranchCount+'), Function covered: '+allFunctionRatio+'% ('+allFunctionCovered+'/'+allFunctionCount+')';
+                message = '    '+symbol.bold+' Test passed: '+String(allTestRatio+'%').bold+' ('+allTestPassed+'/'+allTestCount+') in '+(new Date().getTime()-startTime)+' ms, Line covered: '+String(allLineRatio+'%').bold+' ('+allLineCovered+'/'+allLineCount+'), Branch covered: '+allBrandRatio+'% ('+allBranchCovered+'/'+allBranchCount+'), Function covered: '+allFunctionRatio+'% ('+allFunctionCovered+'/'+allFunctionCount+')';
             }
             else{
                 message = '    All tests failed!';
             }
-            var color = allTestCount > 0 && allTestFailed === 0 ? 'green' : 'red';
             console.log('  ==========================================================================================================================================='[color]);
             console.log(message[color]);
             console.log('  ==========================================================================================================================================='[color]);

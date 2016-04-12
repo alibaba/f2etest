@@ -83,9 +83,9 @@ if (process.platform === 'win32') {
 
 if(server && userid && apikey && browsers && url){
     console.log('');
-    console.log('  ==========================================================================================================================================='.green);
+    console.log('  ===================================================================================================='.green);
     console.log('    JsUnit reporter: '.green+ url.green.bold);
-    console.log('  ==========================================================================================================================================='.green);
+    console.log('  ===================================================================================================='.green);
     console.log('');
     var allTestPassed = 0, allTestFailed = 0, allTestCount = 0;
     var allLineCount = 0, allLineCovered = 0;
@@ -116,7 +116,7 @@ if(server && userid && apikey && browsers && url){
             allTestFailed ++;
             allTestCount ++;
             console.log(testTitle.red.bold);
-            console.log('    -----------------------------------------------------------------------------------------------------------------------------------------'.red);
+            console.log('    -----------------------------------------------------------'.red);
             console.log(testMessage.red);
             console.log('');
         }
@@ -166,10 +166,11 @@ if(server && userid && apikey && browsers && url){
                 symbol = symbols.err;
             }
             testTitle = '    ' + browserName + (browserVersion?' '+browserVersion:'') + ':'
-            testMessage = '        '+symbol.bold+' Test passed: '+String(getFixed(testPassed/testCount*100)+'%').bold+' ('+testPassed+'/'+testCount+') in '+testDuration+' ms, Line covered: '+String(lineRatio+'%').bold+' ('+lineCovered+'/'+lineCount+'), Branch covered: '+branchRatio+'% ('+branchCovered+'/'+branchCount+'), Function covered: '+functionRatio+'% ('+functionCovered+'/'+functionCount+')\r\n';
+            testMessage = '        '+symbol.bold+' Test passed: '+String(getFixed(testPassed/testCount*100)+'%').bold+' ('+testPassed+'/'+testCount+') in '+testDuration+' ms\r\n';
+            testMessage += '        Line covered: '+String(lineRatio+'%').bold+' ('+lineCovered+'/'+lineCount+'), Branch covered: '+branchRatio+'% ('+branchCovered+'/'+branchCount+'), Function covered: '+functionRatio+'% ('+functionCovered+'/'+functionCount+')\r\n';
             testMessage += '        More info: '+server+'jsunit_result?id='+taskId;
             console.log(testTitle[color].bold);
-            console.log('    -----------------------------------------------------------------------------------------------------------------------------------------'[color])
+            console.log('    --------------------------------------------------------------------------------------------------'[color])
             console.log(testMessage[color]);
             console.log('');
         }
@@ -189,14 +190,15 @@ if(server && userid && apikey && browsers && url){
             }
             var message;
             if(allTestCount > 0){
-                message = '    '+symbol.bold+' Test passed: '+String(allTestRatio+'%').bold+' ('+allTestPassed+'/'+allTestCount+') in '+(new Date().getTime()-startTime)+' ms, Line covered: '+String(allLineRatio+'%').bold+' ('+allLineCovered+'/'+allLineCount+'), Branch covered: '+allBrandRatio+'% ('+allBranchCovered+'/'+allBranchCount+'), Function covered: '+allFunctionRatio+'% ('+allFunctionCovered+'/'+allFunctionCount+')';
+                message = '    '+symbol.bold+' Test passed: '+String(allTestRatio+'%').bold+' ('+allTestPassed+'/'+allTestCount+') in '+(new Date().getTime()-startTime)+' ms\r\n';
+                message += '    Line covered: '+String(allLineRatio+'%').bold+' ('+allLineCovered+'/'+allLineCount+'), Branch covered: '+allBrandRatio+'% ('+allBranchCovered+'/'+allBranchCount+'), Function covered: '+allFunctionRatio+'% ('+allFunctionCovered+'/'+allFunctionCount+')';
             }
             else{
                 message = '    All tests failed!';
             }
-            console.log('  ==========================================================================================================================================='[color]);
+            console.log('  ===================================================================================================='[color]);
             console.log(message[color]);
-            console.log('  ==========================================================================================================================================='[color]);
+            console.log('  ===================================================================================================='[color]);
             if(append){
                 var mapVars = {
                     testPassed: allTestPassed,

@@ -129,10 +129,10 @@ if(server && userid && apikey && browsers && url){
             var testSummary = testResult && testResult.summary;
             var testPassed = testSummary && testSummary.passed || 0;
             allTestPassed += testPassed;
-            var testFailed = testSummary && testSummary.failed || 0;
-            allTestFailed += testFailed;
             var testCount = testSummary && testSummary.all || 0;
-            allTestCount += testCount;
+            allTestCount += testCount > 0 ? testCount : 1;
+            var testFailed = testSummary && testSummary.failed || 0;
+            allTestFailed += testCount > 0 ? testFailed : 1;
             var testRatio = testCount > 0 ? getFixed(testPassed/testCount*100) : 0;
             var testDuration = testSummary.duration;
             var coverResult = result.coverResult;

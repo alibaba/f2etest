@@ -56,16 +56,25 @@ function runJsUnit(config, callback){
         request.get({
             url: f2etestServer + 'runJsUnit',
             qs: mapQueryString,
-            json: true,
             timeout: 600000
         },
-        function(error, response, data){
-            error = error || data.error;
+        function(error, response, body){
             if(error){
                 doCallback(error, config);
             }
             else{
-                doCallback(null, data.message);
+                try{
+                    var data = JSON.parse(body);
+                    if(data.error){
+                        doCallback(data.error);
+                    }
+                    else{
+                        doCallback(null, data.message);
+                    }
+                }
+                catch(e){
+                    doCallback(body);
+                }
             }
         });
     }

@@ -87,6 +87,7 @@ if(server && userid && apikey && browsers && url){
     console.log('    JsUnit reporter: '.green+ url.green.bold);
     console.log('  ===================================================================================================='.green);
     console.log('');
+    var browserCount = 0, failedBrowserCount = 0;
     var allTestPassed = 0, allTestFailed = 0, allTestCount = 0;
     var allLineCount = 0, allLineCovered = 0;
     var allBranchCount = 0, allBranchCovered = 0;
@@ -107,6 +108,7 @@ if(server && userid && apikey && browsers && url){
         var browserName, browserVersion;
         var testTitle;
         var testMessage;
+        browserCount ++;
         if(error){
             var config = result;
             browserName = config.browserName;
@@ -115,6 +117,7 @@ if(server && userid && apikey && browsers && url){
             testMessage = '        '+String(error);
             allTestFailed ++;
             allTestCount ++;
+            failedBrowserCount ++;
             console.log(testTitle.red.bold);
             console.log('    -----------------------------------------------------------'.red);
             console.log(testMessage.red);
@@ -190,12 +193,12 @@ if(server && userid && apikey && browsers && url){
                 symbol = symbols.err;
             }
             var message;
-            if(allTestCount > 0){
+            if(failedBrowserCount < browserCount){
                 message = '    '+symbol.bold+' Tests passed: '+String(allTestRatio+'%').bold+' ('+allTestPassed+'/'+allTestCount+') in '+(new Date().getTime()-startTime)+' ms\r\n';
                 message += '    Line covered: '+String(allLineRatio+'%').bold+' ('+allLineCovered+'/'+allLineCount+'), Branch covered: '+allBrandRatio+'% ('+allBranchCovered+'/'+allBranchCount+'), Function covered: '+allFunctionRatio+'% ('+allFunctionCovered+'/'+allFunctionCount+')';
             }
             else{
-                message = '    All tests failed!';
+                message = '    All browser tests failed!';
             }
             console.log('  ===================================================================================================='[color]);
             console.log(message[color]);

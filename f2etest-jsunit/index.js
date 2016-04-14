@@ -56,7 +56,8 @@ function runJsUnit(config, callback){
         request.get({
             url: f2etestServer + 'runJsUnit',
             qs: mapQueryString,
-            json: true
+            json: true,
+            timeout: 600000
         },
         function(error, response, data){
             error = error || data.error;

@@ -66,14 +66,14 @@ function runJsUnit(config, callback){
                 try{
                     var data = JSON.parse(body);
                     if(data.error){
-                        doCallback(data.error);
+                        doCallback(data.error, config);
                     }
                     else{
                         doCallback(null, data.message);
                     }
                 }
                 catch(e){
-                    doCallback(body);
+                    doCallback(body, config);
                 }
             }
         });

@@ -40,6 +40,7 @@ program
     .option('--coverageexclude <string>', 'coverage exclude, example: /\/lib\//i')
     .option('--coveragebeautify <1|0>', 'coverage beautify, 1 for enabled')
     .option('--timeout <number>', 'stop when test timeout')
+    .option('--delay <number>', 'delay close browser for debug')
     .option('--append <string>', 'append message after test')
     .option('--no-color', 'disable colors')
     .parse(process.argv);
@@ -70,6 +71,7 @@ var coverageinclude = program.coverageinclude || config.coverageinclude;
 var coverageexclude = program.coverageexclude || config.coverageexclude;
 var coveragebeautify = program.coveragebeautify || config.coveragebeautify;
 var timeout = program.timeout || config.timeout;
+var delay = program.delay || config.delay;
 var append = program.append || config.append;
 
 var symbols = {
@@ -103,7 +105,8 @@ if(server && userid && apikey && browsers && url){
         coverageInclude: coverageinclude,
         coverageExclude: coverageexclude,
         coverageBeautify: coveragebeautify,
-        timeout: timeout
+        timeout: timeout,
+        delay: delay
     }, function(error, result, isEnd){
         var browserName, browserVersion;
         var testTitle;

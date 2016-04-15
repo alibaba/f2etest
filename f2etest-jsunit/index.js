@@ -40,6 +40,7 @@ function runJsUnit(config, callback){
     var coverageExclude = config.coverageExclude;
     var coverageBeautify = config.coverageBeautify;
     var timeout = config.timeout;
+    var delay = config.delay;
     if(f2etestServer && userid && apiKey && url && browserName){
         var mapQueryString = {
             userid: userid,
@@ -51,7 +52,8 @@ function runJsUnit(config, callback){
             coverageInclude: coverageInclude,
             coverageExclude: coverageExclude,
             coverageBeautify: coverageBeautify,
-            timeout: timeout
+            timeout: timeout,
+            delay: delay
         };
         request.get({
             url: f2etestServer + 'runJsUnit',

@@ -1,6 +1,6 @@
 {
   "name": "f2etest-jsunit",
-  "version": "0.9.8",
+  "version": "0.9.9",
   "description": "Jsunit client for f2etest",
   "main": "./index",
   "bin": {

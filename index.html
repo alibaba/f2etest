@@ -20,7 +20,7 @@
 
     <section class="main-content">
       <h1>
-<a id="f2etest" class="anchor" href="#f2etest" aria-hidden="true"><span class="octicon octicon-link"></span></a>F2etest</h1>
+<a id="f2etest" class="anchor" href="#f2etest" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>F2etest</h1>
 
 <p><img src="https://raw.githubusercontent.com/alibaba/f2etest/master/imgs/logo.png" alt="imgs/logo.png"></p>
 
@@ -61,14 +61,14 @@
 </ol>
 
 <h1>
-<a id="成功案例" class="anchor" href="#%E6%88%90%E5%8A%9F%E6%A1%88%E4%BE%8B" aria-hidden="true"><span class="octicon octicon-link"></span></a>成功案例</h1>
+<a id="成功案例" class="anchor" href="#%E6%88%90%E5%8A%9F%E6%A1%88%E4%BE%8B" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>成功案例</h1>
 
 <p><a href="http://www.alibabagroup.com/"><img src="https://raw.githubusercontent.com/alibaba/f2etest/master/imgs/alibaba.png" alt="imgs/alibaba.png"></a></p>
 
 <p>如果您使用了我们的解决方案，请联系我们添加在此处。</p>
 
 <h1>
-<a id="产品截图" class="anchor" href="#%E4%BA%A7%E5%93%81%E6%88%AA%E5%9B%BE" aria-hidden="true"><span class="octicon octicon-link"></span></a>产品截图</h1>
+<a id="产品截图" class="anchor" href="#%E4%BA%A7%E5%93%81%E6%88%AA%E5%9B%BE" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>产品截图</h1>
 
 <p><img src="https://raw.githubusercontent.com/alibaba/f2etest/master/imgs/screenshot1.jpg" alt="imgs/screenshot1.jpg"></p>
 
@@ -87,7 +87,7 @@
 <p><img src="https://raw.githubusercontent.com/alibaba/f2etest/master/imgs/mac.jpg" alt="imgs/mac.jpg"></p>
 
 <h1>
-<a id="安全风险警示非常重要" class="anchor" href="#%E5%AE%89%E5%85%A8%E9%A3%8E%E9%99%A9%E8%AD%A6%E7%A4%BA%E9%9D%9E%E5%B8%B8%E9%87%8D%E8%A6%81" aria-hidden="true"><span class="octicon octicon-link"></span></a>安全风险警示(非常重要)</h1>
+<a id="安全风险警示非常重要" class="anchor" href="#%E5%AE%89%E5%85%A8%E9%A3%8E%E9%99%A9%E8%AD%A6%E7%A4%BA%E9%9D%9E%E5%B8%B8%E9%87%8D%E8%A6%81" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>安全风险警示(非常重要)</h1>
 
 <p>由于本系统基于Windows Server体系搭建，因此系统的安全性完全取决于部署人的安全部署能力。</p>
 
@@ -101,7 +101,9 @@
 </ol>
 
 <h1>
-<a id="安装" class="anchor" href="#%E5%AE%89%E8%A3%85" aria-hidden="true"><span class="octicon octicon-link"></span></a>安装</h1>
+<a id="安装" class="anchor" href="#%E5%AE%89%E8%A3%85" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>安装</h1>
+
+<p>安装前请加QQ交流群： 416221937 有任何问题请至群中咨询。(加入群时验证信息请填写：城市名+公司名，例如：杭州+阿里巴巴)</p>
 
 <ol>
 <li>
@@ -238,7 +240,6 @@ npm install
 <li>IIS：用来部署f2etest-client，由于我们的脚本使用asp编写，因此请安装asp相关支持组件</li>
 <li>设置当前主机每天凌晨自动重启：防止开机久了，系统出现不稳定</li>
 <li>用户组配置：请将Authenticated Users添加到Remote Desktop Users，允许普通用户可以登录远程</li>
-<li>安装curl: 将curl的路径添加到系统变量的PATH路径中，以供APP快捷方式调用</li>
 <li>配置Remote App：如果是2008操作系统，需要将被远程的程序添加到Remote App，否则无法远程，添加快捷方式时请选择：允许任何命令行参数</li>
 <li>安装周边软件：输入法，Flash等</li>
 </ol>
@@ -280,9 +281,21 @@ npm install
 </ol>
 </li>
 <li>
-<p>部署f2etest-client</p>
+<p>部署<code>f2etest-client\f2etest-browsers</code></p>
 
-<p>每台Server服务器上都需要部署f2etest-client，实现以下两个功能：</p>
+<p>请将<code>f2etest-client\f2etest-browsers</code>复制到<code>c:\f2etest-browsers\</code>。</p>
+
+<p>确保如下路径：<code>c:\f2etest-browsers\www\</code></p>
+
+<p>然后做如下操作：</p>
+
+<ol>
+<li>将curl的路径添加到系统变量的PATH路径中，以供APP快捷方式调用</li>
+<li>添加IIS站点：<code>c:\f2etest-browsers\www\</code>, 站点必需设置为administrator权限，否则无法工作，并且www目录设置为仅管理员有权限，防止任何人都可以创建账号</li>
+<li>修改setuser.asp中的apiKey，保持和f2etest-web中一致。</li>
+</ol>
+
+<p>每台Server服务器上都需要部署<code>f2etest-client\f2etest-browsers</code>，实现以下两个功能：</p>
 
 <ol>
 <li>提供API给f2etest-web调用，用来初始化用户账号</li>
@@ -300,13 +313,11 @@ npm install
 <code>打开应用</code>： 替换为应用的程序路径</li>
 </ol>
 
-<p>由于需要在当前系统中添加新用户，f2etest-web站点必需设置为administrator权限，否则无法工作</p>
-
-<p>修改setuser.asp中的apiKey，保持和f2etest-web中一致。</p>
-
 <p>2008中必需要安装Remote App，并且要在Remote App的设置中：允许任何命令行参数。</p>
 
-<p>重要安全说明：f2etest-client的www目录必需要设置为仅管理员有权限，否则任何人都可以查看到setuser.asp中的apiKey，会有严重的安全风险</p>
+<p>如何确定f2etest-client安装成功？</p>
+
+<p>请确保在服务器上访问以下URL(key改为配置好的key)，返回值是ok：<a href="http:/127.0.0.1/setuser.asp?username=test&amp;password=hello123&amp;key=xxx">http:/127.0.0.1/setuser.asp?username=test&amp;password=hello123&amp;key=xxx</a></p>
 </li>
 <li>
 <p>安装hostsShare-client</p>
@@ -320,7 +331,7 @@ npm install
 </ol>
 
 <h1>
-<a id="使用" class="anchor" href="#%E4%BD%BF%E7%94%A8" aria-hidden="true"><span class="octicon octicon-link"></span></a>使用</h1>
+<a id="使用" class="anchor" href="#%E4%BD%BF%E7%94%A8" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>使用</h1>
 
 <ol>
 <li>
@@ -344,12 +355,107 @@ npm install
 </ol>
 
 <h1>
-<a id="感谢" class="anchor" href="#%E6%84%9F%E8%B0%A2" aria-hidden="true"><span class="octicon octicon-link"></span></a>感谢</h1>
+<a id="初步了解-webdriver云--js单元测试云" class="anchor" href="#%E5%88%9D%E6%AD%A5%E4%BA%86%E8%A7%A3-webdriver%E4%BA%91--js%E5%8D%95%E5%85%83%E6%B5%8B%E8%AF%95%E4%BA%91" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>初步了解 WebDriver云 &amp; JS单元测试云</h1>
+
+<p>f2etest v2.0.0我们添加了WebDriver云 &amp; JS单元测试云两个重要子产品。</p>
+
+<p>在这之前，我们一直都仅仅是一个手工测试的提效平台。</p>
+
+<p>现在，我们终于开始有自动化的功能了。</p>
+
+<h2>
+<a id="我们首先了解下webdriver云" class="anchor" href="#%E6%88%91%E4%BB%AC%E9%A6%96%E5%85%88%E4%BA%86%E8%A7%A3%E4%B8%8Bwebdriver%E4%BA%91" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>我们首先了解下WebDriver云：</h2>
+
+<p><img src="https://raw.githubusercontent.com/alibaba/f2etest/master/imgs/webdriver1.jpg" alt="imgs/webdriver1.jpg"></p>
+
+<p>WebDriver云利用Windows Server多用户的特性，将执行机的使用效率提升10倍以上。</p>
+
+<p>之前1台执行机只能跑1个任务，现在同样的硬件配置，我们可以跑10个任务。</p>
+
+<p>上面的截图看上去有88个执行机节点，传统情况下我们需要88台服务器。</p>
+
+<p>但是我们实际上才5台！</p>
+
+<p>相比较官方的Selenium Grid，我们有以下优势：</p>
+
+<ol>
+<li>10倍以上硬件利用率：传统WebDriver 1台执行机仅能跑1个Job，而我们一台机器可以高并发跑N个Job，这个N取决于机器配置，理论上硬件利用率相当于传统节点的10倍以上</li>
+<li>支持独立hosts绑定：每次申请节点时，可以指定不同的hosts绑定，保证同一台机器上不同节点的Job不会相互干扰</li>
+<li>所有节点支持远程在线调试：利用Guacamole的在线远程功能，当自动化出现问题时，我们能非常便利的对自动化进展进行即时监控和调试</li>
+</ol>
+
+<h2>
+<a id="再来了解下js单元测试云" class="anchor" href="#%E5%86%8D%E6%9D%A5%E4%BA%86%E8%A7%A3%E4%B8%8Bjs%E5%8D%95%E5%85%83%E6%B5%8B%E8%AF%95%E4%BA%91" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>再来了解下JS单元测试云：</h2>
+
+<p>任务队列：</p>
+
+<p><img src="https://raw.githubusercontent.com/alibaba/f2etest/master/imgs/jsunit1.jpg" alt="imgs/jsunit1.jpg"></p>
+
+<p>任务详情页面：</p>
+
+<p><img src="https://raw.githubusercontent.com/alibaba/f2etest/master/imgs/jsunit2.jpg" alt="imgs/jsunit2.jpg"></p>
+
+<p>代码覆盖率：</p>
+
+<p><img src="https://raw.githubusercontent.com/alibaba/f2etest/master/imgs/jsunit3.jpg" alt="imgs/jsunit3.jpg"></p>
+
+<p>命令行客户端：</p>
+
+<p><img src="https://raw.githubusercontent.com/alibaba/f2etest/master/imgs/jsunit4.jpg" alt="imgs/jsunit4.jpg"></p>
+
+<p>f2etest JS单测云，相比较互联网上现有的JS单测自动化解决方案，我们具有以下特点：</p>
+
+<ol>
+<li>真实WebDriver执行机：每次运行均为空白的真实浏览器环境，多个任务间完全隔离，不会相互影响</li>
+<li>便携的远程可视化调试：可以直接远程连接到执行机，进行可视化的调试</li>
+<li>支持用例详情查看：可以在云端方便的查看用例测试详情，对测试结果了如指掌</li>
+<li>支持JS代码覆盖率：云端可视化查看覆盖率结果，支持压缩代码美化，方便对压缩代码的覆盖率检测</li>
+<li>支持hosts绑定：每个任务可运行在自己的hosts环境下，互不影响</li>
+<li>支持以下主流JS单元测试框架：Mocha, Jasmine, QUnit，将来可以方便的适配更多单测框架</li>
+</ol>
+
+<h1>
+<a id="如何部署webdriver云--js单元测试云" class="anchor" href="#%E5%A6%82%E4%BD%95%E9%83%A8%E7%BD%B2webdriver%E4%BA%91--js%E5%8D%95%E5%85%83%E6%B5%8B%E8%AF%95%E4%BA%91" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>如何部署WebDriver云 &amp; JS单元测试云？</h1>
+
+<ol>
+<li>开启WebDriver功能：<code>conf/site.json</code>中的<code>wdEnabled</code>为<code>true</code>，此时重启f2etest-web，可以在上方菜单栏上看到：JS单测云 | WebDriver云</li>
+<li>初始化执行机节点：详细安装请查看<a href="f2etest-client/f2etest-webdriver/%E8%8A%82%E7%82%B9%E9%83%A8%E7%BD%B2%E6%95%99%E7%A8%8B.md">f2etest-client/f2etest-webdriver/节点部署教程.md</a>
+</li>
+<li>将安装好的节点以及浏览器添加至数据库中：wd_nodes, wd_browsers</li>
+</ol>
+
+<p>经过上面的安装过程，我们的WebDriver云及JS单测云即已经部署完成，可以对外服务了。</p>
+
+<h1>
+<a id="f2etest-v100系列如何升级到v200" class="anchor" href="#f2etest-v100%E7%B3%BB%E5%88%97%E5%A6%82%E4%BD%95%E5%8D%87%E7%BA%A7%E5%88%B0v200" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>f2etest v1.0.0系列如何升级到v2.0.0</h1>
+
+<ol>
+<li>导入<code>f2etest-web/f2etest.sql</code>中的wd_开头的表初始化代码</li>
+<li>更新f2etest-web到v2.0.0版本</li>
+<li>按照上面的部署教程进行部署</li>
+</ol>
+
+<h1>
+<a id="感谢" class="anchor" href="#%E6%84%9F%E8%B0%A2" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>感谢</h1>
 
 <ul>
 <li>Guacamole: <a href="http://guac-dev.org/">http://guac-dev.org/</a>
 </li>
 <li>Nodejs: <a href="http://nodejs.org/">http://nodejs.org/</a>
+</li>
+<li>async: <a href="https://github.com/caolan/async">https://github.com/caolan/async</a>
+</li>
+<li>ejs: <a href="https://github.com/mde/ejs">https://github.com/mde/ejs</a>
+</li>
+<li>express: <a href="https://github.com/expressjs/express">https://github.com/expressjs/express</a>
+</li>
+<li>jwebdriver: <a href="https://github.com/yaniswang/jWebDriver">https://github.com/yaniswang/jWebDriver</a>
+</li>
+<li>mysql: <a href="https://github.com/felixge/node-mysql">https://github.com/felixge/node-mysql</a>
+</li>
+<li>pagejsunit: <a href="https://github.com/yaniswang/pageJsUnit">https://github.com/yaniswang/pageJsUnit</a>
+</li>
+<li>request: <a href="https://github.com/request/request">https://github.com/request/request</a>
 </li>
 </ul>
 

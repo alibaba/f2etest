@@ -1,0 +1,61 @@
+
+<!DOCTYPE HTML>
+<html>
+<head>
+    <meta charset="UTF-8">
+	<meta name="renderer" content="webkit"> 
+    <title><%=siteName + ' - ' + siteAbout%></title>
+    <link rel="icon" type="image/icon" href="<%=siteIcon%>">
+    <link rel="stylesheet" type="text/css" href="css/index.css" />
+    <script type="text/javascript" src="js/jquery-1.8.3.min.js"></script>
+</head>
+<body>
+    <% include header.html %>
+    <div id="doc-container">
+        <div id="doc-bg"></div>
+        <div id="doc-area">
+            <h3>ApiKey: <%=apiKey%></h3>
+            <h3>/version: 获得当前F2etest版本信息</h3>
+            <ul>
+                <li>DEMO地址：<a href="http://<%=host%>/version" target="_blank">http://<%=host%>/version</a></li>
+            </ul>
+            <h3>/runJsUnit: 运行JS单元测试</h3>
+            <ul>
+                <li>DEMO地址：<a href="http://<%=host%>/runJsUnit?userid=<%=userid%>&amp;apiKey=<%=apiKey%>&amp;url=http://127.0.0.1/test.html&amp;browserName=xxx" target="_blank">http://<%=host%>/runJsUnit?userid=<%=userid%>&amp;apiKey=<%=apiKey%>&amp;url=http://127.0.0.1/test.html&amp;browserName=xxx</a></li>
+                <li>此接口支持以下入参(除callback和format参数以外，均兼容POST提交)：
+                    <ol>
+                        <li>userid: 用户id</li>
+                        <li>apiKey: apiKey</li>
+                        <li>url: 可访问的JS单元测试URL地址，目前支持以下JS单测框架：mocha, jasmine, qunit (127.0.0.1会自动替换为客户端的局域网IP)</li>
+                        <li>browserName: 浏览器名</li>
+                        <li>browserVersion: 浏览器版本号</li>
+                        <li>hosts: hosts绑定</li>
+                        <li>coverageInclude: 需要覆盖率的代码，正则数组，用来匹配<strong>需要覆盖率</strong>的JS路径，例如：[/\/source\/\/i]，默认值：/\/src\//i</li>
+                        <li>coverageExclude: 不需要覆盖率的代码，正则数组，用来匹配<strong>不需要覆盖率</strong>的JS路径，例如：[/\/dist\/\/i]</li>
+                        <li>coverageBeautify: 1(美化), 0(不美化), 如果代码是压缩的，可以利用此功能对代码进行动态格式化，以解决无法获取真实覆盖率的问题</li>
+                        <li>timeout: 单测超时时间 单位：毫秒, 默认值：60000</li>
+                        <li>delay: 延迟关闭浏览器，用于出错时连接至远程执行机进行调试，单位：秒, 默认值：0</li>
+                        <li>callback: jsonp的回调函数(可省略)</li>
+                        <li>format: 1(格式化), 0(不格式化)，是否格式化接口返回的对象，方便调试时查看结果(可省略)</li>
+                    </ol>
+                </li>
+                <li>
+                    返回以下参数：
+                    <ol>
+                        <li>taskId: 任务id，可用来查看测试结果及覆盖率等数据</li>
+                        <li>result: 执行结果</li>
+                    </ol>
+                </li>
+                <li>
+                    对单测页面的要求：
+                    <ol>
+                        <li>单测框架必需是单独的script标签加载，并且文件名符合以下规则：/(mocha|jasmine|qunit|yuitest)(\-[^\/]+?)?\.js(\?|$)/i，请参考：<a href="http://<%=host%>/demo/mocha.html" target="_blank">http://<%=host%>/demo/mocha.html</a></li>
+                        <li>默认会对src文件夹中的文件进行覆盖率检测，如果需要检测别的路径，请使用coverageInclude参数进行配置</li>
+                    </ol>
+                </li>
+            </ul>
+        </div>
+    </div>
+    <% include footer.html %>
+</body>
+</html>

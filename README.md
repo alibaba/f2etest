@@ -180,9 +180,8 @@ Mac:
     3. IIS：用来部署f2etest-client，由于我们的脚本使用asp编写，因此请安装asp相关支持组件
     4. 设置当前主机每天凌晨自动重启：防止开机久了，系统出现不稳定
     5. 用户组配置：请将Authenticated Users添加到Remote Desktop Users，允许普通用户可以登录远程
-    6. 安装curl: 将curl的路径添加到系统变量的PATH路径中，以供APP快捷方式调用
-    7. 配置Remote App：如果是2008操作系统，需要将被远程的程序添加到Remote App，否则无法远程，添加快捷方式时请选择：允许任何命令行参数
-    8. 安装周边软件：输入法，Flash等
+    6. 配置Remote App：如果是2008操作系统，需要将被远程的程序添加到Remote App，否则无法远程，添加快捷方式时请选择：允许任何命令行参数
+    7. 安装周边软件：输入法，Flash等
 
     提示及注意事项：
 
@@ -209,9 +208,19 @@ Mac:
     3. 下一步选择：`计算机帐户`，再点击下一步
     4. 在`受信任的根证书颁发机构`的`证书`栏目中添加CA即可
 
-7. 部署f2etest-client
+7. 部署`f2etest-client\f2etest-browsers`
 
-    每台Server服务器上都需要部署f2etest-client，实现以下两个功能：
+    请将`f2etest-client\f2etest-browsers`复制到`c:\f2etest-browsers\`。
+
+    确保如下路径：`c:\f2etest-browsers\www\`
+
+    然后做如下操作：
+
+    1. 将curl的路径添加到系统变量的PATH路径中，以供APP快捷方式调用
+    2. 添加IIS站点：`c:\f2etest-browsers\www\`, 站点必需设置为administrator权限，否则无法工作，并且www目录设置为仅管理员有权限，防止任何人都可以创建账号
+    3. 修改setuser.asp中的apiKey，保持和f2etest-web中一致。
+
+    每台Server服务器上都需要部署`f2etest-client\f2etest-browsers`，实现以下两个功能：
 
     1. 提供API给f2etest-web调用，用来初始化用户账号
     2. 远程桌面连接时，需要打开指定的浏览器或软件，并统计相应软件的使用次数
@@ -222,13 +231,7 @@ Mac:
     2. `appid`: 修改为f2etest-web中配置的相同应用id
     3. `打开应用`： 替换为应用的程序路径
 
-    由于需要在当前系统中添加新用户，f2etest-client站点必需设置为administrator权限，否则无法工作
-
-    修改setuser.asp中的apiKey，保持和f2etest-web中一致。
-
     2008中必需要安装Remote App，并且要在Remote App的设置中：允许任何命令行参数。
-
-    重要安全说明：f2etest-client的www目录必需要设置为仅管理员有权限，否则任何人都可以查看到setuser.asp中的apiKey，会有严重的安全风险
 
     如何确定f2etest-client安装成功？
 
@@ -261,8 +264,89 @@ Mac:
 
     相比较之下，由于桌面方式属于直连，性能上会更加理想，因此我们建议用户使用桌面方式。
 
+
+初步了解 WebDriver云 & JS单元测试云
+=================================
+
+f2etest v2.0.0我们添加了WebDriver云 & JS单元测试云两个重要子产品。
+
+在这之前，我们一直都仅仅是一个手工测试的提效平台。
+
+现在，我们终于开始有自动化的功能了。
+
+我们首先了解下WebDriver云：
+-----------------------
+
+![imgs/webdriver1.jpg](https://raw.githubusercontent.com/alibaba/f2etest/master/imgs/webdriver1.jpg)
+
+WebDriver云利用Windows Server多用户的特性，将执行机的使用效率提升10倍以上。
+
+之前1台执行机只能跑1个任务，现在同样的硬件配置，我们可以跑10个任务。
+
+上面的截图看上去有88个执行机节点，传统情况下我们需要88台服务器。
+
+但是我们实际上才5台！
+
+相比较官方的Selenium Grid，我们有以下优势：
+
+1. 10倍以上硬件利用率：传统WebDriver 1台执行机仅能跑1个Job，而我们一台机器可以高并发跑N个Job，这个N取决于机器配置，理论上硬件利用率相当于传统节点的10倍以上
+2. 支持独立hosts绑定：每次申请节点时，可以指定不同的hosts绑定，保证同一台机器上不同节点的Job不会相互干扰
+3. 所有节点支持远程在线调试：利用Guacamole的在线远程功能，当自动化出现问题时，我们能非常便利的对自动化进展进行即时监控和调试
+
+再来了解下JS单元测试云：
+-----------------------
+
+任务队列：
+
+![imgs/jsunit1.jpg](https://raw.githubusercontent.com/alibaba/f2etest/master/imgs/jsunit1.jpg)
+
+
+任务详情页面：
+
+![imgs/jsunit2.jpg](https://raw.githubusercontent.com/alibaba/f2etest/master/imgs/jsunit2.jpg)
+
+代码覆盖率：
+
+![imgs/jsunit3.jpg](https://raw.githubusercontent.com/alibaba/f2etest/master/imgs/jsunit3.jpg)
+
+命令行客户端：
+
+![imgs/jsunit4.jpg](https://raw.githubusercontent.com/alibaba/f2etest/master/imgs/jsunit4.jpg)
+
+f2etest JS单测云，相比较互联网上现有的JS单测自动化解决方案，我们具有以下特点：
+
+1. 真实WebDriver执行机：每次运行均为空白的真实浏览器环境，多个任务间完全隔离，不会相互影响
+2. 便携的远程可视化调试：可以直接远程连接到执行机，进行可视化的调试
+3. 支持用例详情查看：可以在云端方便的查看用例测试详情，对测试结果了如指掌
+4. 支持JS代码覆盖率：云端可视化查看覆盖率结果，支持压缩代码美化，方便对压缩代码的覆盖率检测
+5. 支持hosts绑定：每个任务可运行在自己的hosts环境下，互不影响
+6. 支持以下主流JS单元测试框架：Mocha, Jasmine, QUnit，将来可以方便的适配更多单测框架
+
+如何部署WebDriver云 & JS单元测试云？
+===========================
+
+1. 开启WebDriver功能：`conf/site.json`中的`wdEnabled`为`true`，此时重启f2etest-web，可以在上方菜单栏上看到：JS单测云 | WebDriver云
+2. 初始化执行机节点：详细安装请查看[f2etest-client/f2etest-webdriver/节点部署教程.md](f2etest-client/f2etest-webdriver/节点部署教程.md)
+3. 将安装好的节点以及浏览器添加至数据库中：wd_nodes, wd_browsers
+
+经过上面的安装过程，我们的WebDriver云及JS单测云即已经部署完成，可以对外服务了。
+
+f2etest v1.0.0系列如何升级到v2.0.0
+========================
+
+1. 导入`f2etest-web/f2etest.sql`中的wd_开头的表初始化代码
+2. 更新f2etest-web到v2.0.0版本
+3. 按照上面的部署教程进行部署
+
 感谢
 ===================
 
 * Guacamole: [http://guac-dev.org/](http://guac-dev.org/)
 * Nodejs: [http://nodejs.org/](http://nodejs.org/)
+* async: [https://github.com/caolan/async](https://github.com/caolan/async)
+* ejs: [https://github.com/mde/ejs](https://github.com/mde/ejs)
+* express: [https://github.com/expressjs/express](https://github.com/expressjs/express)
+* jwebdriver: [https://github.com/yaniswang/jWebDriver](https://github.com/yaniswang/jWebDriver)
+* mysql: [https://github.com/felixge/node-mysql](https://github.com/felixge/node-mysql)
+* pagejsunit: [https://github.com/yaniswang/pageJsUnit](https://github.com/yaniswang/pageJsUnit)
+* request: [https://github.com/request/request](https://github.com/request/request)

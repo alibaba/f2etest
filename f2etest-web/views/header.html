@@ -1,0 +1,16 @@
+    <div id="header">
+        <div id="logo">
+            <a href="/"><img src="/imgs/f2etest.png" alt="f2etest" width="24" height="24"><span class="sitename">「<%=siteName%>」</span></a><span class="sitever"><a href="/changelog" target="_blank">v<%=appVersion%></a></span>
+            <span id="navTab"><a href="/" class="<%=navTab=='browser'?'sel':'';%>">浏览器云</a><%if(wdEnabled){%> <a href="/jsunit" class="<%=navTab=='jsunit'?'sel':'';%>">JS单测云</a> <a href="/webdriver" class="<%=navTab=='webdriver'?'sel':'';%>">WebDriver云</a><%}%></span>
+        </div>
+        <div id="options">
+            <span id="username"><%=username%></span> | <a href="/logout"><%=__('Logout')%></a>
+            <% if (navTab=='browser') { %>
+               | <a href="/help" class="<%=navPage=='help'?'cur':'';%>"><%=__('Help')%></a> | <a href="/install" class="<%=navPage=='install'?'cur':'';%>"><%=__('Install')%></a> | <a href="/local" class="<%=navPage=='local'?'cur':'';%>"><%=__('Proxy to local')%></a> | <a href="/stat" class="<%=navPage=='stat'?'cur':'';%>"><%=__('Statistics')%></a> | <a href="/api" class="<%=navPage=='api'?'cur':'';%>">API</a>
+            <% } else if(navTab=='webdriver') { %>
+                  | <a href="/wd_nodejs" class="<%=navPage=='wdnodejs'?'cur':'';%>">NodeJs</a> | <a href="/wd_api" class="<%=navPage=='wdapi'?'cur':'';%>">API</a>
+            <% } else if(navTab=='jsunit') { %>
+                  | <a href="/jsunit_nodejs" class="<%=navPage=='jsunit_nodejs'?'cur':'';%>">NodeJs客户端</a> | <a href="/jsunit_api" class="<%=navPage=='jsunit_api'?'cur':'';%>">API</a>
+            <% } %>
+        </div>
+    </div>

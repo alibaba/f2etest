@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<!--
+    jscoverage-clear-local-storage.html - code coverage for JavaScript
+    Copyright (C) 2013 tntim96
+
+    This program is free software; you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation; either version 2 of the License, or
+    (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License along
+    with this program; if not, write to the Free Software Foundation, Inc.,
+    51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
+-->
+
+<html>
+<head>
+    <meta http-equiv="X-UA-Compatible" content="IE=EmulateIE7"/>
+    <title>JSCover</title>
+    <link rel="stylesheet" type="text/css" href="jscoverage-highlight.css?nowrap"/>
+    <link rel="stylesheet" type="text/css" href="jscoverage.css?nowrap"/>
+    <!--[if IE]>
+    <link rel="stylesheet" type="text/css" href="jscoverage-ie.css"/>
+    <![endif]-->
+    <script type="text/javascript">
+        <!--
+        function clearLocalStorage() {
+            localStorage.removeItem('jscover');
+            var span = document.getElementById("deleteLocalStorage");
+            span.appendChild(document.createTextNode("Deleted localStorage['jscover']"));
+        }
+        //-->
+    </script>
+</head>
+
+<body onload="clearLocalStorage();">
+<div id="mainDiv">
+    <div id="headingDiv">
+        <h1>JSCover</h1>
+    </div>
+    <div class="TabPage" style="display: block;">
+        <p>
+            <span id="deleteLocalStorage"></span>
+        </p>
+
+        <p>
+            See <a href="http://tntim96.github.com/JSCover">http://tntim96.github.com/JSCover</a> for more information.
+        </p>
+
+        <p>
+            Copyright &copy; 2013, 2014 tntim96
+        </p>
+    </div>
+</div>
+</body>
+</html>

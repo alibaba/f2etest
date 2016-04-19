@@ -4,6 +4,8 @@ module.exports = function(app, config) {
         var user = req.session.user;
         viewData.apiKey = user.apiKey;
         viewData.host = req.headers['host'];
+        viewData.navTab = 'browser';
+        viewData.navPage = 'local';
         res.render('local', viewData);
     });
 }

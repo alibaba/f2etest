@@ -10,6 +10,8 @@ module.exports = function(app, config) {
     app.get('/', function(req, res){
         var viewData = req.viewData;
         viewData.appList = indexAppList;
+        viewData.navTab = 'browser';
+        viewData.navPage = '';
         res.render('index', viewData);
     });
 }

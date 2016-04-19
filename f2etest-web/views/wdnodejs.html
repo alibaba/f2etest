@@ -1,0 +1,92 @@
+
+<!DOCTYPE HTML>
+<html>
+<head>
+    <meta charset="UTF-8">
+	<meta name="renderer" content="webkit"> 
+    <title><%=siteName + ' - ' + siteAbout%></title>
+    <link rel="icon" type="image/icon" href="<%=siteIcon%>">
+    <link rel="stylesheet" type="text/css" href="css/index.css" />
+    <link rel="stylesheet" type="text/css" href="css/hljs.min.css" />
+    <link rel="stylesheet" type="text/css" href="css/asciinema-player.css" />
+    <script type="text/javascript" src="js/jquery-1.8.3.min.js"></script>
+    <script type="text/javascript" src="js/highlight.min.js"></script>
+    <script type="text/javascript" src="js/asciinema-player.js"></script>
+</head>
+<body>
+    <% include header.html %>
+    <div id="doc-container">
+        <div id="doc-bg"></div>
+        <div id="doc-area">
+            <h3>面向NodeJs的整体自动化解决方案：</h3>
+            <p>我们基于jWebDriver定制了F2etest WebDriver的客户端，仅在初始化上有差异，其它API完全一致，详细jWebDriver的使用请查看官网：<a href="http://jwebdriver.com/" target="_blank">http://jwebdriver.com/</a></p>
+            <p>请按照以下操作步骤，可以直接体验整个使用过程：</p>
+            <ol>
+                <li>npm install mocha -g</li>
+                <li>npm install expect.js mocha-generators f2etest-webdriver</li>
+                <li>
+                    新建: test.js，内容如下：
+                    <pre><code>var F2etestWebDriver = require('f2etest-webdriver');
+var expect  = require("expect.js");
+require('mocha-generators').install();
+
+describe('f2etest-webdriver test', function(){
+
+    this.timeout(10000);
+    
+    var browser;
+    before(function*(){
+        browser = yield F2etestWebDriver.run({
+            server: 'http://<%=host%>/',
+            userid: '<%=userid%>',
+            apiKey: '<%=apiKey%>',
+            browserName: 'chrome',
+            browserVersion: '',
+            hosts: '',
+            proxy: ''
+        });
+    });
+
+    it('should open url', function*(){
+        yield browser.url('https://www.baidu.com/');
+        var kw = yield browser.find('#kw');
+        expect(kw.length).to.be(1);
+
+        yield kw.val('mp3').submit();
+
+        var url = yield browser.url();
+        expect(url).to.contain('wd=mp3');
+    });
+
+    after(function*(){
+        yield browser.close();
+    });
+
+});</code></pre>
+                </li>
+                <li>mocha test.js</li>
+                <li>
+                    执行结果如下：
+                    <pre><code>  f2etest-webdriver test
+    √ should open url (1368ms)
+
+  1 passing (3s)</code></pre>
+                </li>
+                <li>如何在F2etest上远程查看执行过程？
+                    <ol>
+                        <li>初始化的实例browser对象上，可以读取到browserId这个属性</li>
+                        <li>上面的参数拼接URL，并打开：<a href="http://<%=host%>/openWdBrowser?browserId={browserId}" target="blank">http://<%=host%>/openWdBrowser?browserId={browserId}</a></li>
+                    </ol>
+                </li>
+                <li>详细使用请参考：<a href="https://www.npmjs.com/package/f2etest-webdriver" target="_blank">https://www.npmjs.com/package/f2etest-webdriver</a></li>
+            </ol>
+        </div>
+    </div>
+    <script type="text/javascript">
+        $('pre code').each(function(i, block) {
+            hljs.highlightBlock(block);
+        });    
+    </script>
+    <% include footer.html %>
+</body>
+</html>

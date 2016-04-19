@@ -49,6 +49,31 @@ a{
     font-size: 12px;
     color: #ccc;
 }
+#navTab{
+    padding-left: 20px;
+}
+#navTab a{
+    display: inline-block;
+    margin: 0 auto;
+    padding: 5px 10px;
+    margin: 0 2px;
+    border: 1px solid transparent;
+}
+#navTab a:hover {
+    outline: 0;
+    border: solid 1px #83A999;
+    -webkit-border-radius: 3px;
+    -ms-border-radius: 3px;
+    border-radius: 3px;
+}
+#navTab a.sel{
+    color: red;
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    box-sizing: border-box;
+    background: rgba(255,255,255, 0.1);
+    border-radius: 3px;
+}
 #options{
     float: right;
     padding: 14px 10px 0 0;
@@ -61,6 +86,7 @@ a{
 }
 #header .cur{
     font-weight: bold;
+    color: red;
 }
 #app-list{
     position: absolute;
@@ -269,4 +295,48 @@ kbd {
     text-shadow: 0 1px 0 #fff;
     line-height: 1.4;
     white-space: nowrap
+}
+
+#wdListTitle span{
+    color: #c00;
+}
+#wdBrowserList span.name{
+    display: inline-block;
+    width: 120px;
+    text-align: right;
+    padding-right:10px;
+    font-weight: bold;
+}
+#wdBrowserList img{
+    width: 30px;
+    height: 30px;
+    vertical-align: middle;
+}
+#wdBrowserList span.browser{
+    display: inline-block;
+    position: relative;
+}
+#wdBrowserList span.run{
+    opacity:0.5;
+}
+#wdBrowserList span.run span{
+    position: absolute;
+    right: 2px;
+    bottom: 0px;
+    width: 14px;
+    height: 14px;
+    background: url(/imgs/running.svg);
+}
+#wdBrowserList span.offline{
+    -webkit-filter: grayscale(100%);
+    filter:Gray;
+}
+
+code{
+    -webkit-border-radius: 5px;
+    -ms-border-radius: 5px;
+    border-radius: 5px;
+    max-width: 700px;
+    line-height: 20px;
+    font: normal 11pt Consolas, Monaco, monospace;
 }

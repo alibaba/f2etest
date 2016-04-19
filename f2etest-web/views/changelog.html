@@ -2,22 +2,25 @@
 <html>
 <head>
     <meta charset="UTF-8">
-    <meta name="renderer" content="webkit">
+	<meta name="renderer" content="webkit"> 
     <title><%=siteName + ' - ' + siteAbout%></title>
     <link rel="icon" type="image/icon" href="<%=siteIcon%>">
     <link rel="stylesheet" type="text/css" href="css/index.css" />
     <script type="text/javascript" src="js/jquery-1.8.3.min.js"></script>
 </head>
 <body>
-    <div id="header">
-        <div id="logo"><a href="/"><img src="/imgs/f2etest.png" alt="f2etest" width="24" height="24"><span class="sitename">「<%=siteName%>」</span></a><span class="sitever"><a href="/changelog" target="_blank">v<%=appVersion%></a></span></div>
-        <div id="options">
-            <span id="username"><%=username%></span> | <a href="/logout"><%=__('Logout')%></a> | <span class="cur"><%=__('Help')%></span> | <a href="/install" class="recommend"><%=__('Install')%></a> | <a href="/local"><%=__('Proxy to local')%></a> | <a href="/stat"><%=__('Statistics')%></a> | <a href="/api">API</a>
-        </div>
-    </div>
+    <% include header.html %>
     <div id="doc-container">
         <div id="doc-bg"></div>
         <div id="doc-area">
+            <h3>v2.0.0 (2016-4-11)</h3>
+            <ol>
+                <li>添加API：/applyWdBrowser, /openWdBrowser, /listWdBrowsers, /getWdPac, /runJsUnit</li>
+                <li>添加WebDriver云</li>
+                <li>添加F2etest WebDriver的NodeJs客户端f2etest-webdriver</li>
+                <li>添加JS单元测试云</li>
+                <li>添加F2etest JsUnit的NodeJs客户端f2etest-jsunit</li>
+            </ol>
             <h3>v1.0.2 (2015-10-18)</h3>
             <ol>
                 <li>添加API：/version, /setHosts, /getHostsConfig /setHostsForward /getHostsPac</li>

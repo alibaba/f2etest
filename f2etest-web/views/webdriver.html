@@ -1,0 +1,120 @@
+
+<!DOCTYPE HTML>
+<html>
+<head>
+    <meta charset="UTF-8">
+	<meta name="renderer" content="webkit"> 
+    <title><%=siteName + ' - ' + siteAbout%></title>
+    <link rel="icon" type="image/icon" href="<%=siteIcon%>">
+    <link rel="stylesheet" type="text/css" href="css/index.css" />
+    <script type="text/javascript" src="js/jquery-1.8.3.min.js"></script>
+</head>
+<body>
+    <% include header.html %>
+    <div id="doc-container">
+        <div id="doc-bg"></div>
+        <div id="doc-area">
+            <h3>什么是F2etest WebDriver云？</h3>
+            <p>WebDriver是解决自动化测试的一个W3C标准解决方案：<a href="https://www.w3.org/TR/webdriver/" target="blank">https://www.w3.org/TR/webdriver/</a></p>
+            <p>那么，什么是F2etest WebDriver云？</p>
+            <p>F2etest WebDriver云是在WebDriver方案基础上，实现的一套WebDriver Hub解决方案，可以对外提供并调度海量的执行机节点，并提供了以下功能扩展：</p>
+            <ol>
+                <li><strong>10倍以上硬件利用率</strong>：传统WebDriver 1台执行机仅能跑1个Job，而我们一台机器可以高并发跑N个Job，这个N取决于机器配置，理论上硬件利用率相当于传统节点的10倍以上</li>
+                <li><strong>支持独立hosts绑定</strong>：每次申请节点时，可以指定不同的hosts绑定，保证同一台机器上不同节点的Job不会相互干扰</li>
+                <li><strong>所有节点支持远程在线调试</strong>：利用Guacamole的在线远程功能，我们能非常便利的对自动化进展进行即时监控和调试</li>
+            </ol>
+            <h3>我如何使用？</h3>
+            <ol>
+                <li>Nodejs：可以使用我们定制的f2etestWebDriver客户端，详细请看<a href="/wd_nodejs">面向NodeJs的整体自动化解决方案</a></li>
+                <li>其它语言：可以基于我们的<a href="/wd_api">开放API</a>进行桥接，可以支持任何语言，例如：Java, Ruby...，详细可参考Nodejs版本的实现: <a href="https://github.com/alibaba/f2etest/blob/master/f2etest-webdriver/index.js" target="_blank">https://github.com/alibaba/f2etest/blob/master/f2etest-webdriver/index.js</a></li>
+            </ol>
+            <h3>节点参数需知：</h3>
+            <ol>
+                <li>WebDriver闲置超时：<strong>60秒</strong>(任务会话意外中断，60秒后会自动结束，如果希望增加调试时间，请定时发起一次任意操作，以延后回收时间)</li>
+                <li>节点回收轮询：<strong>5秒</strong>(节点会话结束后，5秒内会被重新放入执行机池)</li>
+            </ol>
+            <h3 id="wdListTitle">WebDriver浏览器列表(2秒刷新), 空闲(<span id="idleCount">0</span>)，工作(<span id="busyCount">0</span>)，离线(<span id="offlineCount">0</span>)：</h3>
+            <div id="wdBrowserList">
+            </div>
+            <script type="text/javascript">
+                var jWdBrowserList = $('#wdBrowserList');
+                var jOfflineCount = $('#offlineCount');
+                var jIdleCount = $('#idleCount');
+                var jBusyCount = $('#busyCount');
+                function refreshWdBrowserList(){
+                    $.getJSON('/listWdBrowsers?callback=?', function(data){
+                        var arrHtml = [];
+                        var offlineCount = 0;
+                        var idleCount = 0;
+                        var busyCount = 0;
+                        var arrBrowsers = data.arrBrowsers;
+                        arrBrowsers.forEach(function(browser){
+                            var browserName = browser.browserName;
+                            var appId = browserName.toLowerCase();
+                            var browserVersion = browser.browserVersion;
+                            if(browserVersion){
+                                browserName += ' ' + browserVersion;
+                                appId += browserVersion;
+                            }
+                            var arrLine = ['<p><span class="name">'+browserName+':</span>'];
+                            var workStatus = browser.workStatus;
+                            var arrNodes = workStatus.split(',');
+                            arrNodes.sort(function(a, b){
+                                var arrA = a.split(':');
+                                var arrB = b.split(':');
+                                var idA = parseInt(arrA[0],10);
+                                var idB = parseInt(arrB[0],10);
+                                if(idA > idB){
+                                    return 1;
+                                }
+                                else if(idA < idB){
+                                    return -1;
+                                }
+                                else{
+                                    return 0;
+                                }
+                            });
+                            arrNodes.forEach(function(browserInfo){
+                                var arrBrowserInfo = browserInfo.split(':');
+                                var browserId = arrBrowserInfo[0];
+                                var status = arrBrowserInfo[1];
+                                switch(status){
+                                    case '0':
+                                        offlineCount ++;
+                                        break;
+                                    case '1':
+                                        idleCount ++;
+                                        break;
+                                    case '2':
+                                        busyCount ++;
+                                        break;
+                                }
+                                var mapClass = {
+                                    0: 'offline',
+                                    1: 'idle',
+                                    2: 'run'
+                                };
+                                var mapTitle = {
+                                    0: '走散了……',
+                                    1: '让我休息会……',
+                                    2: '玩命工作中……'
+                                }
+                                arrLine.push('<a href="/openWdBrowser?browserId='+browserId+'" target="_blank"><span class="browser '+mapClass[status]+'" title="'+mapTitle[status]+'"><span></span><img src="/imgs/app/'+appId+'.png"></span></a> ');
+                            });
+                            arrLine.push('</p>')
+                            arrHtml.push(arrLine.join(''));
+                        });
+                        jWdBrowserList.html(arrHtml.join(''));
+                        jOfflineCount.html(offlineCount);
+                        jIdleCount.html(idleCount);
+                        jBusyCount.html(busyCount);
+                        setTimeout(refreshWdBrowserList, 2000);
+                    });
+                }
+                refreshWdBrowserList();
+            </script>
+        </div>
+    </div>
+    <% include footer.html %>
+</body>
+</html>

@@ -3,19 +3,14 @@
 <html>
 <head>
     <meta charset="UTF-8">
-    <meta name="renderer" content="webkit">
+	<meta name="renderer" content="webkit"> 
     <title><%=siteName + ' - ' + siteAbout%></title>
     <link rel="icon" type="image/icon" href="<%=siteIcon%>">
     <link rel="stylesheet" type="text/css" href="css/index.css" />
     <script type="text/javascript" src="js/jquery-1.8.3.min.js"></script>
 </head>
 <body>
-    <div id="header">
-        <div id="logo"><a href="/"><img src="/imgs/f2etest.png" alt="f2etest" width="24" height="24"><span class="sitename">「<%=siteName%>」</span></a><span class="sitever"><a href="/changelog" target="_blank">v<%=appVersion%></a></span></div>
-        <div id="options">
-            <span id="username"><%=username%></span> | <a href="/logout"><%=__('Logout')%></a> | <a href="/help"><%=__('Help')%></a> | <span class="cur recommend"><%=__('Install')%></span> | <a href="/local"><%=__('Proxy to local')%></a> | <a href="/stat"><%=__('Statistics')%></a> | <a href="/api">API</a>
-        </div>
-    </div>
+    <% include header.html %>
     <div id="doc-container">
         <div id="doc-bg"></div>
         <div id="doc-area">

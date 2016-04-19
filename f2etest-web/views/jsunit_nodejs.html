@@ -1,0 +1,78 @@
+
+<!DOCTYPE HTML>
+<html>
+<head>
+    <meta charset="UTF-8">
+	<meta name="renderer" content="webkit"> 
+    <title><%=siteName + ' - ' + siteAbout%></title>
+    <link rel="icon" type="image/icon" href="<%=siteIcon%>">
+    <link rel="stylesheet" type="text/css" href="css/index.css" />
+    <link rel="stylesheet" type="text/css" href="css/hljs.min.css" />
+    <link rel="stylesheet" type="text/css" href="css/asciinema-player.css" />
+    <script type="text/javascript" src="js/jquery-1.8.3.min.js"></script>
+    <script type="text/javascript" src="js/highlight.min.js"></script>
+    <script type="text/javascript" src="js/asciinema-player.js"></script>
+</head>
+<body>
+    <% include header.html %>
+    <div id="doc-container">
+        <div id="doc-bg"></div>
+        <div id="doc-area">
+            <h3>f2etest-jsunit, Nodejs端的JS单元测试自动化解决方案：</h3>
+            <p>请按照以下操作步骤，可以直接体验整个使用过程：</p>
+            <ol>
+                <li>> npm install f2etest-jsunit -g</li>
+                <li>
+                    新建: jsunit.json，内容如下：
+                    <pre><code>{
+    "server": "http://<%=host%>/",
+    "userid": "<%=userid%>",
+    "apikey": "<%=apiKey%>",
+    "browsers": "chrome, ie 11",
+    "url": "http://<%=host%>/demo/mocha.html",
+    "coverageinclude": "/\\/src\\//i",
+    "coverageexclude": "/\\/lib\\//i",
+    "append": "\n  TEST CASE AMOUNT:{\"passed\":{!testPassed},\"failed\":{!testFailed},\"skipped\":{!testSkiped}}\n  CODE COVERAGE RESULT OF LINES IS: {!lineCovered}/{!lineCount}\n  CODE COVERAGE RESULT OF BRANCHES IS: {!branchCovered}/{!branchCount}"
+}
+</code></pre>
+                </li>
+                <li>> f2etest-jsunit</li>
+                <li>
+                    执行结果如下：
+                    <pre class="html"><code>  ====================================================================================================
+    JsUnit reporter: http://<%=host%>/demo/mocha.html
+  ====================================================================================================
+
+    chrome 49.0.2623.87:
+    --------------------------------------------------------------------------------------------------
+        √ Tests passed: 88.89% (8/9) in 1069 ms
+        Line covered: 98.28% (57/58), Branch covered: 50% (1/2), Function covered: 100% (16/16)
+        More info: http://<%=host%>/jsunit_result?id=973
+
+    internet explorer 11:
+    --------------------------------------------------------------------------------------------------
+        √ Tests passed: 88.89% (8/9) in 1048 ms
+        Line covered: 98.28% (57/58), Branch covered: 50% (1/2), Function covered: 100% (16/16)
+        More info: http://<%=host%>/jsunit_result?id=972
+
+  ====================================================================================================
+    √ Tests passed: 88.89% (16/18) in 4827 ms
+    Line covered: 98.28% (114/116), Branch covered: 50% (2/4), Function covered: 100% (32/32)
+  ====================================================================================================
+
+  TEST CASE AMOUNT:{"passed":16,"failed":0,"skipped":2}
+  CODE COVERAGE RESULT OF LINES IS: 114/116
+  CODE COVERAGE RESULT OF BRANCHES IS: 2/4</code></pre>
+                </li>
+                <li>详细使用请参考：<a href="https://www.npmjs.com/package/f2etest-jsunit" target="_blank">https://www.npmjs.com/package/f2etest-jsunit</a></li>
+            </ol>
+        </div>
+    </div>
+    <script type="text/javascript">
+        $('pre code').each(function(i, block) {
+            hljs.highlightBlock(block);
+        });    
+    </script>
+    <% include footer.html %>
+</body>
+</html>

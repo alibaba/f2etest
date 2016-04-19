@@ -10,5 +10,8 @@
     "clientApiKey":"xxxx",
     "guacamoleApi": "http://f2etest-link.xxxx.com/guacamole/client.xhtml",
     "footer": "",
-    "statNav" : "<a href=\"/stat\">标准统计</a> | <a href=\"/statuser\">个人统计</a>"
+    "statNav" : "<a href=\"/stat\">标准统计</a> | <a href=\"/statuser\">个人统计</a>",
+    "wdEnabled": false,
+    "wdCheckNodesInterval": 5000,
+    "wdCheckNodesParallelLimit": 16
 }

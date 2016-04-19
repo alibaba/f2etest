@@ -63,7 +63,7 @@ i18n.configure({
     updateFiles: false,
     extension: '.js'
 });
-app.set('trust proxy', '127.0.0.1');
+app.set('trust proxy', 'loopback, uniquelocal');
 app.use(i18n.init);
 
 // 初始化新用户
@@ -83,7 +83,8 @@ app.use(function(req ,res, next){
             siteIcon: siteInfo.icon,
             siteFooter: siteInfo.footer,
             userid: userid,
-            username: username
+            username: username,
+            wdEnabled: siteInfo.wdEnabled
         };
         pool.query('select RemotePassword,ApiKey from appUsers where UserId = ?;', userid, function(err, rows){
             if(rows.length > 0){
@@ -115,4 +116,5 @@ files.forEach(function(file){
     require('./control/'+file)(app, config);
 });
 
-app.listen(config.siteInfo.port, '0.0.0.0');
+var server = app.listen(config.siteInfo.port, '0.0.0.0');
+server.timeout = 1800000; // 请求30分钟超时

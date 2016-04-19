@@ -1,0 +1,1 @@
+for /R %1 %%p in (*.rdp) do start "" mstsc %%p

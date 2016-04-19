@@ -1,0 +1,182 @@
+
+<!DOCTYPE HTML>
+<html>
+<head>
+    <meta charset="UTF-8">
+	<meta name="renderer" content="webkit"> 
+    <title><%=siteName + ' - ' + siteAbout%></title>
+    <link rel="icon" type="image/icon" href="<%=siteIcon%>">
+    <link rel="stylesheet" type="text/css" href="css/index.css" />
+    <script type="text/javascript" src="js/jquery-1.8.3.min.js"></script>
+</head>
+<body>
+    <% include header.html %>
+    <div id="doc-container">
+        <div id="doc-bg"></div>
+        <div id="doc-area">
+            <%-statNav%>
+            <ul>
+                <li>我的小团队：<%=Department%></li>
+                <li>我的大团队：<%=ParentDepartment%></li>
+            </ul>
+            <div class="panel">
+                <h3 class="panel-title">小团队次数 / 日</h3>
+                <div class="panel-body" id="logTimeDayCurTeam"></div>
+            </div>
+            <div class="panel">
+                <h3 class="panel-title">小团队排名 (30天)</h3>
+                <div class="panel-body" id="userOrderDayCurTeam"></div>
+            </div>
+            <div class="panel">
+                <h3 class="panel-title">小团队App统计 (30天)</h3>
+                <div class="panel-body" id="appOrderDayCurTeam"></div>
+            </div>
+            <div class="panel">
+                <h3 class="panel-title">大团队次数 / 日</h3>
+                <div class="panel-body" id="logTimeDayParentTeam"></div>
+            </div>
+            <div class="panel">
+                <h3 class="panel-title">大团队排名 (30天)</h3>
+                <div class="panel-body" id="userOrderDayParentTeam"></div>
+            </div>
+            <div class="panel">
+                <h3 class="panel-title">大团队App统计 (30天)</h3>
+                <div class="panel-body" id="appOrderDayParentTeam"></div>
+            </div>
+        </div>
+    </div>
+    <script type="text/javascript" src="js/highcharts.js"></script>
+    <script type="text/javascript" src="js/highcharts-3d.js"></script>
+    <script type="text/javascript" src="js/highcharts-exporting.js"></script>
+    <script type="text/javascript" src="js/highcharts-theme.js"></script>
+    <script type="text/javascript">
+        // chart
+        function showBar(id, type, arrDatas, title, unit, clickFunc){
+            var arrCategories = [];
+            var arrValues = [];
+            var data;
+            for(var i=0,c=arrDatas.length;i<c;i++){
+                data = arrDatas[i];
+                arrCategories.push(data.name);
+                arrValues.push(data.value);
+            }
+            var highchartsObject = {
+                chart: {
+                    type: type==='bar'?'bar':'column',
+                    options3d: {
+                        enabled: true,
+                        alpha: 5,
+                        beta: 0,
+                        depth: 50,
+                        viewDistance: 25
+                    },
+                    backgroundColor: null
+                },
+                credits: {
+                    enabled: false
+                },
+                title: {
+                    text: '　'
+                },
+                xAxis: {
+                    categories: arrCategories,
+                    title: null,
+                    labels:{
+                        formatter: function(){
+                            return this.value;
+                        }
+                    }
+                },
+                yAxis: {
+                    min: 0,
+                    title: {
+                        text: title,
+                        align: 'high'
+                    }
+                },
+                tooltip: {
+                    formatter: function(){
+                        return this.x + ": " + this.y + ' '+ unit;
+                    }
+                }, 
+                plotOptions: {
+                    bar: {
+                        dataLabels: {
+                            enabled: true
+                        },
+                        animation: false,
+                        shadow: true
+                    },
+                    column: {
+                        depth: 40
+                    }
+                },
+                legend: {
+                    enabled: false
+                },
+                series: [{
+                    data: arrValues
+                }]
+            };
+            if(clickFunc){
+                highchartsObject.plotOptions.column.cursor = 'pointer';
+                highchartsObject.plotOptions.column.events = {
+                  click: clickFunc
+                };
+            }
+            $('#'+id).highcharts(highchartsObject);
+        }
+        
+        function showPie(id, arrDatas, title, unit, height){
+            var highchartsObject = {
+                chart: {
+                    plotBackgroundColor: null,
+                    plotBorderWidth: null,
+                    plotShadow: true,
+                    height: height
+                },
+                credits: {
+                    enabled: false
+                },
+                colors:[
+                    '#436EEE','#FF3366'
+                ],
+                title: '',
+                tooltip: {
+                    pointFormat: '{series.name}: <b>{point.y} '+unit+'</b>'
+                },
+                plotOptions: {
+                    pie: {
+                        allowPointSelect: true,
+                        cursor: 'pointer',
+                        dataLabels: {
+                            enabled: true,
+                            color: '#000000',
+                            connectorColor: '#000000',
+                            format: '<b>{point.name}</b>: {point.percentage:.1f} %'
+                        }
+                    }
+                },
+                series: [{
+                    type: 'pie',
+                    name: title,
+                    data: arrDatas
+                }
+                ]
+            }
+            $('#'+id).highcharts(highchartsObject);
+        }
+        function userClickFunc(e){
+            var UserId = e.point.category.replace(/\(.*/,'');
+            window.open('https://work.alibaba-inc.com/work/search?type=person&keywords='+encodeURIComponent(UserId));
+        }
+        showBar('logTimeDayCurTeam', 'column', <%-JSON.stringify(logTimeDayCurTeam)%>, '次数', '次');
+        showBar('userOrderDayCurTeam', 'column', <%-JSON.stringify(userOrderDayCurTeam)%>, '次数', '次', userClickFunc);
+        showBar('appOrderDayCurTeam', 'column', <%-JSON.stringify(appOrderDayCurTeam)%>, '次数', '次');
+        showBar('logTimeDayParentTeam', 'column', <%-JSON.stringify(logTimeDayParentTeam)%>, '次数', '次');
+        showBar('userOrderDayParentTeam', 'column', <%-JSON.stringify(userOrderDayParentTeam)%>, '次数', '次', userClickFunc);
+        showBar('appOrderDayParentTeam', 'column', <%-JSON.stringify(appOrderDayParentTeam)%>, '次数', '次');
+    </script>
+    <% include footer.html %>
+</body>
+</html>

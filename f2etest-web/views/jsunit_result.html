@@ -1,0 +1,412 @@
+
+<!DOCTYPE HTML>
+<html>
+<head>
+    <meta charset="UTF-8">
+	<meta name="renderer" content="webkit"> 
+    <title><%=siteName + ' - ' + siteAbout%></title>
+    <link rel="icon" type="image/icon" href="<%=siteIcon%>">
+    <link rel="stylesheet" type="text/css" href="css/index.css" />
+    <style type="text/css">
+        ul,li{
+            list-style: none;
+        }
+        table {
+            border-collapse: collapse;
+            border: 1px solid #eee;
+        }
+        table th, table td {
+            color: #666;
+            border: 1px solid #eee;
+            padding: 12px;
+            border-collapse: collapse;
+        }
+        table th {
+            text-align: right;
+            min-width: 150px;
+        }
+        table td {
+            text-align: left;
+            min-width: 600px;
+        }
+        table th.last {
+            border-right: none;
+        }
+        tbody tr{
+            background: #fff;
+        }
+        #doc-area tbody a{
+            font-size: 16px;
+            color: #000;
+        }
+        .browser{
+            width: 30px;
+            height: 30px;
+            vertical-align: middle;
+        }
+        .coverimg{
+            width: 24px;
+            height: 24px;
+            vertical-align: middle;
+        }
+        .tester{
+            width: 30px;
+            height: 30px;
+        }
+        .status{
+            width: 24px;
+            height: 24px;
+            vertical-align: middle;
+        }
+        .passed{
+            color: green;
+        }
+        .failed{
+            color: #990000;
+        }
+
+        #test-reporter {
+          font: 20px/1.5 "Helvetica Neue", Helvetica, Arial, sans-serif;
+        }
+
+        #test-reporter ul,
+        #test-reporter li {
+          margin: 0;
+          padding: 0;
+        }
+
+        #test-reporter ul {
+          list-style: none;
+        }
+
+        #test-reporter h1,
+        #test-reporter h2 {
+          margin: 0;
+        }
+
+        #test-reporter h1 {
+          font-size: 1em;
+          font-weight: 200;
+        }
+
+        #test-reporter h1 a {
+          text-decoration: none;
+          color: inherit;
+        }
+
+        #test-reporter h1 a:hover {
+          text-decoration: underline;
+        }
+
+        #test-reporter .suite .suite h1 {
+          margin-top: 0;
+          font-size: .8em;
+        }
+
+        #test-reporter .hidden {
+          display: none;
+        }
+
+        #test-reporter h2 {
+          font-size: 12px;
+          font-weight: normal;
+        }
+
+        #test-reporter .suite {
+          margin-left: 15px;
+        }
+
+        #test-reporter .test {
+          margin-left: 15px;
+          overflow: hidden;
+        }
+
+        #test-reporter .test.pending:hover h2::after {
+          content: '(pending)';
+          font-family: arial, sans-serif;
+        }
+
+        #test-reporter .test.passed.medium .duration {
+          background-color: #c09853;
+        }
+
+        #test-reporter .test.passed.slow .duration {
+          background-color: #b94a48;
+        }
+
+        #test-reporter .test.passed::before {
+          content: '✓';
+          font-size: 12px;
+          display: block;
+          float: left;
+          margin-right: 5px;
+          color: #00d6b2;
+        }
+
+        #test-reporter .test.passed .duration {
+          font-size: 9px;
+          margin-left: 5px;
+          padding: 2px 5px;
+          color: white;
+          -webkit-box-shadow: inset 0 1px 1px rgba(0,0,0,.2);
+          -moz-box-shadow: inset 0 1px 1px rgba(0,0,0,.2);
+          box-shadow: inset 0 1px 1px rgba(0,0,0,.2);
+          -webkit-border-radius: 5px;
+          -moz-border-radius: 5px;
+          -o-border-radius: 5px;
+          border-radius: 5px;
+        }
+
+        #test-reporter .test.passed.fast .duration {
+          display: none;
+        }
+
+        #test-reporter .test.pending {
+          color: #0b97c4;
+        }
+
+        #test-reporter .test.pending::before {
+          content: '◦';
+          color: #0b97c4;
+          font-size: 12px;
+          display: block;
+          float: left;
+          margin-right: 5px;
+        }
+
+        #test-reporter .test.failed {
+          color: #c00;
+        }
+
+        #test-reporter .test.failed pre {
+          color: black;
+        }
+
+        #test-reporter .test.failed::before {
+          content: '✖';
+          font-size: 12px;
+          display: block;
+          float: left;
+          margin-right: 5px;
+          color: #c00;
+        }
+
+        #test-reporter .test pre.error {
+          color: #c00;
+          max-height: 300px;
+          overflow: auto;
+        }
+
+        #test-reporter .test pre {
+          display: block;
+          float: left;
+          clear: left;
+          font: 12px/1.5 monaco, monospace;
+          margin: 5px;
+          padding: 15px;
+          border: 1px solid #eee;
+          border-bottom-color: #ddd;
+          -webkit-border-radius: 3px;
+          -moz-border-radius: 3px;
+          -o-border-radius: 3px;
+          border-radius: 3px;
+          -webkit-box-shadow: 0 1px 3px #eee;
+          -moz-box-shadow: 0 1px 3px #eee;
+          box-shadow: 0 1px 3px #eee;
+        }
+
+        #test-reporter .test h2 {
+          position: relative;
+        }
+
+        #test-reporter .test a.replay {
+          position: absolute;
+          top: 3px;
+          right: 0;
+          text-decoration: none;
+          vertical-align: middle;
+          display: block;
+          width: 15px;
+          height: 15px;
+          line-height: 15px;
+          text-align: center;
+          background-color: #eee;
+          font-size: 15px;
+          -webkit-border-radius: 15px;
+          -moz-border-radius: 15px;
+          -o-border-radius: 15px;
+          border-radius: 15px;
+          -webkit-transition: opacity 200ms;
+          -moz-transition: opacity 200ms;
+          -o-transition: opacity 200ms;
+          transition: opacity 200ms;
+          opacity: 0.3;
+          color: #888;
+        }
+
+        #test-reporter .test:hover a.replay {
+          opacity: 1;
+        }
+
+        #test-error {
+          color: #c00;
+          font-size: 1.5em;
+          font-weight: 100;
+          letter-spacing: 1px;
+        }
+
+        #test-stats {
+          position: fixed;
+          top: 15px;
+          right: 10px;
+          font-size: 12px;
+          margin: 0;
+          color: #888;
+          z-index: 1;
+        }
+
+        #test-stats .progress {
+          float: right;
+          padding-top: 0;
+        }
+
+        #test-stats em {
+          color: black;
+        }
+
+        #test-stats a {
+          text-decoration: none;
+          color: inherit;
+        }
+
+        #test-stats a:hover {
+          border-bottom: 1px solid #eee;
+        }
+
+        #test-stats li {
+          display: inline-block;
+          margin: 0 5px;
+          list-style: none;
+          padding-top: 11px;
+        }
+
+        #test-stats canvas {
+          width: 40px;
+          height: 40px;
+        }
+
+        #test-reporter code .comment { color: #ddd }
+        #test-reporter code .init { color: #2f6fad }
+        #test-reporter code .string { color: #5890ad }
+        #test-reporter code .keyword { color: #8a6343 }
+        #test-reporter code .number { color: #2f6fad }
+
+    </style>
+    <script type="text/javascript" src="js/jquery-1.8.3.min.js"></script>
+</head>
+<body>
+    <% include header.html %>
+    <div id="doc-container">
+        <div id="doc-bg"></div>
+        <div id="doc-area">
+            <h3>单元测试结果：</h3>
+            <table>
+                <tr>
+                    <th>任务id：</th>
+                    <td><%=testResult.task_id%></td>
+                </tr>
+                <tr>
+                    <th>单测URL：</th>
+                    <td><%=testResult.url%></td>
+                </tr>
+                <tr>
+                    <th>浏览器节点：</th>
+                    <td><a href="/openWdBrowser?browserId=<%=testResult.browser_id%>" target="_blank"><img src="/imgs/app/<%=testResult.appId%>.png" class="browser" title="<%=testResult.appName%>"> <%=testResult.appName%></a></td>
+                </tr>
+                <tr>
+                    <th>浏览器版本：</th>
+                    <td>
+                        <%if(testResult.run_status===1){%>
+                            <%=testResult.actual_browser_name + ' ' + testResult.actual_browser_version%>
+                        <%}else if(testResult.run_status===2){%>
+                            <img src="/imgs/test/failed.png" title="status">
+                        <%}else{%>
+                            <img src="/imgs/test/running.gif" class="tester" title="status">
+                        <%}%>
+                    </td>
+                </tr>
+                <tr>
+                    <th>测试框架：</th>
+                    <td>
+                        <%if(testResult.run_status===1){%>
+                            <img src="/imgs/test/<%=testResult.test_type%>.png" class="tester" title="<%=testResult.test_type%>">
+                        <%}else if(testResult.run_status===2){%>
+                            <img src="/imgs/test/failed.png" title="status">
+                        <%}else{%>
+                            <img src="/imgs/test/running.gif" class="tester" title="status">
+                        <%}%>
+                    </td>
+                    </td>
+                </tr>
+                <tr>
+                    <th>测试结果：</th>
+                    <td class="<%=testResult.test_success===1?'passed':'failed'%>">
+                        <%if(testResult.run_status===1){%>
+                            <img src="/imgs/test/<%=testResult.test_success===1?'passed':'failed'%>.png" class="status" /> <%=testResult.test_ratio%>% ( <%=testResult.test_passed_count%> / <%=testResult.test_all_count%> )
+                        <%}else if(testResult.run_status===2){%>
+                            <img src="/imgs/test/failed.png" title="status">
+                        <%}else{%>
+                            <img src="/imgs/test/running.gif" class="tester" title="status">
+                        <%}%>
+                    </td>
+                </tr>
+                <tr>
+                    <th>测试用例：</th>
+                    <td id="test-reporter">
+                        <%if(testResult.run_status===1){%>
+                            <%-testResult.strHtmlCases%>
+                        <%}else if(testResult.run_status===2){%>
+                            <img src="/imgs/test/failed.png" title="status">
+                        <%}else{%>
+                            <img src="/imgs/test/running.gif" class="tester" title="status">
+                        <%}%>
+                    </td>
+                </tr>
+                <tr>
+                    <th>代码覆盖率：</th>
+                    <td>
+                        <%if(testResult.run_status===1){%>
+                            <a href="/jscover/" target="_blank"><img src="/imgs/cover.png" class="coverimg"><%=testResult.line_cover%>% / <%=testResult.branch_cover%>% / <%=testResult.function_cover%>%</a> ( 行 / 分支 / 函数 )
+                            <script>window._$jscoverage=<%-JSON.stringify(testResult.coverFiles)%></script>
+                        <%}else if(testResult.run_status===2){%>
+                            <img src="/imgs/test/failed.png" title="status">
+                        <%}else{%>
+                            <img src="/imgs/test/running.gif" class="tester" title="status">
+                        <%}%>
+                    </td>
+                </tr>
+                <tr>
+                    <th>控制台日志：</th>
+                    <td>
+                        <%if(testResult.run_status===1){%>
+                            <%-testResult.arrConsoles.join('<br />')%></td>
+                        <%}else if(testResult.run_status===2){%>
+                            <img src="/imgs/test/failed.png" title="status">
+                        <%}else{%>
+                            <img src="/imgs/test/running.gif" class="tester" title="status">
+                        <%}%>                       
+                </tr>
+                <tr>
+                    <th>开始时间：</th>
+                    <td><%=testResult.add_time%></td>
+                </tr>
+                <tr>
+                    <th>结束时间：</th>
+                    <td><%=testResult.end_time && testResult.end_time%></td>
+                </tr>
+            </table>
+        </div>
+    </div>
+    <% include footer.html %>
+</body>
+</html>

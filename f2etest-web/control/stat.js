@@ -94,6 +94,8 @@ module.exports = function(app, config) {
                 viewData.newUserDay = results[4];
                 viewData.newUserMonth = results[5];
                 viewData.appOrderDay = results[6];
+                viewData.navTab = 'browser';
+                viewData.navPage = 'stat';
                 res.render('stat', viewData);
             });
         }

@@ -38,6 +38,8 @@ module.exports = function(app, config) {
                 viewData.statNav = statNav;
                 viewData.logTimeDay = results[0];
                 viewData.appOrder30day = results[1];
+                viewData.navTab = 'browser';
+                viewData.navPage = 'stat';
                 res.render('statuser', viewData);
             });
         }

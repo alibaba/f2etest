@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<!--
+    jscoverage.html - code coverage for JavaScript
+    Copyright (C) 2007, 2008, 2009, 2010 siliconforks.com
+
+    This program is free software; you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation; either version 2 of the License, or
+    (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License along
+    with this program; if not, write to the Free Software Foundation, Inc.,
+    51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
+-->
+
+<html>
+<head>
+<meta http-equiv="X-UA-Compatible" content="IE=EmulateIE7"/>
+<title>JSCover</title>
+<link rel="stylesheet" type="text/css" href="jscoverage-highlight.css?nowrap"/>
+<link rel="stylesheet" type="text/css" href="jscoverage.css?nowrap"/>
+<!--[if IE]>
+<link rel="stylesheet" type="text/css" href="jscoverage-ie.css?nowrap"/>
+<![endif]-->
+<script type="text/javascript" src="jscoverage.js?nowrap"></script>
+<script type="text/javascript" src="jscoverage-common.js?nowrap"></script>
+<script type="text/javascript" src="jscoverage-branch.js?nowrap"></script>
+</head>
+
+<body onload="jscoverage_body_load();" onresize="jscoverage_body_resize();">
+<div id="mainDiv">
+
+<div id="tabs" class="Tabs">
+  <div id="summaryTab"><img id="summaryThrobber" src="jscoverage-throbber.gif" alt=""/> Summary <img src="jscoverage-throbber.gif" alt=""/></div>
+  <div id="sourceTab" class="disabled"><img src="jscoverage-throbber.gif" alt=""/> Source <img src="jscoverage-throbber.gif" alt=""/></div>
+  <div id="storeTab"><img id="storeThrobber" src="jscoverage-throbber.gif" alt=""/> Store <img src="jscoverage-throbber.gif" alt=""/></div>
+</div>
+<div id="tabPages" class="TabPages">
+  <div class="TabPage">
+    <input type="checkbox" id="checkbox" onclick="return jscoverage_checkbox_click();"/> <label for="checkbox">Show missing statements column</label>
+    <div id="summaryDiv">
+    <div id="summaryErrorDiv"></div>
+    <table id="summaryTable">
+    <thead>
+    <tr id="headerRow">
+    <th class="leftColumn"><a id="sortByName" href="javascript:jscoverage_recalculateSummaryTabBy('Name')">File</a></th>
+    <th><abbr title="The total number of executable statements">Statements</abbr></th>
+    <th><abbr title="The number of statements actually executed">Executed</abbr></th>
+    <th><abbr title="The total number of branches">Branches</abbr></th>
+    <th><abbr title="The number of branches covered">Branches Hit</abbr></th>
+    <th><abbr title="The total number of functions">Functions</abbr></th>
+    <th><abbr title="The number of functions covered">Functions Hit</abbr></th>
+    <th><a id="sortByLine" href="javascript:jscoverage_recalculateSummaryTabBy('Coverage')"><abbr title="Number of executed statements as a percentage of total number of statements">Coverage</abbr></a></th>
+    <th><a id="sortByBranch" href="javascript:jscoverage_recalculateSummaryTabBy('Branch')"><abbr title="Number of executed branch paths as a percentage of total number of branch paths">Branch</abbr></a></th>
+    <th><a id="sortByFunction" href="javascript:jscoverage_recalculateSummaryTabBy('Function')"><abbr title="Number of executed functions as a percentage of total number of functions">Function</abbr></a></th>
+    </tr>
+    <tr id="summaryTotals">
+        <td class="leftColumn">
+            <span class="title">Total:</span>
+            <span>0</span>
+        </td>
+        <td class="numeric">0</td>
+        <td class="numeric">0</td>
+        <td class="numeric">0</td>
+        <td class="numeric">0</td>
+        <td class="numeric">0</td>
+        <td class="numeric">0</td>
+        <td class="coverage">
+            <div class="pctGraph">
+                <div class="covered"></div>
+            </div>
+            <span id="summaryTotal" class="pct">0%</span>
+        </td>
+        <td class="coverage">
+            <div class="pctGraph">
+                <div class="covered"></div>
+            </div>
+            <span id="branchSummaryTotal" class="pct">0%</span>
+        </td>
+        <td class="coverage">
+            <div class="pctGraph">
+                <div class="covered"></div>
+            </div>
+            <span id="functionSummaryTotal" class="pct">0%</span>
+        </td>
+    </tr>
+
+    </thead>
+    <tbody id="summaryTbody">
+
+    <!--
+    <tr>
+    <td>0</td>
+    <td>0</td>
+    <td>0</td>
+    <td>0%</td>
+    <td>0</td>
+    </tr>
+    -->
+
+    </tbody>
+    </table>
+    </div>
+  </div>
+  <div class="TabPage">
+    <div id="fileDiv"></div>
+    <div id="sourceDiv"></div>
+  </div>
+</div>
+</div>
+</body>
+</html>

@@ -5,6 +5,8 @@ module.exports = function(app, config) {
         viewData.remotePassword = user.remotePassword;
         viewData.apiKey = user.apiKey;
         viewData.host = req.headers['host'];
+        viewData.navTab = 'browser';
+        viewData.navPage = 'install';
         res.render('install', viewData);
     });
 }

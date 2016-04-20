@@ -112,23 +112,25 @@ function applyWdBrowser(userid, browserName, browserVersion, hosts, proxy, callb
                             callback(error);
                         }
                         else{
+                            var capabilities = browser.capabilities;
+                            capabilities['f2etest.browserId'] = browserId;
+                            capabilities['f2etest.wdHost'] = wdHost;
+                            capabilities['f2etest.wdPort'] = wdPort;
                             // yield browser.close();
-                            callback(null, browser.sessionId);
+                            callback(null, {
+                                sessionId: browser.sessionId,
+                                capabilities: capabilities
+                            });
                         }
                     });
                 });
-                async.waterfall(arrTasks, function(err, sessionId){
+                async.waterfall(arrTasks, function(err, result){
                     if(err){
                         callback(err);
                     }
                     else{
                         pool.query('insert into wd_logs set type = "browser", userid = ?, data = ?, log_time = now()', [userid, browserId]);
-                        callback(null, {
-                            browserId: browserId,
-                            wdHost: wdHost,
-                            wdPort: wdPort,
-                            wdSessionId: sessionId
-                        });
+                        callback(null, result);
                     }
                 });
             }

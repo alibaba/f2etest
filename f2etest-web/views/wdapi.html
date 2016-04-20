@@ -19,30 +19,6 @@
             <ul>
                 <li>DEMO地址：<a href="http://<%=host%>/version" target="_blank">http://<%=host%>/version</a></li>
             </ul>
-            <h3>/applyWdBrowser: 申请新webDriver浏览器</h3>
-            <ul>
-                <li>DEMO地址：<a href="http://<%=host%>/applyWdBrowser?userid=<%=userid%>&amp;apiKey=<%=apiKey%>&amp;browserName=xxx" target="_blank">http://<%=host%>/applyWdBrowser?userid=<%=userid%>&amp;apiKey=<%=apiKey%>&amp;browserName=xxx</a></li>
-                <li>此接口支持以下入参(除callback参数以外，均兼容POST提交)：
-                    <ol>
-                        <li>userid: 用户id</li>
-                        <li>apiKey: apiKey</li>
-                        <li>browserName: 浏览器名</li>
-                        <li>browserVersion: 浏览器版本号</li>
-                        <li>hosts: hosts绑定</li>
-                        <li>proxy: 代理服务器(ip:port)</li>
-                        <li>callback: jsonp的回调函数(可省略)</li>
-                    </ol>
-                </li>
-                <li>
-                    返回以下参数：
-                    <ol>
-                        <li>browserId: 浏览器id，可用来调用<strong>/openWdBrowser</strong>这个API在线远程打开浏览器</li>
-                        <li>wdHost: webDriver节点的IP地址</li>
-                        <li>wdPort: webDriver节点的端口号</li>
-                        <li>wdSessionId: webDriver会话的sessionId，可用来附加到实例中</li>
-                    </ol>
-                </li>
-            </ul>
             <h3>/openWdBrowser: 在线打开WebDriver执行机节点，观看或调试远程的脚本执行情况</h3>
             <ul>
                 <li>DEMO地址：<a href="http://<%=host%>/openWdBrowser?browserId=1" target="_blank">http://<%=host%>/openWdBrowser?browserId=1</a></li>

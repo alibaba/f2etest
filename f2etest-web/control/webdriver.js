@@ -4,6 +4,7 @@ var JWebDriver = require('jwebdriver');
 var async = require('async');
 var siteInfo = require('../conf/site.json');
 var WebDriver = require('../lib/webdriver');
+var WebDriverHub = require('../lib/webdriverhub');
 var utils = require('../lib/utils');
 
 var checkNodesInterval = siteInfo.wdCheckNodesInterval || 5000; // 定时检查节点频率
@@ -33,56 +34,9 @@ function checkNodes(){
     });
 }
 checkNodes();
+WebDriverHub.start();
 
 module.exports = function(app, config) {
-    app.all('/applyWdBrowser', function(req, res) {
-        var query = req.query;
-        var body = req.body;
-        var callback = query['callback'] || '';
-        var userid = query['userid'] || body['userid'] || '';
-        var apiKey = query['apiKey'] || body['apiKey'] || '';
-        var browserName = query['browserName'] || body['browserName'] || '';
-        var browserVersion = query['browserVersion'] || body['browserVersion'] || '';
-        var hosts = query['hosts'] || body['hosts'] || '';
-        var proxy = query['proxy'] || body['proxy'] || '';
-        utils.checkApiKey(userid, apiKey, function(isSuccess){
-            var result;
-            if(isSuccess){
-                WebDriver.applyWdBrowser(userid, browserName, browserVersion, hosts, proxy, function(err, result){
-                    if(err){
-                        result = {
-                            error: err
-                        };
-                    }
-                    else{
-                        result = {
-                            message: result
-                        };
-                    }
-                    endRes(result);
-                });
-            }
-            else{
-                result = {
-                    error: 'ApiKey check failed!'
-                };
-                endRes(result);
-            }
-        });
-        function endRes(result){
-            result = JSON.stringify(result);
-
-            if(callback){
-                res.type('js'); 
-                result = callback+'('+result+');';
-            }
-            else{
-                res.type('json'); 
-            }
-
-            res.end(result);
-        }
-    });
 
     app.get('/openWdBrowser', function(req, res){
         var query = req.query;
@@ -154,6 +108,7 @@ module.exports = function(app, config) {
     app.get('/webdriver', function(req, res){
         var viewData = req.viewData;
         viewData.host = req.headers['host'];
+        viewData.hostname = req.hostname;
         var user = req.session.user;
         viewData.userid = user.userid;
         viewData.apiKey = user.apiKey;
@@ -176,6 +131,7 @@ module.exports = function(app, config) {
     app.get('/wd_nodejs', function(req, res){
         var viewData = req.viewData;
         viewData.host = req.headers['host'];
+        viewData.hostname = req.hostname;
         var user = req.session.user;
         viewData.userid = user.userid;
         viewData.apiKey = user.apiKey;

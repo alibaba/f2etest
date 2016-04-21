@@ -10,11 +10,13 @@ function checkAllNodeAlive(){
 	var result = cp.spawnSync('query.exe', ['session']);
 	var sessionList = result.stdout.toString();
 	
+	var mapOpened = {};
 	var arrLines = sessionList.split('\n');
 	arrLines.forEach(function(line){
 		var match = line.match(/node(\d+)/);
 		if(match){
 			var nodeid = match[1];
+			mapOpened[nodeid] = true;
 			if(/rdp-tcp#/.test(line) === true){
 				mapNodeOffCount[nodeid] = 0;
 			}
@@ -28,7 +30,7 @@ function checkAllNodeAlive(){
 	arrFiles.forEach(function(file){
 		var match = file.match(/node(\d+)/);
 		var nodeid = match && match[1];
-		if(nodeid && mapNodeOffCount[nodeid] !== undefined && mapNodeOffCount[nodeid] >= 3){
+		if(nodeid && (!mapOpened[nodeid] || mapNodeOffCount[nodeid] !== undefined && mapNodeOffCount[nodeid] >= 3)){
 			mapNodeOffCount[nodeid] = 0;
 			reOpenNode(nodeid);
 		}

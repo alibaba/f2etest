@@ -1,6 +1,5 @@
 var pool = require('../lib/db.js');
 var hostsServer = require('../lib/hostsserver');
-var JWebDriver = require('jwebdriver');
 var async = require('async');
 var siteInfo = require('../conf/site.json');
 var WebDriver = require('../lib/webdriver');
@@ -11,29 +10,11 @@ var checkNodesInterval = siteInfo.wdCheckNodesInterval || 5000; // 定时检查�
 var checkNodesParallelLimit = siteInfo.wdCheckNodesParallelLimit || 16; // 定时检查节点并发限制
 
 // 定时检查所有节点工作状态
-function checkNodes(){
-    pool.query('select node_id, node_ip, node_name from wd_nodes', function(err, rows){
-        var arrTasks = [];
-        if(rows){
-            rows.forEach(function(row){
-                arrTasks.push(function(callback){
-                    var driver = new JWebDriver({
-                        'host': row.node_ip,
-                        'port': '40'+row.node_name
-                    });
-                    driver.sessions(function(error, arrSessions){
-                        var work_status = error ? 0 : arrSessions.length > 0 ? 2 : 1;
-                        pool.query('update wd_nodes set work_status = ? where node_id = ?', [work_status, row.node_id], callback);
-                    });
-                });
-            });
-        }
-        async.parallelLimit(arrTasks, checkNodesParallelLimit, function(err, results){
-            setTimeout(checkNodes, checkNodesInterval);
-        });
-    });
+function checkNodeAlive(){
+    pool.query('update wd_nodes set work_status = 0 where work_status > 0 and timestampdiff(second,last_report_time, now()) > 5');
 }
-checkNodes();
+setInterval(checkNodeAlive, 1000);
+
 WebDriverHub.start();
 
 module.exports = function(app, config) {
@@ -138,5 +119,45 @@ module.exports = function(app, config) {
         viewData.navTab = 'webdriver';
         viewData.navPage = 'wdnodejs';
         res.render('wdnodejs', viewData);
+    });
+
+    app.get('/reportWdNode', function(req, res){
+        var query = req.query;
+        var clientIp = req.ip || '';
+        var nodeName = query['nodename'] || '';
+        var rdp = query['rdp'] || '';
+        var status = query['status'] || '';
+        var browsers = query['browsers'] || '';
+        if(status){
+            status = parseInt(status, 10);
+        }
+        pool.query('update wd_nodes set work_status = ?, last_report_time = now() where node_ip = ? and node_name = ?', [status, clientIp, nodeName], function(error, result){
+            if(result && result.changedRows === 0){
+                var mapInsert = {
+                    work_status: status,
+                    node_ip: clientIp,
+                    node_name: nodeName,
+                    rdp_support: rdp
+                };
+                pool.query('insert into wd_nodes set last_report_time = now(), ?', mapInsert, function(error, result){
+                    if(result){
+                        var nodeId = result.insertId;
+                        var arrBrowsers = browsers.split(/,\s*/);
+                        arrBrowsers.forEach(function(browser){
+                            var arrBrowserInfo = browser.split(' ');
+                            var browserName = arrBrowserInfo[0];
+                            var brwoserVersion = arrBrowserInfo[1] || '';
+                            var mapInsert = {
+                                browser_name: browserName,
+                                browser_version: brwoserVersion,
+                                node_id: nodeId
+                            };
+                            pool.query('insert into wd_browsers set ?', mapInsert);
+                        });
+                    }
+                });
+            }
+        });
+        res.end('ok');
     });
 }

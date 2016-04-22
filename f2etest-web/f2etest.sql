@@ -105,7 +105,9 @@ CREATE TABLE `wd_nodes` (
   `node_ip` varchar(20) DEFAULT NULL,
   `node_name` varchar(2) DEFAULT NULL,
   `rdp_support` tinyint(4) DEFAULT '1',
+  `last_report_time` datetime DEFAULT NULL,
   `last_apply_userid` varchar(255) DEFAULT NULL,
   `last_apply_time` datetime DEFAULT NULL,
-  PRIMARY KEY (`node_id`)
+  PRIMARY KEY (`node_id`),
+  KEY `node_ip+node_name` (`node_ip`,`node_name`) USING BTREE
 ) ENGINE=MyISAM AUTO_INCREMENT=73 DEFAULT CHARSET=latin1;

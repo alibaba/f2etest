@@ -51,7 +51,7 @@ function doNodeCallback(userid, row, callback){
     var wdNodeId = row.node_id;
     var wdHost = row.node_ip;
     var wdPort = '40'+row.node_name;
-    pool.query('update wd_nodes set work_status = 2, last_apply_userid = ?, last_apply_time = now() where node_id = ?', [userid, wdNodeId], function(err){
+    pool.query('update wd_nodes set work_status = 2, last_apply_userid = ?, last_report_time = now(), last_apply_time = now() where node_id = ?', [userid, wdNodeId], function(err){
         pool.query('insert into wd_logs set type = "node", userid = ?, data = ?, log_time = now()', [userid, wdNodeId]);
         callback(null, {
             browserId: browserId,

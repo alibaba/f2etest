@@ -156,7 +156,7 @@ function newWdSession(headers, json, callback){
                                     sessionJson = JSON.parse(body);
                                 }
                                 catch(e){
-                                    callback('New session json parse error!');
+                                    return callback('New session json parse error!');
                                 }
                                 if(sessionJson.status === 0){
                                     var sessionId = sessionJson.sessionId;
@@ -176,7 +176,7 @@ function newWdSession(headers, json, callback){
                                     });
                                 }
                                 else{
-                                    callback('error');
+                                    callback(sessionJson.value.message);
                                 }
                             });
                         });

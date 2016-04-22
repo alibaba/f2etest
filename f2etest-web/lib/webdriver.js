@@ -1,7 +1,4 @@
 var pool = require('./db');
-var hostsServer = require('./hostsserver');
-var JWebDriver = require('jwebdriver');
-var async = require('async');
 
 var mapNodeWait = {};
 
@@ -67,77 +64,6 @@ function doNodeCallback(userid, row, callback){
     });
 }
 
-// 申请浏览器
-function applyWdBrowser(userid, browserName, browserVersion, hosts, proxy, callback){
-    applyWdNode(userid, browserName, browserVersion, function(error, nodeInfo){
-            if(error){
-                callback(error);
-            }
-            else{
-                var browserId = nodeInfo.browserId;
-                var wdNodeId = nodeInfo.wdNodeId;
-                var wdHost = nodeInfo.wdHost;
-                var wdPort = nodeInfo.wdPort;
-                var arrTasks = [];
-                var hostsServerName = 'wdnodes_'+browserId;
-                // 初始化hosts&proxy
-                arrTasks.push(function(callback){
-                    if(proxy){
-                        var arrProxy = proxy.split(':');
-                        hostsServer.setForward(hostsServerName, arrProxy[0], arrProxy[1]);
-                    }
-                    else{
-                        hostsServer.setHosts(hostsServerName, hosts || '');
-                    }
-                    hostsServer.getProxyPort(hostsServerName, function(localIp, workPort){
-                        callback(null, localIp+':'+workPort);
-                    });
-                });
-                // 初始化session
-                arrTasks.push(function(proxy, callback){
-                    var driver = new JWebDriver({
-                        'host': wdHost,
-                        'port': wdPort
-                    });
-                    driver.session({
-                        browserName: browserName,
-                        browserVersion: browserVersion,
-                        proxy: {
-                            'proxyType': 'manual',
-                            'httpProxy': proxy,
-                            'sslProxy': proxy
-                        }
-                    }, function*(error, browser){
-                        if(error){
-                            callback(error);
-                        }
-                        else{
-                            var capabilities = browser.capabilities;
-                            capabilities['f2etest.browserId'] = browserId;
-                            capabilities['f2etest.wdHost'] = wdHost;
-                            capabilities['f2etest.wdPort'] = wdPort;
-                            // yield browser.close();
-                            callback(null, {
-                                sessionId: browser.sessionId,
-                                capabilities: capabilities
-                            });
-                        }
-                    });
-                });
-                async.waterfall(arrTasks, function(err, result){
-                    if(err){
-                        callback(err);
-                    }
-                    else{
-                        pool.query('insert into wd_logs set type = "browser", userid = ?, data = ?, log_time = now()', [userid, browserId]);
-                        callback(null, result);
-                    }
-                });
-            }
-    });
-}
-
 module.exports = {
-    applyWdNode: applyWdNode,
-    applyWdBrowser: applyWdBrowser
+    applyWdNode: applyWdNode
 };

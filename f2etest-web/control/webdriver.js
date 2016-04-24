@@ -132,7 +132,7 @@ module.exports = function(app, config) {
             status = parseInt(status, 10);
         }
         pool.query('update wd_nodes set work_status = ?, last_report_time = now() where node_ip = ? and node_name = ?', [status, clientIp, nodeName], function(error, result){
-            if(result && result.changedRows === 0){
+            if(!error && result.changedRows === 0){
                 var mapInsert = {
                     work_status: status,
                     node_ip: clientIp,
@@ -140,7 +140,7 @@ module.exports = function(app, config) {
                     rdp_support: rdp
                 };
                 pool.query('insert into wd_nodes set last_report_time = now(), ?', mapInsert, function(error, result){
-                    if(result){
+                    if(!error && result){
                         var nodeId = result.insertId;
                         var arrBrowsers = browsers.split(/,\s*/);
                         arrBrowsers.forEach(function(browser){

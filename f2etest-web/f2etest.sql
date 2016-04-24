@@ -41,17 +41,6 @@ CREATE TABLE `appUsers` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 -- ----------------------------
--- Table structure for wd_browsers
--- ----------------------------
-CREATE TABLE `wd_browsers` (
-  `browser_id` int(11) NOT NULL AUTO_INCREMENT,
-  `browser_name` varchar(20) DEFAULT '',
-  `browser_version` varchar(10) DEFAULT '',
-  `node_id` int(11) DEFAULT NULL,
-  PRIMARY KEY (`browser_id`)
-) ENGINE=MyISAM AUTO_INCREMENT=89 DEFAULT CHARSET=latin1;
-
--- ----------------------------
 -- Table structure for wd_jsunit
 -- ----------------------------
 CREATE TABLE `wd_jsunit` (
@@ -97,6 +86,18 @@ CREATE TABLE `wd_logs` (
 ) ENGINE=MyISAM AUTO_INCREMENT=2535 DEFAULT CHARSET=utf8;
 
 -- ----------------------------
+-- Table structure for wd_browsers
+-- ----------------------------
+CREATE TABLE `wd_browsers` (
+  `browser_id` int(11) NOT NULL AUTO_INCREMENT,
+  `browser_name` varchar(20) DEFAULT '',
+  `browser_version` varchar(10) DEFAULT '',
+  `node_id` int(11) DEFAULT NULL,
+  PRIMARY KEY (`browser_id`),
+  UNIQUE KEY `node_id` (`node_id`,`browser_name`,`browser_version`)
+) ENGINE=MyISAM AUTO_INCREMENT=89 DEFAULT CHARSET=latin1;
+
+-- ----------------------------
 -- Table structure for wd_nodes
 -- ----------------------------
 CREATE TABLE `wd_nodes` (
@@ -109,5 +110,5 @@ CREATE TABLE `wd_nodes` (
   `last_apply_userid` varchar(255) DEFAULT NULL,
   `last_apply_time` datetime DEFAULT NULL,
   PRIMARY KEY (`node_id`),
-  KEY `node_ip+node_name` (`node_ip`,`node_name`) USING BTREE
+  UNIQUE KEY `node_ip` (`node_ip`,`node_name`)
 ) ENGINE=MyISAM AUTO_INCREMENT=73 DEFAULT CHARSET=latin1;

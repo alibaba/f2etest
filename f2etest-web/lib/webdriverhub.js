@@ -3,7 +3,6 @@ var WebDriver = require('./webdriver');
 var utils = require('./utils');
 var hostsServer = require('./hostsserver');
 var async = require('async');
-var JWebDriver = require('jwebdriver');
 
 var mapSession = {};
 function startHub(){

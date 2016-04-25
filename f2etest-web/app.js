@@ -116,5 +116,7 @@ files.forEach(function(file){
     require('./control/'+file)(app, config);
 });
 
-var server = app.listen(config.siteInfo.port, '0.0.0.0');
+var server = app.listen(config.siteInfo.port, '0.0.0.0', function(){
+    console.log('f2etest-web listened on :', config.siteInfo.port);
+});
 server.timeout = 1800000; // 请求30分钟超时

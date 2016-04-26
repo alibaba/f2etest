@@ -49,7 +49,7 @@ module.exports = function(app, config) {
             var result;
             for(var i=0,c=results.length;i<c;i++){
                 result = results[i];
-                if(result.ret !== 'ok'){
+                if(!result || result.ret !== 'ok'){
                     allOk = false;
                     arrFailed.push(result.ip);
                 }

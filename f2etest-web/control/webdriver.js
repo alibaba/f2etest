@@ -131,7 +131,7 @@ module.exports = function(app, config) {
         if(status){
             status = parseInt(status, 10);
         }
-        pool.query('update wd_nodes set work_status = ?, last_report_time = now() where node_ip = ? and node_name = ?', [status, clientIp, nodeName], function(error, result){
+        pool.query('update wd_nodes set work_status = ?, last_report_time = now() where node_ip = ? and node_name = ? and (isnull(last_apply_time) or timestampdiff(second,last_apply_time, now()) > 30)', [status, clientIp, nodeName], function(error, result){
             if(!error && result.changedRows === 0){
                 var mapInsert = {
                     work_status: status,

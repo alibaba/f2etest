@@ -1,14 +1,22 @@
 var pool = require('./db');
+var async = require('async');
 
 var mapNodeWait = {};
 
-// 申请wd节点
-function applyWdNode(userid, browserName, browserVersion, callback){
+var applyQueue = async.queue(function(applyInfo, next) {
+    var userid = applyInfo.userid;
+    var browserName = applyInfo.browserName;
+    var browserVersion = applyInfo.browserVersion;
+    var callback = applyInfo.callback;
     var strBrowserSql = 'b.browser_name = ?';
     var arrBrowserInfo = [browserName];
     if(browserVersion){
         strBrowserSql += ' and b.browser_version = ?';
         arrBrowserInfo.push(browserVersion);
+    }
+    function endApply(error, result){
+        callback(error, result);
+        next();
     }
     pool.query('select b.browser_id,b.browser_name,b.browser_version,b.node_id,n.node_ip,n.node_name from wd_browsers as b left join wd_nodes as n on b.node_id = n.node_id where n.work_status = 1 and '+strBrowserSql+' order by b.browser_id limit 1;', arrBrowserInfo, function(err, rows){
         if(rows.length === 1){
@@ -20,13 +28,13 @@ function applyWdNode(userid, browserName, browserVersion, callback){
             if(browserName === 'IE'){
                 if(mapNodeWait[browserNameId]){
                     setTimeout(function(){
-                        applyWdNode(userid, browserName, browserVersion, callback);
+                        applyWdNode(userid, browserName, browserVersion, endApply);
                     }, 1000);
                 }
                 else{
                     mapNodeWait[browserNameId] = true;
                     doNodeCallback(userid, row, function(error, result){
-                        callback(error, result);
+                        endApply(error, result);
                         setTimeout(function(){
                             mapNodeWait[browserNameId] = false;
                         }, 6000);
@@ -34,13 +42,23 @@ function applyWdNode(userid, browserName, browserVersion, callback){
                 }
             }
             else{
-                doNodeCallback(userid, row, callback);
+                doNodeCallback(userid, row, endApply);
             }
             
         }
         else{
-            callback('No matched idle browser, please try again later.');
+            endApply('No matched idle browser, please try again later.');
         }
+    });
+}, 1);
+
+// 申请wd节点
+function applyWdNode(userid, browserName, browserVersion, callback){
+    applyQueue.push({
+        userid:userid,
+        browserName:browserName,
+        browserVersion:browserVersion,
+        callback: callback
     });
 }
 

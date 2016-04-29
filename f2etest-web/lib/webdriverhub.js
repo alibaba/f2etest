@@ -129,6 +129,8 @@ function newWdSession(headers, json, callback){
                     });
                     // 初始化session
                     arrTasks.push(function(proxy, callback){
+                        browserName = browserName === 'ie' ? 'internet explorer' : browserName.toLowerCase();
+                        desiredCapabilities.browserName = browserName;
                         desiredCapabilities.proxy = {
                             'proxyType': 'manual',
                             'httpProxy': proxy,

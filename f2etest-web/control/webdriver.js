@@ -11,7 +11,7 @@ var checkNodesParallelLimit = siteInfo.wdCheckNodesParallelLimit || 16; // 定�
 
 // 定时检查所有节点工作状态
 function checkNodeAlive(){
-    pool.query('update wd_nodes set work_status = 0 where work_status > 0 and timestampdiff(second,last_report_time, now()) > 5');
+    pool.query('update wd_nodes set work_status = 0 where work_status > 0 and timestampdiff(second,last_report_time, now()) > 5 and (isnull(last_apply_time) or timestampdiff(second,last_apply_time, now()) > 30)');
 }
 setInterval(checkNodeAlive, 1000);
 

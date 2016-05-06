@@ -1,0 +1,34 @@
+{
+  "name": "f2etest-recorder",
+  "version": "0.9.11",
+  "description": "Nodejs client for f2etest-recorder",
+  "main": "./index",
+  "bin": {
+    "f2etest-recorder": "./bin/f2etest-recorder"
+  },
+  "dependencies": {
+    "async": "2.0.0-rc.3",
+    "co": "4.6.0",
+    "colors": "1.1.2",
+    "commander": "2.9.0",
+    "expect.js": "0.3.1",
+    "inquirer": "1.0.2",
+    "jwebdriver": "1.0.6"
+  },
+  "devDependencies": {},
+  "repository": {
+    "type": "git",
+    "url": "git@github.com:alibaba/f2etest.git"
+  },
+  "bugs": {
+    "url": "https://github.com/alibaba/f2etest/issues"
+  },
+  "keywords": [
+    "f2etest",
+    "webdriver",
+    "recorder",
+    "chrome"
+  ],
+  "author": "Yanis Wang",
+  "license": "MIT"
+}

@@ -10,6 +10,7 @@
    "content_scripts": [{
       "matches": [ "http://*/*", "https://*/*" ],
       "all_frames": true,
+      "match_about_blank": true,
       "run_at": "document_start",
       "js": ["js/foreground.js"]
    }],

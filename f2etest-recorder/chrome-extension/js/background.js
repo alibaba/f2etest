@@ -6,6 +6,7 @@ var DISABLE_ICON = 'img/icon-disable.png';
 var isWorking = true;
 var workIcon = 1;
 var workIconTimer = null;
+
 // set recorder work status
 function setRecorderWork(enable){
     isWorking = enable;
@@ -31,45 +32,40 @@ var allKeyMap = {};
 var allMouseMap = {};
 // save recoreded command
 function saveCommand(windowId, frame, cmd, data){
-    if(cmd === 'end'){
-        endRecorder();
-    }
-    else{
-        if( cmd === 'target'){
-            // filter duplication target
-            var targetLocation = ''+windowId+frame+data.xpath;
-            if(targetLocation === lastTargetLocation){
-                return;
-            }
-            lastTargetLocation = targetLocation;
+    if( cmd === 'target'){
+        // filter duplication target
+        var targetLocation = ''+windowId+frame+data.xpath;
+        if(targetLocation === lastTargetLocation){
+            return;
         }
-        var cmdInfo = {
-            window: windowId,
-            frame: frame,
-            cmd: cmd,
-            data: data,
-            fix: false
-        };
-
-        switch(cmd){
-            case 'keyDown':
-                allKeyMap[data.character] = cmdInfo;
-                break;
-            case 'keyUp':
-                delete allKeyMap[data.character];
-                break;
-            case 'mouseDown':
-                allMouseMap[data.button] = cmdInfo;
-                break;
-            case 'mouseUp':
-                delete allMouseMap[data.button];
-                break;
-        }
-
-        checkLostKey(windowId);
-
-        execNextCommand(cmdInfo);
+        lastTargetLocation = targetLocation;
     }
+    var cmdInfo = {
+        window: windowId,
+        frame: frame,
+        cmd: cmd,
+        data: data,
+        fix: false
+    };
+
+    switch(cmd){
+        case 'keyDown':
+            allKeyMap[data.character] = cmdInfo;
+            break;
+        case 'keyUp':
+            delete allKeyMap[data.character];
+            break;
+        case 'mouseDown':
+            allMouseMap[data.button] = cmdInfo;
+            break;
+        case 'mouseUp':
+            delete allMouseMap[data.button];
+            break;
+    }
+
+    checkLostKey(windowId);
+
+    execNextCommand(cmdInfo);
 }
 
 // 补足丢失的事件
@@ -208,9 +204,31 @@ chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
         if(windowId !== -1){
             chrome.tabs.query({currentWindow: true, active: true}, function(tabs){
                 if(tabs.length > 0 && tabId === tabs[0].id){
-                    saveCommand(windowId, request.frame, request.cmd, request.data);
+                    var type = request.type;
+                    var data = request.data;
+                    switch(type){
+                        case 'end':
+                            endRecorder();
+                            break;
+                        case 'getConfig':
+                            getHttp(F2ETESTAPI + '/getConfig', function(error, result){
+                                if(result){
+                                    try{
+                                        var recordConfig = JSON.parse(result);
+                                        sendResponse(recordConfig);
+                                    }
+                                    catch(e){}
+                                }
+                            });
+                            break;
+                        case 'command':
+                            saveCommand(windowId, data.frame, data.cmd, data.data);
+                            break;
+
+                    }
                 }
             });
+            return true;
         }
     }
 });
@@ -225,9 +243,27 @@ chrome.browserAction.onClicked.addListener(function(tab){
     }
 });
 
+// end recorder
 function endRecorder(){
     setRecorderWork(false);
     getHttp(F2ETESTAPI + '/endRecorder');
 }
 
+// Global events port
+var mapPorts = {};
+var maxPortId = 0;
+chrome.extension.onConnect.addListener(function(port) {
+    var portId = maxPortId++;
+    mapPorts[portId] = port;
+    port.onMessage.addListener(function(msg) {
+        for(var portId in mapPorts){
+            mapPorts[portId].postMessage(msg);
+        }
+    });
+    port.onDisconnect.addListener(function(port){
+        delete mapPorts[portId];
+    });
+});
+
 setRecorderWork(true);
+

@@ -6,10 +6,13 @@
         var url = txtUrl.value;
         if(/^https?:\/\//i.test(url)){
             chrome.runtime.sendMessage({
-                frame: null,
-                cmd: 'url',
+                type: 'command',
                 data: {
-                    url: url
+                    frame: null,
+                    cmd: 'url',
+                    data: {
+                        url: url
+                    }
                 }
             });
             location.href = url;

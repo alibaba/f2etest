@@ -59,11 +59,18 @@ function startRecorder(){
             'name': 'checker',
             'message': '打开同步校验浏览器？',
             'default': true
+        },
+        {
+            'type': 'input',
+            'name': 'xpathAttrs',
+            'message': 'XPath属性配置',
+            'default': 'id,name,type,data-id,data-name,data-type,data-role'
         }
     ];
     inquirer.prompt(questions).then(function(anwsers){
         var fileName = anwsers.fileName;
         var openChecker = anwsers.checker;
+        var xpathAttrs = anwsers.xpathAttrs;
 
         var arrTestCodes = [];
         var recorderBrowser, checkerBrowser;
@@ -93,19 +100,41 @@ function startRecorder(){
             var data = cmdInfo.data;
             var arrTasks = [];
             arrTasks.push(function(callback){
+                function doNext(){
+                    if(checkerBrowser){
+                        console.log(' '+symbols.ok.green+' Check successed.'.green);
+                    }
+                    callback();
+                }
+                function catchError(error){
+                    if(checkerBrowser){
+                        console.log(' '+symbols.err.red+' Check failed!'.red, error);
+                    }
+                    callback();
+                }
                 if(window !== lastWindowId){
                     lastWindowId = window;
                     lastFrameId = null;
                     pushTestCode('switchWindow: '+window, 'yield browser.switchWindow('+window+');')
-                    checkerBrowser && checkerBrowser.switchWindow(window, function(error){
-                        callback();
-                    }) || callback();
+                    checkerBrowser && checkerBrowser.switchWindow(window).then(doNext).catch(catchError) || callback();
                 }
                 else{
                     callback();
                 }
             });
             arrTasks.push(function(callback){
+                function doNext(){
+                    if(checkerBrowser){
+                        console.log(' '+symbols.ok.green+' Check successed.'.green);
+                    }
+                    callback();
+                }
+                function catchError(error){
+                    if(checkerBrowser){
+                        console.log(' '+symbols.err.red+' Check failed!'.red, error);
+                    }
+                    callback();
+                }
                 if(frame !== lastFrameId){
                     lastFrameId = frame;
                     var arrCodes = [];
@@ -116,12 +145,9 @@ function startRecorder(){
                     pushTestCode('switchFrame: ' + frame, arrCodes);
                     checkerBrowser && checkerBrowser.switchFrame(null, function(error){
                         if(frame !== null){
-                            checkerBrowser.wait(frame).switchFrame(frame).then(callback).catch(callback);
+                            return checkerBrowser.wait(frame).switchFrame(frame);
                         }
-                        else{
-                            callback();
-                        }
-                    }) || callback();
+                    }).then(doNext).catch(catchError) || doNext();
                 }
                 else{
                     callback();
@@ -546,7 +572,11 @@ function startRecorder(){
                 });
             });
         }
-        startRecorderServer(onReady, onCommand, onEnd);
+        var recorderConfig = {
+            xpathAttrs : xpathAttrs,
+            testVars: testVars
+        };
+        startRecorderServer(recorderConfig, onReady, onCommand, onEnd);
         function saveTestFile(){
             var tempalteFile = path.resolve(__dirname, '../template/jwebdriver.js');
             var templateContent = fs.readFileSync(tempalteFile).toString();
@@ -568,18 +598,22 @@ function startRecorder(){
 }
 
 // start recorder server
-function startRecorderServer(onReady, onCommand, onEnd){
+function startRecorderServer(config, onReady, onCommand, onEnd){
     var serverPort = 9765;
     var server = http.createServer(function(req, res){
         var urlInfo = url.parse(req.url, true);
         var pathname = urlInfo.pathname;
         var query = urlInfo.query;
         switch(pathname){
+            case '/getConfig':
+                res.end(JSON.stringify(config));
+                break
             case '/endRecorder':
                 server.close(function(){
                     console.log('Recorder server closed.'.green);
                     onEnd();
                 });
+                res.end('ok');
                 break
             case '/saveCmd':
                 var cmdInfo = query['cmdInfo'];
@@ -588,9 +622,9 @@ function startRecorderServer(onReady, onCommand, onEnd){
                 }
                 catch(e){}
                 onCommand(cmdInfo);
+                res.end('ok');
                 break;
         }
-        res.end('ok');
     });
     server.listen(serverPort, function(){
         console.log('Recorder server listend on %s'.green, serverPort);
@@ -612,7 +646,7 @@ function newChromeBrowser(f2etestConfig, hosts, isRecorder, callback){
         var crxPath = path.resolve(__dirname, '../chrome-extension/f2etest-recorder.crx');
         var extContent = fs.readFileSync(crxPath).toString('base64');
         capabilities.chromeOptions = {
-            // args:['load-extension=E:\\github\\f2etest\\f2etest-recorder\\chrome'],
+            // args:['load-extension=E:\\github\\f2etest\\f2etest-recorder\\chrome-extension'],
             extensions: [extContent]
         };
     }

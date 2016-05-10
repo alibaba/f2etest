@@ -1221,7 +1221,6 @@
                         var filepath = target.value || '';
                         var match = filepath.match(/[^\\\/]+$/);
                         if(xpath !== null && match !== null){
-                            addActionTarget(target);
                             saveCommand('uploadFile', {
                                 xpath: xpath,
                                 filename: match[0]

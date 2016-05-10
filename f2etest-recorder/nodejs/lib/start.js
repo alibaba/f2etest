@@ -145,7 +145,7 @@ function startRecorder(){
                     pushTestCode('switchFrame: ' + frame, arrCodes);
                     checkerBrowser && checkerBrowser.switchFrame(null, function(error){
                         if(frame !== null){
-                            return checkerBrowser.wait(frame).switchFrame(frame);
+                            return checkerBrowser.wait(frame, 30000).switchFrame(frame);
                         }
                     }).then(doNext).catch(catchError) || doNext();
                 }
@@ -264,11 +264,14 @@ function startRecorder(){
                         break;
                     case 'uploadFile':
                         arrCodes = [];
-                        arrCodes.push('yield browser.wait("'+data.xpath+'").then(function*(element){');
+                        arrCodes.push('yield browser.wait("'+data.xpath+'", {timeout: 30000, displayed: false}).then(function*(element){');
                         arrCodes.push('    yield element.sendKeys("c:/uploadFiles/'+data.filename+'");');
                         arrCodes.push('});');
                         pushTestCode('uploadFile: ' + data.xpath + ', ' + data.filename, arrCodes);
-                        checkerBrowser && checkerBrowser.wait(data.xpath, function*(error, element){
+                        checkerBrowser && checkerBrowser.wait(data.xpath, {
+                            timeout: 30000,
+                            displayed: false
+                        }, function*(error, element){
                             if(!error){
                                 yield element.sendKeys('c:/uploadFiles/'+data.filename);
                             }
@@ -285,7 +288,7 @@ function startRecorder(){
                             var reDomRequire = /^(val|text|displayed|enabled|selected|attr|css)$/;
                             var reParamRequire = /^(attr|css|cookie|localStorage|sessionStorage)$/;
                             if(reDomRequire.test(expectType)){
-                                arrCodes.push('var element = yield browser.wait("'+expectParams[0]+'");');
+                                arrCodes.push('var element = yield browser.wait("'+expectParams[0]+'", 30000);');
                                 arrCodes.push('expect(element.length).to.be(1);');
                             }
                             switch(expectType){
@@ -341,7 +344,7 @@ function startRecorder(){
                             if(checkerBrowser){
                                 var element, value;
                                 if(reDomRequire.test(expectType)){
-                                    element = yield checkerBrowser.wait(expectParams[0]);
+                                    element = yield checkerBrowser.wait(expectParams[0], 30000);
                                     expect(element.length).to.be(1);
                                 }
                                 switch(expectType){
@@ -400,10 +403,10 @@ function startRecorder(){
                     // 设置变量
                     case 'setvar':
                         arrCodes = [];
-                        arrCodes.push('var element = yield browser.wait("'+data.xpath+'");');
+                        arrCodes.push('var element = yield browser.wait("'+data.xpath+'", 30000);');
                         arrCodes.push('yield element.clear().val(testVars["'+data.name+'"]);');
                         pushTestCode('setvar: ' + data.xpath + ', ' + data.name, arrCodes);
-                        checkerBrowser && checkerBrowser.wait(data.xpath, function(error, element){
+                        checkerBrowser && checkerBrowser.wait(data.xpath, 30000, function(error, element){
                             return element.clear().val(testVars[data.name]);
                         }).then(doNext).catch(catchError) || doNext();
                         break;
@@ -657,8 +660,14 @@ function newChromeBrowser(f2etestConfig, hosts, isRecorder, callback){
         var crxPath = path.resolve(__dirname, '../chrome-extension/f2etest-recorder.crx');
         var extContent = fs.readFileSync(crxPath).toString('base64');
         capabilities.chromeOptions = {
-            // args:['load-extension=E:\\github\\f2etest\\f2etest-recorder\\chrome-extension'],
+            // args:['disable-bundled-ppapi-flash', 'load-extension=E:\\github\\f2etest\\f2etest-recorder\\chrome-extension'],
+            args: ['disable-bundled-ppapi-flash'],
             extensions: [extContent]
+        };
+    }
+    else{
+        capabilities.chromeOptions = {
+            args: ['disable-bundled-ppapi-flash']
         };
     }
     driver.session(capabilities, function*(error, browser){

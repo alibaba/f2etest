@@ -196,6 +196,7 @@ chrome.tabs.onRemoved.addListener(function(tabId, removeInfo){
     }
 });
 
+var recordConfig = null;
 // catch current window events
 chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
     if(isWorking && sender && sender.tab){
@@ -211,15 +212,20 @@ chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
                             endRecorder();
                             break;
                         case 'getConfig':
-                            getHttp(F2ETESTAPI + '/getConfig', function(error, result){
-                                if(result){
-                                    try{
-                                        var recordConfig = JSON.parse(result);
-                                        sendResponse(recordConfig);
+                            if(recordConfig !== null){
+                                sendResponse(recordConfig);
+                            }
+                            else{
+                                getHttp(F2ETESTAPI + '/getConfig', function(error, result){
+                                    if(result){
+                                        try{
+                                            recordConfig = JSON.parse(result);
+                                            sendResponse(recordConfig);
+                                        }
+                                        catch(e){}
                                     }
-                                    catch(e){}
-                                }
-                            });
+                                });
+                            }
                             break;
                         case 'command':
                             saveCommand(windowId, data.frame, data.cmd, data.data);

@@ -20,7 +20,8 @@
       "img/expect.png",
       "img/end.png",
       "img/ok.png",
-      "img/cancel.png"
+      "img/cancel.png",
+      "img/vars.png"
    ],
    "background": {
       "scripts": [ "js/background.js" ]

@@ -416,6 +416,24 @@
         }
     });
 
+    // 插入变量
+    GlobalEvents.on('setVar', function(event){
+        if(frameId === event.frame){
+            var xpath = event.xpath;
+            var elements = findXPathElement(xpath);
+            if(elements.length === 1){
+                var target = elements[0];
+                target.focus();
+                target.value = event.value;
+                addActionTarget(target);
+                saveCommand('setvar', {
+                    xpath: xpath,
+                    name: event.name
+                });
+            }
+        }
+    });
+
     // 获取断言默认值
     GlobalEvents.on('getExpectValue', function(event){
         var domInfo = event.domInfo;
@@ -556,7 +574,7 @@
         }, true);
 
         // 初始化选择器
-        function initSelecterMask(){
+        function initDomSelecter(){
             divDomSelector = document.createElement("div");
             divDomSelector.id = 'f2etest-selecter-mask';
             divDomSelector.className = 'f2etest-recorder';
@@ -578,8 +596,6 @@
 
         // 初始化工具面板
         function initToolsPannel(){
-            var expectTarget = null;
-            var expectCallback = null;
             // tools pannel
             var baseUrl = chrome.extension.getURL("/");
             var divDomToolsPannel = document.createElement("div");
@@ -587,8 +603,8 @@
             divDomToolsPannel.className = 'f2etest-recorder';
             var arrHTML = [
                 '<div style="padding:5px;color:#666"><strong>XPath: </strong><span id="f2etest-xpath"></span></div>',
-                '<div><span class="f2etest-button"><a name="f2etest-hover"><img src="'+baseUrl+'img/hover.png" alt="">添加悬停</a></span><span class="f2etest-button"><a name="f2etest-expect"><img src="'+baseUrl+'img/expect.png" alt="">添加断言</a></span><span class="f2etest-button"><a name="f2etest-end"><img src="'+baseUrl+'img/end.png" alt="">结束录制</a></span></div>',
-                '<style>#f2etest-tools-pannel{position:fixed;z-index:9999999;padding:20px;width:450px;box-sizing:border-box;border:1px solid #ccc;line-height:1;background:rgba(241,241,241,0.8);box-shadow: 5px 5px 10px #888888;bottom:20px;right:20px;cursor:move;}#f2etest-xpath{border-bottom: dashed 1px #ccc;padding:2px;color:#FF7159;}.f2etest-button{cursor:pointer;margin: 8px;}.f2etest-button a{text-decoration: none;color:#333333;font-family: arial, sans-serif;font-size: 13px;color: #777;text-shadow: 1px 1px 0px white;background: -webkit-linear-gradient(top, #ffffff 0%,#dfdfdf 100%);border-radius: 3px;box-shadow: 0 1px 3px 0px rgba(0,0,0,0.4);padding: 6px 12px;}.f2etest-button a:hover{background: -webkit-linear-gradient(top, #ffffff 0%,#eee 100%);box-shadow: 0 1px 3px 0px rgba(0,0,0,0.4);}.f2etest-button a:active{background: -webkit-linear-gradient(top, #dfdfdf 0%,#f1f1f1 100%);box-shadow: 0px 1px 1px 1px rgba(0,0,0,0.2) inset, 0px 1px 1px 0 rgba(255,255,255,1);}.f2etest-button a img{padding-right: 8px;position: relative;top: 2px;vertical-align:baseline;}</style>'
+                '<div><span class="f2etest-button"><a name="f2etest-hover"><img src="'+baseUrl+'img/hover.png" alt="">添加悬停</a></span><span class="f2etest-button"><a name="f2etest-expect"><img src="'+baseUrl+'img/expect.png" alt="">添加断言</a></span><span class="f2etest-button"><a name="f2etest-vars"><img src="'+baseUrl+'img/vars.png" alt="">插入变量</a></span><span class="f2etest-button"><a name="f2etest-end"><img src="'+baseUrl+'img/end.png" alt="">结束录制</a></span></div>',
+                '<style>#f2etest-tools-pannel{position:fixed;z-index:9999999;padding:20px;width:570px;box-sizing:border-box;border:1px solid #ccc;line-height:1;background:rgba(241,241,241,0.8);box-shadow: 5px 5px 10px #888888;bottom:20px;right:20px;cursor:move;}#f2etest-xpath{border-bottom: dashed 1px #ccc;padding:2px;color:#FF7159;}.f2etest-button{cursor:pointer;margin: 8px;}.f2etest-button a{text-decoration: none;color:#333333;font-family: arial, sans-serif;font-size: 13px;color: #777;text-shadow: 1px 1px 0px white;background: -webkit-linear-gradient(top, #ffffff 0%,#dfdfdf 100%);border-radius: 3px;box-shadow: 0 1px 3px 0px rgba(0,0,0,0.4);padding: 6px 12px;}.f2etest-button a:hover{background: -webkit-linear-gradient(top, #ffffff 0%,#eee 100%);box-shadow: 0 1px 3px 0px rgba(0,0,0,0.4);}.f2etest-button a:active{background: -webkit-linear-gradient(top, #dfdfdf 0%,#f1f1f1 100%);box-shadow: 0px 1px 1px 1px rgba(0,0,0,0.2) inset, 0px 1px 1px 0 rgba(255,255,255,1);}.f2etest-button a img{padding-right: 8px;position: relative;top: 2px;vertical-align:baseline;}</style>'
             ];
             divDomToolsPannel.innerHTML = arrHTML.join('');
             var diffX = 0, diffY =0;
@@ -629,23 +645,38 @@
                 var name = target.name;
                 switch(name){
                     case 'f2etest-hover':
+                        hideDialog();
                         showSelector(function(domInfo, requirePause){
-                            if(requirePause){
-                                // 使事件可以触发
-                                setGlobalWorkMode('pauseRecord');
-                            }
+                            // 使事件可以触发
+                            setGlobalWorkMode('pauseRecord');
+                            // 添加悬停
                             GlobalEvents.emit('addHover', domInfo);
+                            // 恢复录制或暂停
                             setGlobalWorkMode(requirePause?'pauseAll':'record');
                         });
                         break;
                     case 'f2etest-expect':
+                        hideDialog();
                         showSelector(function(domInfo, requirePause){
-                            expectTarget = domInfo;
-                            showExpectDailog(function(frameId, expectData){
+                            showExpectDailog(domInfo, function(frameId, expectData){
                                 GlobalEvents.emit('addExpect', {
                                     frame: frameId,
                                     data: expectData
                                 })
+                                setGlobalWorkMode(requirePause?'pauseAll':'record');
+                            });
+                        });
+                        break;
+                    case 'f2etest-vars':
+                        hideDialog();
+                        showSelector(function(domInfo, requirePause){
+                            showVarsDailog(function(varInfo){
+                                GlobalEvents.emit('setVar', {
+                                    frame: domInfo.frame,
+                                    xpath: domInfo.xpath,
+                                    name: varInfo.name,
+                                    value: varInfo.value
+                                });
                                 setGlobalWorkMode(requirePause?'pauseAll':'record');
                             });
                         });
@@ -663,71 +694,23 @@
             }
             document.body.appendChild(divDomToolsPannel);
             spanShowXPath = document.getElementById('f2etest-xpath');
-            // 断言对话框
-            var divDomExpectDialog = document.createElement("div");
-            divDomExpectDialog.id = 'f2etest-expect-dialog';
-            divDomExpectDialog.className = 'f2etest-recorder';
+            // 对话框
+            var divDomDialog = document.createElement("div");
+            var okCallback = null;
+            var cancelCallback = null;
+            divDomDialog.id = 'f2etest-dialog';
+            divDomDialog.className = 'f2etest-recorder';
             var arrHTML = [
-                '<h2>添加断言：</h2>',
-                '<div class="f2etest-field"><label>断言类型: </label><select id="f2etest-expect-type" value=""><option>val</option><option>text</option><option>displayed</option><option>enabled</option><option>selected</option><option>attr</option><option>css</option><option>url</option><option>title</option><option>cookie</option><option>localStorage</option><option>sessionStorage</option></select></div>',
-                '<div class="f2etest-field" id="f2etest-expect-dom-div"><label>断言DOM: </label><input id="f2etest-expect-dom" type="text" readonly /></div>',
-                '<div class="f2etest-field" id="f2etest-expect-param-div"><label>断言参数: </label><input id="f2etest-expect-param" type="text" /></div>',
-                '<div class="f2etest-field"><label>比较方式: </label><select id="f2etest-expect-compare"><option>equal</option><option>contain</option><option>regexp</option></select></div>',
-                '<div class="f2etest-field"><label>断言结果: </label><input id="f2etest-expect-to" type="text" /></div>',
-                '<div class="f2etest-field"><span class="f2etest-button"><a name="f2etest-ok"><img src="'+baseUrl+'img/ok.png" alt="">确认添加</a></span><span class="f2etest-button"><a name="f2etest-cancel"><img src="'+baseUrl+'img/cancel.png" alt="">取消添加</a></span></div>',
-                '<style>#f2etest-expect-dialog{display:none;position:fixed;z-index:9999999;padding:20px;top:50%;left:50%;width:450px;margin-left:-225px;margin-top:-160px;box-sizing:border-box;border:1px solid #ccc;background:rgba(241,241,241,1);box-shadow: 5px 5px 10px #888888;}#f2etest-expect-dialog h2{padding-bottom:10px;border-bottom: solid 1px #ccc;margin-bottom:10px;color:#333;}.f2etest-field{padding: 5px 0 5px 30px;}.f2etest-field label{display:inline-block;width:80px;color:#666}.f2etest-field input,.f2etest-field select{border:1px solid #ccc;border-radius:2px;padding:5px;}.f2etest-field input{width: 250px;}</style>'
+                '<h2 id="f2etest-dialog-title"></h2>',
+                '<div id="f2etest-dialog-content"></div>',
+                '<div style="padding-bottom:10px;text-align:center;"><span class="f2etest-button"><a name="f2etest-ok"><img src="'+baseUrl+'img/ok.png" alt="">确认添加</a></span><span class="f2etest-button"><a name="f2etest-cancel"><img src="'+baseUrl+'img/cancel.png" alt="">取消添加</a></span></div>',
+                '<style>#f2etest-dialog{display:none;position:fixed;z-index:9999999;padding:20px;top:50%;left:50%;width:450px;margin-left:-225px;margin-top:-160px;box-sizing:border-box;border:1px solid #ccc;background:rgba(241,241,241,1);box-shadow: 5px 5px 10px #888888;}#f2etest-dialog h2{padding-bottom:10px;border-bottom: solid 1px #ccc;margin-bottom:10px;color:#333;}#f2etest-dialog ul{list-style:none;padding:0;}#f2etest-dialog li{padding: 5px 0 5px 30px;}#f2etest-dialog li label{display:inline-block;width:80px;color:#666}#f2etest-dialog li input,.f2etest-field select{border:1px solid #ccc;border-radius:2px;padding:5px;}#f2etest-dialog li input{width: 250px;}</style>'
             ];
-            divDomExpectDialog.innerHTML = arrHTML.join('');
-            document.body.appendChild(divDomExpectDialog);
-            var domF2etestExpectDomDiv = document.getElementById('f2etest-expect-dom-div');
-            var domF2etestExpectParamDiv = document.getElementById('f2etest-expect-param-div');
-            var domF2etestExpectType = document.getElementById('f2etest-expect-type');
-            var domF2etestExpectDom = document.getElementById('f2etest-expect-dom');
-            var domF2etestExpectParam = document.getElementById('f2etest-expect-param');
-            var domF2etestExpectCompare = document.getElementById('f2etest-expect-compare');
-            var domF2etestExpectTo = document.getElementById('f2etest-expect-to');
-            var reDomRequire = /^(val|text|displayed|enabled|selected|attr|css)$/;
-            var reParamRequire = /^(attr|css|cookie|localStorage|sessionStorage)$/;
-            domF2etestExpectType.onchange = function(){
-                var type = domF2etestExpectType.value;
-                domF2etestExpectDomDiv.style.display = reDomRequire.test(type) ? 'block' : 'none';
-                domF2etestExpectParamDiv.style.display = reParamRequire.test(type) ? 'block' : 'none';
-                refreshToValue();
-            };
-            domF2etestExpectParam.onchange = refreshToValue
-            function refreshToValue(){
-                var type = domF2etestExpectType.value;
-                var param = domF2etestExpectParam.value;
-                switch(type){
-                    case 'url':
-                        domF2etestExpectTo.value = location.href;
-                        break;
-                    case 'title':
-                        domF2etestExpectTo.value = document.title;
-                        break;
-                    case 'cookie':
-                        if(param){
-                            domF2etestExpectTo.value = getCookie(param) || '';
-                        }
-                        break;
-                    case 'localStorage':
-                        if(param){
-                            domF2etestExpectTo.value = localStorage.getItem(param) || '';
-                        }
-                        break;
-                    case 'sessionStorage':
-                        if(param){
-                            domF2etestExpectTo.value = sessionStorage.getItem(param) || '';
-                        }
-                        break;
-                    default:
-                        // 到iframe中获取默认值
-                        getExpectValue(type, expectTarget, param, function(value){
-                            domF2etestExpectTo.value = value;
-                        });                        
-                }
-            }
-            divDomExpectDialog.addEventListener('click', function(event){
+            divDomDialog.innerHTML = arrHTML.join('');
+            document.body.appendChild(divDomDialog);
+            var domDialogTitle = document.getElementById('f2etest-dialog-title');
+            var domDialogContent = document.getElementById('f2etest-dialog-content');
+            divDomDialog.addEventListener('click', function(event){
                 event.stopPropagation();
                 event.preventDefault();
                 var target = event.target;
@@ -737,18 +720,116 @@
                 var name = target.name;
                 switch(name){
                     case 'f2etest-ok':
-                        var type = domF2etestExpectType.value;
+                        hideDialog();
+                        okCallback();
+                        break;
+                    case 'f2etest-cancel':
+                        hideDialog();
+                        cancelCallback();
+                        break;
+                }
+            });
+            // 显示对话框
+            function showDialog(title, content, events){
+                domDialogTitle.innerHTML = title;
+                domDialogContent.innerHTML = content;
+                var onInit = events.onInit;
+                if(onInit){
+                    onInit();
+                }
+                okCallback = events.onOk;
+                cancelCallback = events.onCancel;
+                divDomDialog.style.display = 'block';
+            }
+            // 隐藏对话框
+            function hideDialog(){
+                domDialogTitle.innerHTML = '';
+                domDialogContent.innerHTML = '';
+                divDomDialog.style.display = 'none';
+            }
+            function showExpectDailog(expectTarget, callback){
+                var arrHtmls = [
+                    '<ul>',
+                    '<li><label>断言类型: </label><select id="f2etest-expect-type" value=""><option>val</option><option>text</option><option>displayed</option><option>enabled</option><option>selected</option><option>attr</option><option>css</option><option>url</option><option>title</option><option>cookie</option><option>localStorage</option><option>sessionStorage</option></select></li>',
+                    '<li id="f2etest-expect-dom-div"><label>断言DOM: </label><input id="f2etest-expect-dom" type="text" readonly /></li>',
+                    '<li id="f2etest-expect-param-div"><label>断言参数: </label><input id="f2etest-expect-param" type="text" /></li>',
+                    '<li><label>比较方式: </label><select id="f2etest-expect-compare"><option>equal</option><option>contain</option><option>regexp</option></select></li>',
+                    '<li><label>断言结果: </label><input id="f2etest-expect-to" type="text" /></li>',
+                    '</ul>'
+                ];
+                var domExpectDomDiv, domExpectParamDiv, domExpectType, domExpectDom, domExpectParam, domExpectCompare, domExpectTo;
+                var reDomRequire = /^(val|text|displayed|enabled|selected|attr|css)$/;
+                var reParamRequire = /^(attr|css|cookie|localStorage|sessionStorage)$/;
+                showDialog('添加断言：', arrHtmls.join(''), {
+                    onInit: function(){
+                        // 初始化dom及事件
+                        domExpectDomDiv = document.getElementById('f2etest-expect-dom-div');
+                        domExpectParamDiv = document.getElementById('f2etest-expect-param-div');
+                        domExpectType = document.getElementById('f2etest-expect-type');
+                        domExpectDom = document.getElementById('f2etest-expect-dom');
+                        domExpectParam = document.getElementById('f2etest-expect-param');
+                        domExpectCompare = document.getElementById('f2etest-expect-compare');
+                        domExpectTo = document.getElementById('f2etest-expect-to');
+                        domExpectType.onchange = function(){
+                            var type = domExpectType.value;
+                            domExpectDomDiv.style.display = reDomRequire.test(type) ? 'block' : 'none';
+                            domExpectParamDiv.style.display = reParamRequire.test(type) ? 'block' : 'none';
+                            refreshToValue();
+                        };
+                        domExpectParam.onchange = refreshToValue
+                        function refreshToValue(){
+                            var type = domExpectType.value;
+                            var param = domExpectParam.value;
+                            switch(type){
+                                case 'url':
+                                    domExpectTo.value = location.href;
+                                    break;
+                                case 'title':
+                                    domExpectTo.value = document.title;
+                                    break;
+                                case 'cookie':
+                                    if(param){
+                                        domExpectTo.value = getCookie(param) || '';
+                                    }
+                                    break;
+                                case 'localStorage':
+                                    if(param){
+                                        domExpectTo.value = localStorage.getItem(param) || '';
+                                    }
+                                    break;
+                                case 'sessionStorage':
+                                    if(param){
+                                        domExpectTo.value = sessionStorage.getItem(param) || '';
+                                    }
+                                    break;
+                                default:
+                                    // 到iframe中获取默认值
+                                    getExpectValue(type, expectTarget, param, function(value){
+                                        domExpectTo.value = value;
+                                    });                        
+                            }
+                        }
+                        // 初始化默认值
+                        domExpectType.value = 'val';
+                        domExpectDom.value = expectTarget.xpath;
+                        domExpectParam.value = '';
+                        domExpectCompare.value = 'equal';
+                        domExpectTo.value = '';
+                        domExpectType.onchange();
+                    },
+                    onOk: function(){
+                        var type = domExpectType.value;
                         var arrParams = [];
-                        reDomRequire.test(type) && arrParams.push(domF2etestExpectDom.value);
-                        reParamRequire.test(type) && arrParams.push(domF2etestExpectParam.value);
-                        var compare = domF2etestExpectCompare.value;
-                        var to = domF2etestExpectTo.value;
+                        reDomRequire.test(type) && arrParams.push(domExpectDom.value);
+                        reParamRequire.test(type) && arrParams.push(domExpectParam.value);
+                        var compare = domExpectCompare.value;
+                        var to = domExpectTo.value;
                         if(compare === 'regexp'){
                             try{
                                 eval(to);
                             }
                             catch(e){
-                                domF2etestExpectTo.focus();
+                                domExpectTo.focus();
                                 return alert('请输入合法的正则表达式！');
                             }
                         }
@@ -758,28 +839,47 @@
                             compare:compare,
                             to: to
                         };
-                        hideExpectDialog();
-                        expectCallback(expectTarget.frame, expectData);
-                        break;
-                    case 'f2etest-cancel':
-                        hideExpectDialog();
+                        callback(expectTarget.frame, expectData);
+                    },
+                    onCancel: function(){
                         setGlobalWorkMode('record');
-                        break;
-                }
-            });
-            
-            function showExpectDailog(callback){
-                domF2etestExpectType.value = 'val';
-                domF2etestExpectDom.value = expectTarget.xpath;
-                domF2etestExpectParam.value = '';
-                domF2etestExpectCompare.value = 'equal';
-                domF2etestExpectTo.value = '';
-                domF2etestExpectType.onchange();
-                divDomExpectDialog.style.display = 'block';
-                expectCallback = callback;
+                    }
+                });
             }
-            function hideExpectDialog(){
-                divDomExpectDialog.style.display = 'none';
+            function showVarsDailog(callback){
+                var arrHtmls = [
+                    '<ul>',
+                    '<li><label>变量名: </label><select id="f2etest-vars-name" value="">',
+                ];
+                for(var name in testVars){
+                    arrHtmls.push('<option>'+name+'</option>');
+                }
+                arrHtmls.push('</select></li>');
+                arrHtmls.push('<li><label>变量值: </label><input id="f2etest-vars-value" type="text" readonly /></li>');
+                arrHtmls.push('</ul>');
+                var domVarsName, domVarsValue;
+                showDialog('插入变量：', arrHtmls.join(''), {
+                    onInit: function(){
+                        // 初始化dom及事件
+                        domVarsName = document.getElementById('f2etest-vars-name');
+                        domVarsValue = document.getElementById('f2etest-vars-value');
+                        domVarsName.onchange = function(){
+                            var value = testVars[domVarsName.value];
+                            domVarsValue.value = value;
+                        };
+                        domVarsName.onchange();
+                    },
+                    onOk: function(){
+                        var varName = domVarsName.value;
+                        callback({
+                            name: varName,
+                            value: testVars[varName]
+                        });
+                    },
+                    onCancel: function(){
+                        setGlobalWorkMode('record');
+                    }
+                });
             }
         }
 
@@ -1190,7 +1290,7 @@
         }
 
         hookAlert();
-        initSelecterMask();
+        initDomSelecter();
         if(isIframe === false){
             initToolsPannel();
         }

@@ -264,16 +264,17 @@ function startRecorder(){
                         break;
                     case 'uploadFile':
                         arrCodes = [];
-                        arrCodes.push('yield browser.find("'+data.xpath+'").then(function*(element){');
+                        arrCodes.push('yield browser.wait("'+data.xpath+'").then(function*(element){');
                         arrCodes.push('    yield element.sendKeys("c:/uploadFiles/'+data.filename+'");');
                         arrCodes.push('});');
                         pushTestCode('uploadFile: ' + data.xpath + ', ' + data.filename, arrCodes);
-                        checkerBrowser && checkerBrowser.find(data.xpath, function*(error, element){
+                        checkerBrowser && checkerBrowser.wait(data.xpath, function*(error, element){
                             if(!error){
                                 yield element.sendKeys('c:/uploadFiles/'+data.filename);
                             }
                         }).then(doNext).catch(catchError) || doNext();
                         break;
+                    // 添加断言
                     case 'expect':
                         co(function*(){
                             var expectType = data.type;
@@ -395,6 +396,16 @@ function startRecorder(){
                                 }
                             }
                         }).then(doNext).catch(catchError);
+                        break;
+                    // 设置变量
+                    case 'setvar':
+                        arrCodes = [];
+                        arrCodes.push('var element = yield browser.wait("'+data.xpath+'");');
+                        arrCodes.push('yield element.clear().val(testVars["'+data.name+'"]);');
+                        pushTestCode('setvar: ' + data.xpath + ', ' + data.name, arrCodes);
+                        checkerBrowser && checkerBrowser.wait(data.xpath, function(error, element){
+                            return element.clear().val(testVars[data.name]);
+                        }).then(doNext).catch(catchError) || doNext();
                         break;
                 }
             });

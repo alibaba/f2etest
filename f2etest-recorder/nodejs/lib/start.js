@@ -64,7 +64,7 @@ function startRecorder(){
             'type': 'input',
             'name': 'xpathAttrs',
             'message': 'XPath属性配置',
-            'default': 'id,name,type,data-id,data-name,data-type,data-role'
+            'default': 'id,data-id,name,data-name,type,data-type,data-role'
         }
     ];
     inquirer.prompt(questions).then(function(anwsers){
@@ -145,7 +145,7 @@ function startRecorder(){
                     pushTestCode('switchFrame: ' + frame, arrCodes);
                     checkerBrowser && checkerBrowser.switchFrame(null, function(error){
                         if(frame !== null){
-                            return checkerBrowser.wait(frame, 30000).switchFrame(frame);
+                            return checkerBrowser.wait(frame, 10000).switchFrame(frame);
                         }
                     }).then(doNext).catch(catchError) || doNext();
                 }
@@ -187,7 +187,7 @@ function startRecorder(){
                         arrCodes.push('expect(element.length).to.be(1);');
                         arrCodes.push('yield browser.mouseMove("'+data.xpath+'");');
                         pushTestCode('target:' + data.xpath, arrCodes);
-                        checkerBrowser && checkerBrowser.wait(data.xpath, 30000).then(function(element){
+                        checkerBrowser && checkerBrowser.wait(data.xpath, 10000).then(function(element){
                             expect(element.length).to.be(1);
                         }).mouseMove(data.xpath).then(doNext).catch(catchError) || doNext();
                         break;
@@ -234,20 +234,18 @@ function startRecorder(){
                         break;
                     case 'select':
                         arrCodes = [];
-                        arrCodes.push('yield browser.find("'+data.xpath+'").then(function(element){');
+                        arrCodes.push('yield browser.wait("'+data.xpath+'", 30000).then(function(element){');
                         arrCodes.push('    return element.select({');
                         arrCodes.push('        type: "'+data.type+'",');
                         arrCodes.push('        value: "'+data.value+'"');
                         arrCodes.push('    });');
                         arrCodes.push('});');
                         pushTestCode('select:' + data.xpath + ', ' + data.type + ', ' + data.value, arrCodes);
-                        checkerBrowser && checkerBrowser.find(data.xpath, function(error, element){
-                            if(!error){
-                                return element.select({
-                                    type: data.type,
-                                    value: data.value
-                                });
-                            }
+                        checkerBrowser && checkerBrowser.wait(data.xpath, 10000).then(function(element){
+                            return element.select({
+                                type: data.type,
+                                value: data.value
+                            });
                         }).then(doNext).catch(catchError) || doNext();
                         break;
                     case 'acceptAlert':
@@ -269,7 +267,7 @@ function startRecorder(){
                         arrCodes.push('});');
                         pushTestCode('uploadFile: ' + data.xpath + ', ' + data.filename, arrCodes);
                         checkerBrowser && checkerBrowser.wait(data.xpath, {
-                            timeout: 30000,
+                            timeout: 10000,
                             displayed: false
                         }, function*(error, element){
                             if(!error){
@@ -344,7 +342,7 @@ function startRecorder(){
                             if(checkerBrowser){
                                 var element, value;
                                 if(reDomRequire.test(expectType)){
-                                    element = yield checkerBrowser.wait(expectParams[0], 30000);
+                                    element = yield checkerBrowser.wait(expectParams[0], 10000);
                                     expect(element.length).to.be(1);
                                 }
                                 switch(expectType){
@@ -406,7 +404,7 @@ function startRecorder(){
                         arrCodes.push('var element = yield browser.wait("'+data.xpath+'", 30000);');
                         arrCodes.push('yield element.clear().val(testVars["'+data.name+'"]);');
                         pushTestCode('setvar: ' + data.xpath + ', ' + data.name, arrCodes);
-                        checkerBrowser && checkerBrowser.wait(data.xpath, 30000, function(error, element){
+                        checkerBrowser && checkerBrowser.wait(data.xpath, 10000, function(error, element){
                             return element.clear().val(testVars[data.name]);
                         }).then(doNext).catch(catchError) || doNext();
                         break;

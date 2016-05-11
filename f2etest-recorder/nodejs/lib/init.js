@@ -7,8 +7,8 @@ function initConfig(){
         {
             'type': 'input',
             'name': 'server',
-            'message': '请输入f2etest的域名或IP',
-            'default': 'f2etest.xxx.com',
+            'message': '请输入f2etest的域名或IP，例如：f2etest.xxx.com',
+            'default': '',
             'validate': function(input){
                 return input !== '' && /^https?:\/\//.test(input) === false;
             }
@@ -32,7 +32,7 @@ function initConfig(){
         {
             'type': 'input',
             'name': 'browsers',
-            'message': '请输入需要测试的浏览器列表',
+            'message': '请输入需要同时测试的浏览器列表',
             'default': 'Chrome, IE 11',
             'validate': function(input){
                 return input !== '';

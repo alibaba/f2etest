@@ -16,7 +16,7 @@
 
     // 全局配置
     var testVars = {};
-    var arrXPathAttrs = ['id', 'name', 'type', 'data-id', 'data-name', 'data-type', 'data-role'];
+    var arrXPathAttrs = ['id', 'data-id', 'name', 'data-name', 'type', 'data-type', 'data-role'];
 
     // 全局事件
     var mapGlobalEvents = {};
@@ -71,17 +71,13 @@
         var current = target;
         var path = '';
         while(current !== null){
-            var nodeName = current.nodeName.toLowerCase();
-            path  = getElementXPath(target, current, path);
-            if(/^\/\//.test(path)){
-                return path;
+            if(current.nodeName !== 'HTML'){
+                path  = getElementXPath(target, current, path);
+                if(/^\/\//.test(path)){
+                    return path;
+                }
             }
-            if(nodeName === 'html'){
-                current = null;
-            }
-            else{
-                current = current.parentNode;
-            }
+            current = current.parentNode;
         }
         return null;
     }
@@ -106,8 +102,7 @@
             for(var i=0,len=arrXPathAttrs.length;i<len;i++){
                 attrName = arrXPathAttrs[i];
                 attrValue = mapAttrs[attrName];
-                // 非随机值
-                if(attrValue && /\d{10,}/.test(attrValue) === false){
+                if(attrValue){
                     arrAttrs.push({
                         name: attrName,
                         value: attrValue
@@ -140,7 +135,8 @@
                     newPath = '/'+ nodeName + (index>-1?'['+(index+1)+']':'') + path;
                 }
                 arrResults = findXPathElement('/'+newPath, document);
-                if(arrResults.length === 1 && arrResults[0] == target){
+                // 必需有属性值，或者是从/BODY开始的绝对路径
+                if(arrResults.length === 1 && arrResults[0] == target && (/@/.test(newPath) || /^\/BODY/.test(newPath))){
                     return '/'+newPath;
                 }
             }
@@ -329,7 +325,7 @@
     
     function onBodyReady(){
         isBodyReady = true;
-        if(isIframe === false){
+        if(isOnload === false && isIframe === false){
             // 主窗口显示loading
             showLoading();
         }
@@ -341,7 +337,17 @@
             divLoading.style.display = 'none';
         }
         frameId = getFrameId();
-        initRecorderDom();
+        if(isIframe && location.href === 'about:blank'){
+            // 富文本延后初始化
+            setTimeout(function(){
+                initRecorderEvent();
+                initRecorderDom();
+            }, 500);
+        }
+        else{
+            initRecorderEvent();
+            initRecorderDom();
+        }
     }
 
     function checkBodyReady(){
@@ -367,29 +373,34 @@
     GlobalEvents.on('modeChange', function(mode){
         switch(mode){
             case 'record':
+                removeDomSelecter();
                 isRecording = true;
                 isStopEvent = false;
                 isDomSelecter = false;
-                divDomSelector.style.display = 'none';
                 break;
             case 'pauseAll':
+                removeDomSelecter();
                 isRecording = false;
                 isStopEvent = true;
                 isDomSelecter = false;
-                divDomSelector.style.display = 'none';
                 break;
             case 'pauseRecord':
+                removeDomSelecter();
                 isRecording = false;
                 isStopEvent = false;
                 isDomSelecter = false;
-                divDomSelector.style.display = 'none';
                 break;
             case 'select':
+                initDomSelecter();
                 isRecording = false;
                 isStopEvent = true;
                 isDomSelecter = true;
         }
     });
+    // 设置全局工作模式
+    function setGlobalWorkMode(mode){
+        GlobalEvents.emit('modeChange', mode);
+    }
 
     // dom选择器hover事件
     GlobalEvents.on('selecterHover', function(event){
@@ -509,20 +520,48 @@
         }
     }
 
-    // 初始化dom
-    function initRecorderDom(){
-        var selecterMask = document.getElementById('f2etest-selecter-mask');
-        if(selecterMask){
-            // 定时探测DOM是否被破坏
-            setTimeout(initRecorderDom, 200);
-            return;
-        }
+    // 初始化选择器
+    function initDomSelecter(){
+        divDomSelector = document.createElement("div");
+        divDomSelector.id = 'f2etest-selecter-mask';
+        divDomSelector.className = 'f2etest-recorder';
+        divDomSelector.innerHTML = '<style>#f2etest-selecter-mask{display:none;position:fixed;z-index:2147483550;background:rgba(151, 232, 81,0.5)}</style>';
+        divDomSelector.addEventListener('click', function(event){
+            if(lastSelectDom !== null){
+                setGlobalWorkMode('pauseAll');
+                GlobalEvents.emit('selecterClick', {
+                    frame: frameId,
+                    xpath: getXPath(lastSelectDom),
+                    ctrlKey: event.ctrlKey
+                });
+            }
+            event.stopPropagation();
+            event.preventDefault();
+        });
+        document.body.appendChild(divDomSelector);
+    }
 
-        // 设置全局工作模式
-        function setGlobalWorkMode(mode){
-            GlobalEvents.emit('modeChange', mode);
+    // 卸载选择器
+    function removeDomSelecter(){
+        if(divDomSelector){
+            document.body.removeChild(divDomSelector);
+            divDomSelector = null;
         }
+    }
 
+    // 判断事件是否在工具面板
+    function isNotInToolsPannel(target){
+        while(target){
+            if(/f2etest-recorder/.test(target.className)){
+                return false;
+            }
+            target = target.parentNode;
+        }
+        return true;
+    }
+
+    // 初始化事件
+    function initRecorderEvent(){
         document.addEventListener('mousemove', function(event){
             var target = event.target;
             if(isDomSelecter){
@@ -573,26 +612,414 @@
             }
         }, true);
 
-        // 初始化选择器
-        function initDomSelecter(){
-            divDomSelector = document.createElement("div");
-            divDomSelector.id = 'f2etest-selecter-mask';
-            divDomSelector.className = 'f2etest-recorder';
-            divDomSelector.innerHTML = '<style>#f2etest-selecter-mask{display:none;position:fixed;z-index:2147483550;background:rgba(151, 232, 81,0.5)}</style>';
-            divDomSelector.addEventListener('click', function(event){
-                if(lastSelectDom !== null){
-                    setGlobalWorkMode('pauseAll');
-                    GlobalEvents.emit('selecterClick', {
-                        frame: frameId,
-                        xpath: getXPath(lastSelectDom),
-                        ctrlKey: event.ctrlKey
+        // catch event
+        document.addEventListener('mousedown', function(event){
+            var target = event.target;
+            if(isNotInToolsPannel(target)){
+                if(isRecording){
+                    if(/^(html|select|optgroup|option)$/i.test(target.tagName) === false && isFileInput(target) === false){
+                        saveParentsOffset(target);
+                        addActionTarget(target);
+                        var offset = target.getBoundingClientRect();
+                        var xpath = getXPath(target);
+                        if(xpath !== null){
+                            addActionTarget(target);
+                            saveCommand('mouseDown', {
+                                xpath: xpath,
+                                x: event.clientX-offset.left,
+                                y: event.clientY-offset.top,
+                                button: event.button
+                            });
+                        }
+                    }
+                }
+                else if(isStopEvent){
+                    event.stopPropagation();
+                    event.preventDefault();
+                }
+            }
+        }, true);
+
+        // save all parents offset
+        var mapParentsOffset = {};
+        function saveParentsOffset(target){
+            var documentElement = document.documentElement;
+            mapParentsOffset = {};
+            while(target !== null){
+                var nodeName = target.nodeName.toLowerCase();
+                var xpath = getXPath(target);
+                var rect = target.getBoundingClientRect();
+                mapParentsOffset[xpath] = {
+                    left: rect.left,
+                    top: rect.top
+                };
+                if(nodeName === 'html'){
+                    target = null;
+                }
+                else{
+                    target = target.parentNode;
+                }
+            }
+        }
+
+        // get the fixed offset parent
+        function getFixedParent(target){
+            var documentElement = document.documentElement;
+            var node = target;
+            var nodeName, xpath, offset, left, top, savedParent;
+            while(node !== null){
+                nodeName = node.nodeName.toLowerCase();
+                xpath = getXPath(node);
+                if(xpath === null){
+                    break;
+                }
+                offset = node.getBoundingClientRect();
+                left = offset.left;
+                top = offset.top;
+                savedParent = mapParentsOffset[xpath];
+                if(savedParent && left === savedParent.left && top === savedParent.top){
+                    return {
+                        xpath: xpath,
+                        left: left,
+                        top: top
+                    };
+                }
+                if(nodeName === 'html'){
+                    node = null;
+                }
+                else{
+                    node = node.parentNode;
+                }
+            }
+            xpath = getXPath(target);
+            if(xpath !== null){
+                offset = target.getBoundingClientRect();
+                return {
+                    xpath: xpath,
+                    left: offset.left,
+                    top: offset.top
+                };
+            }
+            else{
+                return null;
+            }
+        }
+
+        document.addEventListener('mouseup', function(event){
+            var target = event.target;
+            if(isNotInToolsPannel(target)){
+                if(isRecording){
+                    var tagName = target.tagName;
+                    if(/^(html|select|optgroup|option)$/i.test(tagName) === false && isFileInput(target) === false){
+                        // get offset of the fixed parent
+                        var fixedParent = getFixedParent(target);
+                        if(fixedParent !== null){
+                            addActionTarget(target);
+                            saveCommand('mouseUp', {
+                                xpath: fixedParent.xpath,
+                                x: event.clientX-fixedParent.left,
+                                y: event.clientY-fixedParent.top,
+                                button: event.button
+                            });
+                        }
+                    }
+                }
+                else if(isStopEvent){
+                    event.stopPropagation();
+                    event.preventDefault();
+                }
+            }
+        }, true);    
+
+        var modifierKeys = {
+            17: 'CTRL', // Ctrl
+            18: 'ALT', // Alt
+            16: 'SHIFT', // Shift
+            91: 'META' // Command/Meta
+        };
+
+        var NonTextKeys = {
+            8: 'BACK_SPACE', // BACK_SPACE
+            9: 'TAB', // TAB
+            13: 'ENTER', // ENTER
+            19: 'PAUSE', // PAUSE
+            27: 'ESCAPE', // ESCAPE
+            33: 'PAGE_UP', // PAGE_UP
+            34: 'PAGE_DOWN', // PAGE_DOWN
+            35: 'END', // END
+            36: 'HOME', // HOME
+            37: 'LEFT', // LEFT
+            38: 'UP', // UP
+            39: 'RIGHT', // RIGHT
+            40: 'DOWN', // DOWN
+            45: 'INSERT', // INSERT
+            46: 'DELETE' // DELETE
+        };
+
+        // catch keydown event
+        var lastModifierKeydown = null;
+        document.addEventListener('keydown', function(event){
+            var target = event.target;
+            if(isNotInToolsPannel(target)){
+                var keyCode = event.keyCode;
+                var modifierKey = modifierKeys[keyCode];
+                var NonTextKey = NonTextKeys[keyCode];
+                if(isRecording){
+                    if(modifierKey){
+                        // 控制键只触发一次keyDown
+                        if(modifierKey !== lastModifierKeydown){
+                            lastModifierKeydown = modifierKey;
+                            addActionTarget(target);
+                            saveCommand('keyDown', {
+                                character: modifierKey
+                            });
+                        }
+                    }
+                    else if(NonTextKey){
+                        addActionTarget(target);
+                        saveCommand('sendKeys', {
+                            text: '{'+NonTextKey+'}'
+                        });
+                    }
+                    else if(event.ctrlKey || event.altKey || event.shiftKey || event.metaKey){
+                        var typedCharacter = String.fromCharCode(keyCode);
+                        if(typedCharacter !== '' && /^[azcxv]$/i.test(typedCharacter) === true){
+                            addActionTarget(target);
+                            saveCommand('sendKeys', {
+                                text: typedCharacter.toLowerCase()
+                            });
+                        }
+                    }
+                }
+                else if(isStopEvent){
+                    event.stopPropagation();
+                    event.preventDefault();
+                }
+            }
+        }, true);
+        
+        // catch keyup event
+        document.addEventListener('keyup', function(event){
+            var target= event.target;
+            if(isNotInToolsPannel(target)){
+                var modifierKey = modifierKeys[event.keyCode];
+                if(isRecording){
+                    if(modifierKey){
+                        lastModifierKeydown = null;
+                        addActionTarget(target);
+                        saveCommand('keyUp', {
+                            character: modifierKey
+                        });
+                    }
+                }
+                else{
+                    if(!isRecording && event.keyCode === 27){
+                        setGlobalWorkMode('record');
+                    }
+                    if(isStopEvent){
+                        event.stopPropagation();
+                        event.preventDefault();
+                    }
+                }
+            }
+        }, true);
+
+        // catch keypress event
+        document.addEventListener('keypress', function(event){
+            var target = event.target;
+            if(isNotInToolsPannel(target) && /^(HTML|IFRAME)$/i.test(target.tagName) === false){
+                if(isRecording){
+                    var typedCharacter = String.fromCharCode(event.keyCode);
+                    if(typedCharacter !== '' && /[\r\n]/.test(typedCharacter) === false){
+                        addActionTarget(target);
+                        saveCommand('sendKeys', {
+                            text: typedCharacter
+                        });
+                    }
+                }
+                else if(isStopEvent){
+                    event.stopPropagation();
+                    event.preventDefault();
+                }
+            }
+        }, true);
+
+        document.addEventListener('compositionend', function(event){
+            var target = event.target;
+            if(isNotInToolsPannel(target)){
+                if(isRecording){
+                    addActionTarget(target);
+                    saveCommand('sendKeys', {
+                        text:event.data
                     });
                 }
-                event.stopPropagation();
-                event.preventDefault();
-            });
-            document.body.appendChild(divDomSelector);
+                else if(isStopEvent){
+                    event.stopPropagation();
+                    event.preventDefault();
+                }
+            }
+        }, true);
+
+        var lastScroll = {};
+        document.addEventListener('scroll', function(event){
+            var target = event.target;
+            if(isNotInToolsPannel(target)){
+                if(isRecording){
+                    var pageOffset = {
+                        x: window.pageXOffset,
+                        y: window.pageYOffset
+                    };
+                    if(pageOffset.x !== lastScroll.x || pageOffset.y !== lastScroll.y){
+                        saveCommand('scrollTo', pageOffset);
+                        lastScroll = pageOffset;
+                    }
+                }
+                else if(isStopEvent){
+                    event.stopPropagation();
+                    event.preventDefault();
+                }
+            }
+        }, true);
+
+        // catch select change file
+        document.addEventListener('click', function(event){
+            var target = event.target;
+            if(isNotInToolsPannel(target)){
+                if(isRecording){
+                    var tagName = target.tagName;
+                    if(tagName === 'OPTION'){
+                        // 定位SELECT父元素
+                        target = target.parentNode;
+                        tagName = target.tagName;
+                        if(tagName !== 'SELECT'){
+                            // 如果是optgroup，定位两次父元素
+                            target = target.parentNode;
+                            tagName = target.tagName;
+                        }
+                    }
+                    if(tagName === 'SELECT'){
+                        var xpath = getXPath(target);
+                        if(xpath !== null){
+                            var index = target.selectedIndex;
+                            var option = target.options[index];
+                            var value = option.getAttribute('value');
+                            var type;
+                            if(value){
+                                type = 'value';
+                            }
+                            else{
+                                type = 'index';
+                                value = index;
+                            }
+                            addActionTarget(target);
+                            saveCommand('select', {
+                                xpath: xpath,
+                                type: type,
+                                value: value
+                            });
+                        }
+                    }
+                }
+                else if(isStopEvent){
+                    event.stopPropagation();
+                    event.preventDefault();
+                }
+            }
+        }, true);
+
+        // catch file change
+        function isFileInput(target){
+            return target.tagName === 'INPUT' && target.getAttribute('type') === 'file';
         }
+        document.addEventListener('change', function(event){
+            var target = event.target;
+            if(isNotInToolsPannel(target)){
+                if(isRecording){
+                    if(isFileInput(target)){
+                        var xpath = getXPath(target);
+                        var filepath = target.value || '';
+                        var match = filepath.match(/[^\\\/]+$/);
+                        if(xpath !== null && match !== null){
+                            saveCommand('uploadFile', {
+                                xpath: xpath,
+                                filename: match[0]
+                            });
+                        }
+                        
+                    }
+                }
+                else if(isStopEvent){
+                    event.stopPropagation();
+                    event.preventDefault();
+                }
+            }
+        }, true);
+
+        // eval with unsafe window
+        function unsafeEval(str){
+            var head = document.getElementsByTagName("head")[0];
+            var script = document.createElement("script");
+            script.innerHTML = '('+str+')();';
+            head.appendChild(script);
+            head.removeChild(script);
+        }
+
+        // hook alert, confirm, prompt
+        function hookAlertFunction(){
+            var rawAlert = window.alert;
+            function sendAlertCmd(cmd, data){
+                var cmdInfo = {
+                    cmd: cmd,
+                    data: data || {}
+                };
+                window.postMessage({
+                    'type': 'f2etestAlertCommand',
+                    'cmdInfo': cmdInfo
+                }, '*');
+            }
+            window.alert = function(str){
+                var ret = rawAlert.call(this, str);
+                sendAlertCmd('acceptAlert');
+                return ret;
+            }
+            var rawConfirm = window.confirm;
+            window.confirm = function(str){
+                var ret = rawConfirm.call(this, str);
+                sendAlertCmd(ret?'acceptAlert':'dismissAlert');
+                return ret;
+            }
+            var rawPrompt = window.prompt;
+            window.prompt = function(str){
+                var ret = rawPrompt.call(this, str);
+                if(ret === null){
+                    sendAlertCmd('dismissAlert');
+                }
+                else{
+                    sendAlertCmd('setAlert', {
+                        text: ret
+                    });
+                    sendAlertCmd('acceptAlert');
+                }
+                return ret;
+            }
+        }
+        unsafeEval(hookAlertFunction.toString());
+    }
+
+    // 初始化dom
+    function initRecorderDom(){
+        var recorderLoaded = document.getElementById('f2etestloaded');
+        if(recorderLoaded){
+            // 定时探测DOM是否被破坏
+            setTimeout(initRecorderDom, 200);
+            return;
+        }
+
+        // 加载探测
+        recorderLoaded = document.createElement("span");
+        recorderLoaded.id = 'f2etestloaded';
+        recorderLoaded.style.display = 'none';
+        document.body.appendChild(recorderLoaded);
 
         // 初始化工具面板
         function initToolsPannel(){
@@ -883,413 +1310,6 @@
             }
         }
 
-        function isNotInToolsPannel(target){
-            while(target){
-                if(/f2etest-recorder/.test(target.className)){
-                    return false;
-                }
-                target = target.parentNode;
-            }
-            return true;
-        }
-
-        // catch event
-        document.addEventListener('mousedown', function(event){
-            var target = event.target;
-            if(isNotInToolsPannel(target)){
-                if(isRecording){
-                    if(/^(html|select|optgroup|option)$/i.test(target.tagName) === false && isFileInput(target) === false){
-                        saveParentsOffset(target);
-                        addActionTarget(target);
-                        var offset = target.getBoundingClientRect();
-                        var xpath = getXPath(target);
-                        if(xpath !== null){
-                            addActionTarget(target);
-                            saveCommand('mouseDown', {
-                                xpath: xpath,
-                                x: event.clientX-offset.left,
-                                y: event.clientY-offset.top,
-                                button: event.button
-                            });
-                        }
-                    }
-                }
-                else if(isStopEvent){
-                    event.stopPropagation();
-                    event.preventDefault();
-                }
-            }
-        }, true);
-
-        // save all parents offset
-        var mapParentsOffset = {};
-        function saveParentsOffset(target){
-            var documentElement = document.documentElement;
-            mapParentsOffset = {};
-            while(target !== null){
-                var nodeName = target.nodeName.toLowerCase();
-                var xpath = getXPath(target);
-                var rect = target.getBoundingClientRect();
-                mapParentsOffset[xpath] = {
-                    left: rect.left,
-                    top: rect.top
-                };
-                if(nodeName === 'html'){
-                    target = null;
-                }
-                else{
-                    target = target.parentNode;
-                }
-            }
-        }
-
-        // get the fixed offset parent
-        function getFixedParent(target){
-            var documentElement = document.documentElement;
-            var node = target;
-            var nodeName, xpath, offset, left, top, savedParent;
-            while(node !== null){
-                nodeName = node.nodeName.toLowerCase();
-                xpath = getXPath(node);
-                if(xpath === null){
-                    break;
-                }
-                offset = node.getBoundingClientRect();
-                left = offset.left;
-                top = offset.top;
-                savedParent = mapParentsOffset[xpath];
-                if(savedParent && left === savedParent.left && top === savedParent.top){
-                    return {
-                        xpath: xpath,
-                        left: left,
-                        top: top
-                    };
-                }
-                if(nodeName === 'html'){
-                    node = null;
-                }
-                else{
-                    node = node.parentNode;
-                }
-            }
-            xpath = getXPath(target);
-            if(xpath !== null){
-                offset = target.getBoundingClientRect();
-                return {
-                    xpath: xpath,
-                    left: offset.left,
-                    top: offset.top
-                };
-            }
-            else{
-                return null;
-            }
-        }
-
-        document.addEventListener('mouseup', function(event){
-            var target = event.target;
-            if(isNotInToolsPannel(target)){
-                if(isRecording){
-                    var tagName = target.tagName;
-                    if(/^(html|select|optgroup|option)$/i.test(tagName) === false && isFileInput(target) === false){
-                        // get offset of the fixed parent
-                        var fixedParent = getFixedParent(target);
-                        if(fixedParent !== null){
-                            addActionTarget(target);
-                            saveCommand('mouseUp', {
-                                xpath: fixedParent.xpath,
-                                x: event.clientX-fixedParent.left,
-                                y: event.clientY-fixedParent.top,
-                                button: event.button
-                            });
-                        }
-                    }
-                }
-                else if(isStopEvent){
-                    event.stopPropagation();
-                    event.preventDefault();
-                }
-            }
-        }, true);    
-
-        var modifierKeys = {
-            17: 'CTRL', // Ctrl
-            18: 'ALT', // Alt
-            16: 'SHIFT', // Shift
-            91: 'META' // Command/Meta
-        };
-
-        var NonTextKeys = {
-            8: 'BACK_SPACE', // BACK_SPACE
-            9: 'TAB', // TAB
-            13: 'ENTER', // ENTER
-            19: 'PAUSE', // PAUSE
-            27: 'ESCAPE', // ESCAPE
-            33: 'PAGE_UP', // PAGE_UP
-            34: 'PAGE_DOWN', // PAGE_DOWN
-            35: 'END', // END
-            36: 'HOME', // HOME
-            37: 'LEFT', // LEFT
-            38: 'UP', // UP
-            39: 'RIGHT', // RIGHT
-            40: 'DOWN', // DOWN
-            45: 'INSERT', // INSERT
-            46: 'DELETE' // DELETE
-        };
-
-        // catch keydown event
-        var lastModifierKeydown = null;
-        document.addEventListener('keydown', function(event){
-            var target = event.target;
-            if(isNotInToolsPannel(target)){
-                var keyCode = event.keyCode;
-                var modifierKey = modifierKeys[keyCode];
-                var NonTextKey = NonTextKeys[keyCode];
-                if(isRecording){
-                    if(modifierKey){
-                        // 控制键只触发一次keyDown
-                        if(modifierKey !== lastModifierKeydown){
-                            lastModifierKeydown = modifierKey;
-                            addActionTarget(target);
-                            saveCommand('keyDown', {
-                                character: modifierKey
-                            });
-                        }
-                    }
-                    else if(NonTextKey){
-                        addActionTarget(target);
-                        saveCommand('sendKeys', {
-                            text: '{'+NonTextKey+'}'
-                        });
-                    }
-                    else if(event.ctrlKey || event.altKey || event.shiftKey || event.metaKey){
-                        var typedCharacter = String.fromCharCode(keyCode);
-                        if(typedCharacter !== '' && /^[azcxv]$/i.test(typedCharacter) === true){
-                            addActionTarget(target);
-                            saveCommand('sendKeys', {
-                                text: typedCharacter.toLowerCase()
-                            });
-                        }
-                    }
-                }
-                else if(isStopEvent){
-                    event.stopPropagation();
-                    event.preventDefault();
-                }
-            }
-        }, true);
-        
-        // catch keyup event
-        document.addEventListener('keyup', function(event){
-            var target= event.target;
-            if(isNotInToolsPannel(target)){
-                var modifierKey = modifierKeys[event.keyCode];
-                if(isRecording){
-                    if(modifierKey){
-                        lastModifierKeydown = null;
-                        addActionTarget(target);
-                        saveCommand('keyUp', {
-                            character: modifierKey
-                        });
-                    }
-                }
-                else{
-                    if(!isRecording && event.keyCode === 27){
-                        setGlobalWorkMode('record');
-                    }
-                    if(isStopEvent){
-                        event.stopPropagation();
-                        event.preventDefault();
-                    }
-                }
-            }
-        }, true);
-
-        // catch keypress event
-        document.addEventListener('keypress', function(event){
-            var target = event.target;
-            if(isNotInToolsPannel(target) && /^(HTML|IFRAME|BODY)$/i.test(target.tagName) === false){
-                if(isRecording){
-                    var typedCharacter = String.fromCharCode(event.keyCode);
-                    if(typedCharacter !== '' && /[\r\n]/.test(typedCharacter) === false){
-                        addActionTarget(target);
-                        saveCommand('sendKeys', {
-                            text: typedCharacter
-                        });
-                    }
-                }
-                else if(isStopEvent){
-                    event.stopPropagation();
-                    event.preventDefault();
-                }
-            }
-        }, true);
-
-        document.addEventListener('compositionend', function(event){
-            var target = event.target;
-            if(isNotInToolsPannel(target)){
-                if(isRecording){
-                    addActionTarget(target);
-                    saveCommand('sendKeys', {
-                        text:event.data
-                    });
-                }
-                else if(isStopEvent){
-                    event.stopPropagation();
-                    event.preventDefault();
-                }
-            }
-        }, true);
-
-        var lastScroll = {};
-        document.addEventListener('scroll', function(event){
-            var target = event.target;
-            if(isNotInToolsPannel(target)){
-                if(isRecording){
-                    var pageOffset = {
-                        x: window.pageXOffset,
-                        y: window.pageYOffset
-                    };
-                    if(pageOffset.x !== lastScroll.x || pageOffset.y !== lastScroll.y){
-                        saveCommand('scrollTo', pageOffset);
-                        lastScroll = pageOffset;
-                    }
-                }
-                else if(isStopEvent){
-                    event.stopPropagation();
-                    event.preventDefault();
-                }
-            }
-        }, true);
-
-        // catch select change file
-        document.addEventListener('click', function(event){
-            var target = event.target;
-            if(isNotInToolsPannel(target)){
-                if(isRecording){
-                    var tagName = target.tagName;
-                    if(tagName === 'OPTION'){
-                        // 定位SELECT父元素
-                        target = target.parentNode;
-                        tagName = target.tagName;
-                        if(tagName !== 'SELECT'){
-                            // 如果是optgroup，定位两次父元素
-                            target = target.parentNode;
-                            tagName = target.tagName;
-                        }
-                    }
-                    if(tagName === 'SELECT'){
-                        var xpath = getXPath(target);
-                        if(xpath !== null){
-                            var index = target.selectedIndex;
-                            var option = target.options[index];
-                            var value = option.getAttribute('value');
-                            var type;
-                            if(value){
-                                type = 'value';
-                            }
-                            else{
-                                type = 'index';
-                                value = index;
-                            }
-                            addActionTarget(target);
-                            saveCommand('select', {
-                                xpath: xpath,
-                                type: type,
-                                value: value
-                            });
-                        }
-                    }
-                }
-                else if(isStopEvent){
-                    event.stopPropagation();
-                    event.preventDefault();
-                }
-            }
-        }, true);
-
-        // catch file change
-        function isFileInput(target){
-            return target.tagName === 'INPUT' && target.getAttribute('type') === 'file';
-        }
-        document.addEventListener('change', function(event){
-            var target = event.target;
-            if(isNotInToolsPannel(target)){
-                if(isRecording){
-                    if(isFileInput(target)){
-                        var xpath = getXPath(target);
-                        var filepath = target.value || '';
-                        var match = filepath.match(/[^\\\/]+$/);
-                        if(xpath !== null && match !== null){
-                            saveCommand('uploadFile', {
-                                xpath: xpath,
-                                filename: match[0]
-                            });
-                        }
-                        
-                    }
-                }
-                else if(isStopEvent){
-                    event.stopPropagation();
-                    event.preventDefault();
-                }
-            }
-        }, true);
-
-        // eval with unsafe window
-        function unsafeEval(str){
-            var head = document.getElementsByTagName("head")[0];
-            var script = document.createElement("script");
-            script.innerHTML = '('+str+')();';
-            head.appendChild(script);
-            head.removeChild(script);
-        }
-
-        function hookAlert(){
-            // hook alert, confirm, prompt
-            function hookAlertFunction(){
-                var rawAlert = window.alert;
-                function sendAlertCmd(cmd, data){
-                    var cmdInfo = {
-                        cmd: cmd,
-                        data: data || {}
-                    };
-                    window.postMessage({
-                        'type': 'f2etestAlertCommand',
-                        'cmdInfo': cmdInfo
-                    }, '*');
-                }
-                window.alert = function(str){
-                    var ret = rawAlert.call(this, str);
-                    sendAlertCmd('acceptAlert');
-                    return ret;
-                }
-                var rawConfirm = window.confirm;
-                window.confirm = function(str){
-                    var ret = rawConfirm.call(this, str);
-                    sendAlertCmd(ret?'acceptAlert':'dismissAlert');
-                    return ret;
-                }
-                var rawPrompt = window.prompt;
-                window.prompt = function(str){
-                    var ret = rawPrompt.call(this, str);
-                    if(ret === null){
-                        sendAlertCmd('dismissAlert');
-                    }
-                    else{
-                        sendAlertCmd('setAlert', {
-                            text: ret
-                        });
-                        sendAlertCmd('acceptAlert');
-                    }
-                    return ret;
-                }
-            }
-            unsafeEval(hookAlertFunction.toString());
-        }
-
-        hookAlert();
-        initDomSelecter();
         if(isIframe === false){
             initToolsPannel();
         }

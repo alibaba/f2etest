@@ -402,10 +402,10 @@ function startRecorder(){
                     case 'setvar':
                         arrCodes = [];
                         arrCodes.push('var element = yield browser.wait("'+data.xpath+'", 30000);');
-                        arrCodes.push('yield element.clear().val(testVars["'+data.name+'"]);');
+                        arrCodes.push('yield element.val(testVars["'+data.name+'"]);');
                         pushTestCode('setvar: ' + data.xpath + ', ' + data.name, arrCodes);
                         checkerBrowser && checkerBrowser.wait(data.xpath, 10000, function(error, element){
-                            return element.clear().val(testVars[data.name]);
+                            return element.val(testVars[data.name]);
                         }).then(doNext).catch(catchError) || doNext();
                         break;
                 }

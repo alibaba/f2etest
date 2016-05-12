@@ -307,6 +307,7 @@
         if(/^(HTML|IFRAME)$/i.test(target.tagName) === false){
             var xpath = getXPath(target);
             if(xpath !== null){
+                GlobalEvents.emit('showXPath', xpath);
                 saveCommand('target', {
                     xpath: xpath
                 });
@@ -518,6 +519,10 @@
                 param: param
             });
         }
+        // 显示target的xpath
+        GlobalEvents.on('showXPath', function(xpath){
+            spanShowXPath.innerHTML = xpath;
+        });
     }
 
     // 初始化选择器
@@ -894,6 +899,7 @@
                         var filepath = target.value || '';
                         var match = filepath.match(/[^\\\/]+$/);
                         if(xpath !== null && match !== null){
+                            GlobalEvents.emit('showXPath', xpath);
                             saveCommand('uploadFile', {
                                 xpath: xpath,
                                 filename: match[0]

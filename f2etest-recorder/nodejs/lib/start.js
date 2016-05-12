@@ -9,6 +9,7 @@ var JWebDriver = require('jwebdriver');
 var async = require('async');
 var co = require('co');
 var expect = require('expect.js');
+var WebSocketServer = require('websocket').server;
 require('colors');
 
 var symbols = {
@@ -19,6 +20,8 @@ if (process.platform === 'win32') {
   symbols.ok = '\u221A';
   symbols.err = '\u00D7';
 }
+
+var wsConnection;
 
 function startRecorder(){
     var configFile = path.resolve('config.json');
@@ -76,22 +79,40 @@ function startRecorder(){
         var recorderBrowser, checkerBrowser;
         var lastWindowId = 0;
         var lastFrameId = null;
+        var lastTestTitle = '';
+        var arrLastTestCodes = [];
         function pushTestCode(title, codes){
-            arrTestCodes.push('it("'+title.replace(/"/g, '\\"')+'", function*(){');
+            lastTestTitle = title;
+            arrLastTestCodes = [];
             if(Array.isArray(codes)){
                 codes.forEach(function(line){
-                    arrTestCodes.push('    '+line);
+                    arrLastTestCodes.push('    '+line);
                 });
             }
             else{
-                arrTestCodes.push('    '+codes);
+                arrLastTestCodes.push('    '+codes);
             }
-            arrTestCodes.push("});");
-            arrTestCodes.push("");
             title = title.replace(/^\w+:/, function(all){
                 return all.cyan;
             });
             console.log(title);
+        }
+        function saveTestCode(success){
+            if(arrLastTestCodes.length > 0){
+                checkerBrowser && sendWsMessage('checkResult', {
+                    title: lastTestTitle,
+                    success: success
+                });
+                if(!success){
+                    lastTestTitle = '\u00D7 ' + lastTestTitle;
+                }
+                arrTestCodes.push('it("'+lastTestTitle.replace(/"/g, '\\"').replace(/\n/g, '\\n')+'", function*(){');
+                arrTestCodes = arrTestCodes.concat(arrLastTestCodes);
+                arrTestCodes.push("});");
+                arrTestCodes.push("");
+                lastTestTitle = '';
+                arrLastTestCodes = [];
+            }
         }
         var cmdQueue = async.queue(function(cmdInfo, next) {
             var window = cmdInfo.window;
@@ -104,12 +125,14 @@ function startRecorder(){
                     if(checkerBrowser){
                         console.log(' '+symbols.ok.green+' Check successed.'.green);
                     }
+                    saveTestCode(true);
                     callback();
                 }
                 function catchError(error){
                     if(checkerBrowser){
                         console.log(' '+symbols.err.red+' Check failed!'.red, error);
                     }
+                    saveTestCode();
                     callback();
                 }
                 if(window !== lastWindowId){
@@ -127,12 +150,14 @@ function startRecorder(){
                     if(checkerBrowser){
                         console.log(' '+symbols.ok.green+' Check successed.'.green);
                     }
+                    saveTestCode(true);
                     callback();
                 }
                 function catchError(error){
                     if(checkerBrowser){
                         console.log(' '+symbols.err.red+' Check failed!'.red, error);
                     }
+                    saveTestCode();
                     callback();
                 }
                 if(frame !== lastFrameId){
@@ -159,12 +184,14 @@ function startRecorder(){
                     if(checkerBrowser){
                         console.log(' '+symbols.ok.green+' Check successed.'.green);
                     }
+                    saveTestCode(true);
                     callback();
                 }
                 function catchError(error){
                     if(checkerBrowser){
                         console.log(' '+symbols.err.red+' Check failed!'.red, error);
                     }
+                    saveTestCode();
                     callback();
                 }
                 var arrCodes = [];
@@ -185,7 +212,7 @@ function startRecorder(){
                         arrCodes = [];
                         arrCodes.push('var element = yield browser.wait("'+data.xpath+'", 30000);');
                         arrCodes.push('expect(element.length).to.be(1);');
-                        arrCodes.push('yield browser.mouseMove("'+data.xpath+'");');
+                        arrCodes.push('yield browser.mouseMove("'+data.xpath+'").sleep(100);');
                         pushTestCode('target:' + data.xpath, arrCodes);
                         checkerBrowser && checkerBrowser.wait(data.xpath, 10000).then(function(element){
                             expect(element.length).to.be(1);
@@ -327,15 +354,16 @@ function startRecorder(){
                                     arrCodes.push('var value = yield browser.sessionStorage("'+expectParams[0]+'");');
                                     break;
                             }
+                            var codeExpectTo = expectTo.replace(/"/g, '\\"').replace(/\n/g, '\\n');
                             switch(expectCompare){
                                 case 'equal':
-                                    arrCodes.push('expect(value).to.equal('+(/^(true|false)$/.test(expectTo)?expectTo:'"'+expectTo.replace(/"/g, '\\"')+'"')+');');
+                                    arrCodes.push('expect(value).to.equal('+(/^(true|false)$/.test(codeExpectTo)?codeExpectTo:'"'+codeExpectTo+'"')+');');
                                     break;
                                 case 'contain':
-                                    arrCodes.push('expect(value).to.contain("'+expectTo+'");');
+                                    arrCodes.push('expect(value).to.contain("'+codeExpectTo+'");');
                                     break;
                                 case 'regexp':
-                                    arrCodes.push('expect(value).to.match('+expectTo+');');
+                                    arrCodes.push('expect(value).to.match('+codeExpectTo+');');
                                     break;
                             }
                             pushTestCode('expect: ' + expectType + ', ' + JSON.stringify(expectParams) + ', ' + expectCompare + ', ' + expectTo, arrCodes);
@@ -513,15 +541,6 @@ function startRecorder(){
                     else{
                         // 不需要合并，恢复之前旧的mouseDown
                         dblClickFilter(lastCmdInfo1);
-                        // mouseDown后加延迟，以增加兼容性
-                        dblClickFilter({
-                            window: cmdInfo.window,
-                            frame: cmdInfo.frame,
-                            cmd: 'sleep',
-                            data: {
-                                time: 300
-                            }
-                        });
                     }
                 }
                 if(cmdInfo.cmd !== 'mouseDown'){
@@ -612,36 +631,52 @@ function startRecorder(){
 // start recorder server
 function startRecorderServer(config, onReady, onCommand, onEnd){
     var serverPort = 9765;
-    var server = http.createServer(function(req, res){
-        var urlInfo = url.parse(req.url, true);
-        var pathname = urlInfo.pathname;
-        var query = urlInfo.query;
-        switch(pathname){
-            case '/getConfig':
-                res.end(JSON.stringify(config));
-                break
-            case '/endRecorder':
-                server.close(function(){
-                    console.log('Recorder server closed.'.green);
-                    onEnd();
-                });
-                res.end('ok');
-                break
-            case '/saveCmd':
-                var cmdInfo = query['cmdInfo'];
-                try{
-                    cmdInfo = JSON.parse(cmdInfo);
-                }
-                catch(e){}
-                onCommand(cmdInfo);
-                res.end('ok');
-                break;
-        }
-    });
+    var server = http.createServer();
     server.listen(serverPort, function(){
         console.log('Recorder server listend on %s'.green, serverPort);
         onReady();
     });
+    wsServer = new WebSocketServer({
+        httpServer: server,
+        autoAcceptConnections: true
+    });
+    wsServer.on('connect', function(connection) {
+        wsConnection = connection;
+        sendWsMessage('config', config);
+        connection.on('message', function(message) {
+            var message = message.utf8Data;
+            try{
+                message = JSON.parse(message);
+            }
+            catch(e){};
+            var type = message.type;
+            switch(type){
+                case 'saveCmd':
+                    onCommand(message.data);
+                    break;
+                case 'end':
+                    wsConnection.close();
+                    server.close(function(){
+                        console.log('Recorder server closed.'.green);
+                        onEnd();
+                    });
+                    break;
+            }
+        });
+        connection.on('close', function(reasonCode, description) {
+            wsConnection = null;
+        });
+    });
+}
+
+function sendWsMessage(type, data){
+    if(wsConnection){
+        var message = {
+            type: type,
+            data: data
+        };
+        wsConnection.send(JSON.stringify(message));
+    }
 }
 
 function newChromeBrowser(f2etestConfig, hosts, isRecorder, callback){

@@ -881,23 +881,26 @@
             }
         }, true);
 
-        // catch select change file
-        document.addEventListener('click', function(event){
+        // catch file change
+        function isFileInput(target){
+            return target.tagName === 'INPUT' && target.getAttribute('type') === 'file';
+        }
+        document.addEventListener('change', function(event){
             var target = event.target;
             if(isNotInToolsPannel(target)){
                 if(isRecording){
-                    var tagName = target.tagName;
-                    if(tagName === 'OPTION'){
-                        // 定位SELECT父元素
-                        target = target.parentNode;
-                        tagName = target.tagName;
-                        if(tagName !== 'SELECT'){
-                            // 如果是optgroup，定位两次父元素
-                            target = target.parentNode;
-                            tagName = target.tagName;
+                    if(isFileInput(target)){
+                        var xpath = getXPath(target);
+                        var filepath = target.value || '';
+                        var match = filepath.match(/[^\\\/]+$/);
+                        if(xpath !== null && match !== null){
+                            saveCommand('uploadFile', {
+                                xpath: xpath,
+                                filename: match[0]
+                            });
                         }
                     }
-                    if(tagName === 'SELECT'){
+                    else if(target.tagName === 'SELECT'){
                         var xpath = getXPath(target);
                         if(xpath !== null){
                             var index = target.selectedIndex;
@@ -918,34 +921,6 @@
                                 value: value
                             });
                         }
-                    }
-                }
-                else if(isStopEvent){
-                    event.stopPropagation();
-                    event.preventDefault();
-                }
-            }
-        }, true);
-
-        // catch file change
-        function isFileInput(target){
-            return target.tagName === 'INPUT' && target.getAttribute('type') === 'file';
-        }
-        document.addEventListener('change', function(event){
-            var target = event.target;
-            if(isNotInToolsPannel(target)){
-                if(isRecording){
-                    if(isFileInput(target)){
-                        var xpath = getXPath(target);
-                        var filepath = target.value || '';
-                        var match = filepath.match(/[^\\\/]+$/);
-                        if(xpath !== null && match !== null){
-                            saveCommand('uploadFile', {
-                                xpath: xpath,
-                                filename: match[0]
-                            });
-                        }
-                        
                     }
                 }
                 else if(isStopEvent){
@@ -1031,7 +1006,7 @@
             var arrHTML = [
                 '<div style="padding:5px;color:#666"><strong>XPath: </strong><span id="f2etest-xpath"></span></div>',
                 '<div><span class="f2etest-button"><a name="f2etest-hover"><img src="'+baseUrl+'img/hover.png" alt="">添加悬停</a></span><span class="f2etest-button"><a name="f2etest-expect"><img src="'+baseUrl+'img/expect.png" alt="">添加断言</a></span><span class="f2etest-button"><a name="f2etest-vars"><img src="'+baseUrl+'img/vars.png" alt="">插入变量</a></span><span class="f2etest-button"><a name="f2etest-end"><img src="'+baseUrl+'img/end.png" alt="">结束录制</a></span></div>',
-                '<style>#f2etest-tools-pannel{position:fixed;z-index:9999999;padding:20px;width:570px;box-sizing:border-box;border:1px solid #ccc;line-height:1;background:rgba(241,241,241,0.8);box-shadow: 5px 5px 10px #888888;bottom:20px;right:20px;cursor:move;}#f2etest-xpath{border-bottom: dashed 1px #ccc;padding:2px;color:#FF7159;}.f2etest-button{cursor:pointer;margin: 8px;}.f2etest-button a{text-decoration: none;color:#333333;font-family: arial, sans-serif;font-size: 13px;color: #777;text-shadow: 1px 1px 0px white;background: -webkit-linear-gradient(top, #ffffff 0%,#dfdfdf 100%);border-radius: 3px;box-shadow: 0 1px 3px 0px rgba(0,0,0,0.4);padding: 6px 12px;}.f2etest-button a:hover{background: -webkit-linear-gradient(top, #ffffff 0%,#eee 100%);box-shadow: 0 1px 3px 0px rgba(0,0,0,0.4);}.f2etest-button a:active{background: -webkit-linear-gradient(top, #dfdfdf 0%,#f1f1f1 100%);box-shadow: 0px 1px 1px 1px rgba(0,0,0,0.2) inset, 0px 1px 1px 0 rgba(255,255,255,1);}.f2etest-button a img{padding-right: 8px;position: relative;top: 2px;vertical-align:baseline;}</style>'
+                '<style>#f2etest-tools-pannel{position:fixed;z-index:9999999;padding:20px;width:570px;box-sizing:border-box;border:1px solid #ccc;line-height:1;background:rgba(241,241,241,0.8);box-shadow: 5px 5px 10px #888888;bottom:20px;left:20px;cursor:move;}#f2etest-xpath{border-bottom: dashed 1px #ccc;padding:2px;color:#FF7159;}.f2etest-button{cursor:pointer;margin: 8px;}.f2etest-button a{text-decoration: none;color:#333333;font-family: arial, sans-serif;font-size: 13px;color: #777;text-shadow: 1px 1px 0px white;background: -webkit-linear-gradient(top, #ffffff 0%,#dfdfdf 100%);border-radius: 3px;box-shadow: 0 1px 3px 0px rgba(0,0,0,0.4);padding: 6px 12px;}.f2etest-button a:hover{background: -webkit-linear-gradient(top, #ffffff 0%,#eee 100%);box-shadow: 0 1px 3px 0px rgba(0,0,0,0.4);}.f2etest-button a:active{background: -webkit-linear-gradient(top, #dfdfdf 0%,#f1f1f1 100%);box-shadow: 0px 1px 1px 1px rgba(0,0,0,0.2) inset, 0px 1px 1px 0 rgba(255,255,255,1);}.f2etest-button a img{padding-right: 8px;position: relative;top: 2px;vertical-align:baseline;}</style>'
             ];
             divDomToolsPannel.innerHTML = arrHTML.join('');
             var diffX = 0, diffY =0;
@@ -1131,7 +1106,7 @@
                 '<h2 id="f2etest-dialog-title"></h2>',
                 '<div id="f2etest-dialog-content"></div>',
                 '<div style="padding-bottom:10px;text-align:center;"><span class="f2etest-button"><a name="f2etest-ok"><img src="'+baseUrl+'img/ok.png" alt="">确认添加</a></span><span class="f2etest-button"><a name="f2etest-cancel"><img src="'+baseUrl+'img/cancel.png" alt="">取消添加</a></span></div>',
-                '<style>#f2etest-dialog{display:none;position:fixed;z-index:9999999;padding:20px;top:50%;left:50%;width:450px;margin-left:-225px;margin-top:-160px;box-sizing:border-box;border:1px solid #ccc;background:rgba(241,241,241,1);box-shadow: 5px 5px 10px #888888;}#f2etest-dialog h2{padding-bottom:10px;border-bottom: solid 1px #ccc;margin-bottom:10px;color:#333;}#f2etest-dialog ul{list-style:none;padding:0;}#f2etest-dialog li{padding: 5px 0 5px 30px;}#f2etest-dialog li label{display:inline-block;width:80px;color:#666}#f2etest-dialog li input,#f2etest-dialog li select{font-size:16px;border:1px solid #ccc;border-radius:2px;padding:5px;}#f2etest-dialog li input{width: 250px;}</style>'
+                '<style>#f2etest-dialog{display:none;position:fixed;z-index:9999999;padding:20px;top:50%;left:50%;width:450px;margin-left:-225px;margin-top:-160px;box-sizing:border-box;border:1px solid #ccc;background:rgba(241,241,241,1);box-shadow: 5px 5px 10px #888888;}#f2etest-dialog h2{padding-bottom:10px;border-bottom: solid 1px #ccc;margin-bottom:10px;color:#333;}#f2etest-dialog ul{list-style:none;padding:0;}#f2etest-dialog li{padding: 5px 0 5px 30px;}#f2etest-dialog li label{display:inline-block;width:80px;color:#666}#f2etest-dialog li input,#f2etest-dialog li select,#f2etest-dialog li textarea{font-size:16px;border:1px solid #ccc;border-radius:2px;padding:5px;}#f2etest-dialog li input,#f2etest-dialog li textarea{width:250px;}</style>'
             ];
             divDomDialog.innerHTML = arrHTML.join('');
             document.body.appendChild(divDomDialog);
@@ -1181,7 +1156,7 @@
                     '<li id="f2etest-expect-dom-div"><label>断言DOM: </label><input id="f2etest-expect-dom" type="text" readonly /></li>',
                     '<li id="f2etest-expect-param-div"><label>断言参数: </label><input id="f2etest-expect-param" type="text" /></li>',
                     '<li><label>比较方式: </label><select id="f2etest-expect-compare"><option>equal</option><option>contain</option><option>regexp</option></select></li>',
-                    '<li><label>断言结果: </label><input id="f2etest-expect-to" type="text" /></li>',
+                    '<li><label>断言结果: </label><textarea id="f2etest-expect-to"></textarea></li>',
                     '</ul>'
                 ];
                 var domExpectDomDiv, domExpectParamDiv, domExpectType, domExpectDom, domExpectParam, domExpectCompare, domExpectTo;

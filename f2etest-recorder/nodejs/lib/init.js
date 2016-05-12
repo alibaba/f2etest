@@ -3,12 +3,31 @@ var path = require('path');
 var inquirer = require('inquirer');
 
 function initConfig(){
+
+    var configFile = path.resolve('config.json');
+    var config = {};
+    if(fs.existsSync(configFile)){
+        var content = fs.readFileSync(configFile).toString();
+        try{
+            config = JSON.parse(content);
+        }
+        catch(e){}
+    }
+    var f2etest = config.f2etest;
+    var server = '', userid = '', apiKey = '', browsers = 'chrome, ie 11';
+    if(f2etest){
+        server = f2etest.server;
+        userid = f2etest.userid;
+        apiKey = f2etest.apiKey;
+        browsers = f2etest.browsers;
+    }
+
     var questions = [
         {
             'type': 'input',
             'name': 'server',
             'message': '请输入f2etest的域名或IP，例如：f2etest.xxx.com',
-            'default': '',
+            'default': server,
             'validate': function(input){
                 return input !== '' && /^https?:\/\//.test(input) === false;
             }
@@ -17,6 +36,7 @@ function initConfig(){
             'type': 'input',
             'name': 'userid',
             'message': '请输入f2etest userid',
+            'default': userid,
             'validate': function(input){
                 return input !== '';
             }
@@ -25,6 +45,7 @@ function initConfig(){
             'type': 'input',
             'name': 'apiKey',
             'message': '请输入f2etest apiKey',
+            'default': apiKey,
             'validate': function(input){
                 return input !== '';
             }
@@ -33,7 +54,7 @@ function initConfig(){
             'type': 'input',
             'name': 'browsers',
             'message': '请输入需要同时测试的浏览器列表',
-            'default': 'Chrome, IE 11',
+            'default': browsers,
             'validate': function(input){
                 return input !== '';
             }
@@ -42,14 +63,15 @@ function initConfig(){
     inquirer.prompt(questions).then(function(anwsers){
         var configJson = {
             f2etest: anwsers,
-            vars: {}
+            vars: config.vars || {}
         };
-        var configFile = path.resolve('config.json');
         fs.writeFileSync(configFile, JSON.stringify(configJson, null, 4));
         console.log('config.json'.bold+' writed.'.green);
         var hostsFile = path.resolve('hosts');
-        fs.writeFileSync(hostsFile, '');
-        console.log('hosts'.bold+' writed.'.green);
+        if(fs.existsSync(hostsFile) === false){
+            fs.writeFileSync(hostsFile, '');
+            console.log('hosts'.bold+' writed.'.green);
+        }
     });
 }
 

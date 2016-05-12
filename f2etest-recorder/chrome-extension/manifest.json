@@ -21,7 +21,9 @@
       "img/end.png",
       "img/ok.png",
       "img/cancel.png",
-      "img/vars.png"
+      "img/vars.png",
+      "img/success.png",
+      "img/fail.png"
    ],
    "background": {
       "scripts": [ "js/background.js" ]
@@ -31,5 +33,5 @@
       "64": "img/icon-64.png",
       "128": "img/icon-128.png"
    },
-   "permissions": ["tabs", "webNavigation", "\u003Call_urls\u003E"]
+   "permissions": ["tabs", "webNavigation", "\u003Call_urls\u003E", "notifications"]
 }

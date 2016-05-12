@@ -1,4 +1,4 @@
-var F2ETESTAPI = 'http://f2etest-recorder-server:9765';
+var F2ETESTAPI = 'ws://f2etest-recorder-server:9765';
 var ENABLE_ICON1 = 'img/icon.png';
 var ENABLE_ICON2 = 'img/icon-record.png';
 var DISABLE_ICON = 'img/icon-disable.png';
@@ -6,6 +6,48 @@ var DISABLE_ICON = 'img/icon-disable.png';
 var isWorking = true;
 var workIcon = 1;
 var workIconTimer = null;
+var recordConfig = null;
+
+// websocket to f2etest recorder server
+var wsSocket = new WebSocket(F2ETESTAPI, "protocolOne");
+wsSocket.onopen = function (event) {
+    console.log('ws connected!');
+}
+wsSocket.onmessage = function (message) {
+    message = message.data;
+    try{
+        message = JSON.parse(message);
+    }
+    catch(e){}
+    var type = message.type;
+    var data = message.data;
+    switch(type){
+        case 'config':
+            recordConfig = data
+            break;
+        case 'checkResult':
+            chrome.notifications.create('checkResult', {
+                type: 'basic',
+                iconUrl: 'img/'+(data.success?'success':'fail')+'.png',
+                title: data.success?'校验成功':'校验失败',
+                message: data.title
+            });
+            break;
+    }
+}
+wsSocket.onclose = function(){
+    wsSocket = null;
+}
+
+function sendWsMessage(type, data){
+    if(wsSocket){
+        var message = {
+            type: type,
+            data: data
+        };
+        wsSocket.send(JSON.stringify(message));
+    }
+}
 
 // set recorder work status
 function setRecorderWork(enable){
@@ -107,28 +149,13 @@ function execNextCommand(newCmdInfo){
     if(arrTasks.length > 0 && isRunning === false){
         var cmdInfo = arrTasks.shift();
         console.log('cmd: { window: '+cmdInfo.window+', frame: '+cmdInfo.frame+', cmd: '+cmdInfo.cmd+ ', data:', JSON.stringify(cmdInfo.data) + ', fix: '+cmdInfo.fix+' }');
-        var strCmdInfo = JSON.stringify(cmdInfo);
-        var url = F2ETESTAPI + '/saveCmd?cmdInfo='+encodeURIComponent(strCmdInfo);
         isRunning = true;
-        getHttp(url, function(){
+        sendWsMessage('saveCmd', cmdInfo);
+        setTimeout(function(){
             isRunning = false;
             execNextCommand();
-        });
+        }, 200);
     }
-}
-
-function getHttp(url, callback){
-    var xmlhttp = new XMLHttpRequest();
-    xmlhttp.onreadystatechange = function() {
-        if (xmlhttp.readyState === 4 && xmlhttp.status === 200) {
-            callback(null, xmlhttp.responseText);
-        }
-        else{
-            callback('error');
-        }
-    };
-    xmlhttp.open("GET", url, true);
-    xmlhttp.send(null);
 }
 
 // manage window id
@@ -196,7 +223,6 @@ chrome.tabs.onRemoved.addListener(function(tabId, removeInfo){
     }
 });
 
-var recordConfig = null;
 // catch current window events
 chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
     if(isWorking && sender && sender.tab){
@@ -212,20 +238,7 @@ chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
                             endRecorder();
                             break;
                         case 'getConfig':
-                            if(recordConfig !== null){
-                                sendResponse(recordConfig);
-                            }
-                            else{
-                                getHttp(F2ETESTAPI + '/getConfig', function(error, result){
-                                    if(result){
-                                        try{
-                                            recordConfig = JSON.parse(result);
-                                            sendResponse(recordConfig);
-                                        }
-                                        catch(e){}
-                                    }
-                                });
-                            }
+                            sendResponse(recordConfig);
                             break;
                         case 'command':
                             saveCommand(windowId, data.frame, data.cmd, data.data);
@@ -252,7 +265,7 @@ chrome.browserAction.onClicked.addListener(function(tab){
 // end recorder
 function endRecorder(){
     setRecorderWork(false);
-    getHttp(F2ETESTAPI + '/endRecorder');
+    sendWsMessage('end');
 }
 
 // Global events port

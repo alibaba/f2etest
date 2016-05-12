@@ -455,6 +455,7 @@ function startRecorder(){
                 browserId && openUrl(f2etestUrl);
                 console.log('Recorder browser opened:'.green, f2etestUrl);
                 pushTestCode('maximize: ', 'yield browser.maximize();');
+                saveTestCode(true);
                 for(var i=0;i<900;i++){
                     if(recorderBrowser){
                         yield recorderBrowser.size();

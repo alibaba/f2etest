@@ -1,6 +1,5 @@
 (function(){
     var isIframe = self !== top;
-    var frameId = null;
     var isRecording = false;
     var isStopEvent = false;
     var isBodyReady = false;
@@ -11,7 +10,7 @@
     var divDomSelector = null;
     var lastSelectDom = null;
     var domSelectorCallback = null;
-    var spanShowXPath = null;
+    var spanShowDomPath = null;
     var expectGetValueCallback = null;
 
     // 全局配置
@@ -66,6 +65,108 @@
         return mapCookies[name];
     }
 
+    // get selector path or XPath
+    function getDomPath(target){
+        var selectorPath = getSelectorPath(target);
+        var XPath = getXPath(target);
+        if(selectorPath){
+            var match = selectorPath.match(/>/g);
+            var selectorLevelCount = match ? match.length + 1 : 1;
+            match = XPath.match(/\//g);
+            var XPathLevelCount = match ? match.length - 1 : 1;
+            return XPathLevelCount === 1 && selectorLevelCount > 1 ? XPath : selectorPath;
+        }
+        else{
+            return XPath;
+        }
+    }
+
+    // get selector path
+    function getSelectorPath(target){
+        var current = target;
+        var selectorPath = '';
+        var levelCount = 0;
+        while(current !== null && levelCount < 4){
+            if(current.nodeName !== 'HTML'){
+                selectorPath = getSelectorElement(current, selectorPath);
+                if(selectorPath.substr(0,1) === '!'){
+                    return selectorPath.substr(1);
+                }
+                current = current.parentNode;
+                levelCount ++;
+            }
+            else{
+                current = null;
+            }
+        }
+        return null;
+    }
+    function getSelectorElement(target, childPath){
+        var tagName = target.nodeName.toLowerCase();
+        var tempPath;
+        var relativeClass = null;
+        var idValue = target.getAttribute && target.getAttribute('id');
+        if(idValue && /^[a-z]/i.test(idValue)){
+            tempPath = '#'+idValue;
+            if(childPath){
+                tempPath += ' > ' + childPath;
+            }
+            if(checkUniqueSelector(tempPath)){
+                return '!' + tempPath;
+            }
+        }
+        var classValue = target.getAttribute && target.getAttribute('class');
+        if(classValue){
+            var arrClass = classValue.split(/\s+/);
+            for(var i in arrClass){
+                var className = arrClass[i];
+                if(className && /(over)/i.test(className) === false){
+                    tempPath = tagName + '.'+arrClass[i];
+                    if(childPath){
+                        tempPath += ' > ' + childPath;
+                    }
+                    if(checkUniqueSelector(tempPath)){
+                        return '!' + tempPath;
+                    }
+                    // 无法绝对定位,再次测试是否可以在父节点中相对定位自身
+                    else{
+                        var parent = target.parentNode;
+                        if(parent){
+                            var element = parent.querySelectorAll('.'+className);
+                            if(element.length === 1){
+                                relativeClass = className;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        tempPath = tagName;
+        if(relativeClass){
+            tempPath += '.' + relativeClass;
+        }
+        else{
+            var index = getElementIndex(target);
+            if(index !== -1){
+                tempPath += ':nth-child('+(index+1)+')';
+            }
+        }
+        if(childPath){
+            tempPath += ' > ' + childPath;
+        }
+        if(checkUniqueSelector(tempPath) && /^\w+:nth-child/.test(tempPath) === false){
+            tempPath = '!' + tempPath;
+        }
+        return tempPath;
+    }
+    function checkUniqueSelector(path){
+        var elements = document.querySelectorAll(path);
+        return elements.length === 1 && /[\.#]/.test(path);
+    }
+    function findDomPathElement(path){
+        return /^\/\//.test(path) ? findXPathElement(path) : document.querySelectorAll(path);
+    }
+
     // XPath tools
     function getXPath(target){
         var current = target;
@@ -76,8 +177,11 @@
                 if(/^\/\//.test(path)){
                     return path;
                 }
+                current = current.parentNode;
             }
-            current = current.parentNode;
+            else{
+                current = null;
+            }
         }
         return null;
     }
@@ -95,13 +199,16 @@
             // test locator
             var document = target.ownerDocument;
             var ownerSVGElement = target.ownerSVGElement;
-            var nodeName = el.nodeName;
+            var nodeName = el.nodeName.toLowerCase();
             var arrAttrs = [];
             var attrName, attrValue;
             var arrResults;
             for(var i=0,len=arrXPathAttrs.length;i<len;i++){
                 attrName = arrXPathAttrs[i];
                 attrValue = mapAttrs[attrName];
+                if(attrName === 'class' && /\s+/.test(attrValue)){
+                    attrValue = '';
+                }
                 if(attrValue){
                     arrAttrs.push({
                         name: attrName,
@@ -134,10 +241,13 @@
                 else{
                     newPath = '/'+ nodeName + (index>-1?'['+(index+1)+']':'') + path;
                 }
-                arrResults = findXPathElement('/'+newPath, document);
-                // 必需有属性值，或者是从/BODY开始的绝对路径
-                if(arrResults.length === 1 && arrResults[0] == target && (/@/.test(newPath) || /^\/BODY/.test(newPath))){
-                    return '/'+newPath;
+                // index模式非body不允许作为根
+                if(nodeName === 'body'){
+                    arrResults = findXPathElement('/'+newPath, document);
+                    // 必需有属性值，或者是从/body开始的绝对路径
+                    if(arrResults.length === 1 && arrResults[0] == target && (/@/.test(newPath) || /^\/body/.test(newPath))){
+                        return '/'+newPath;
+                    }
                 }
             }
         }
@@ -238,7 +348,7 @@
             try{
                 var frameElement = window.frameElement;
                 if(frameElement !== null){
-                    frame = getXPath(frameElement);
+                    frame = getDomPath(frameElement);
                 }
                 else{
                     var parentFrames = parent.frames;
@@ -257,6 +367,7 @@
 
     // save command
     function saveCommand(cmd, data){
+        var frameId = getFrameId();
         var cmdData = {
             frame: frameId,
             cmd: cmd,
@@ -285,8 +396,17 @@
         }
         else if(type === 'f2etestFrameCommmand'){
             data = data.data;
+            // fix frameId to path
+            var frameWindow = window.frames[data.frame];
             var arrIframes = document.getElementsByTagName("iframe");
-            data.frame = getXPath(arrIframes[data.frame]);
+            var frameDom = null;
+            for(var i =0, len = arrIframes.length;i<len;i++){
+                frameDom = arrIframes[i];
+                if(frameDom.contentWindow === frameWindow){
+                    break;
+                }
+            }
+            data.frame = getDomPath(frameDom);
             chrome.runtime.sendMessage({
                 type: 'command',
                 data: data
@@ -305,11 +425,11 @@
 
     function addActionTarget(target){
         if(/^(HTML|IFRAME)$/i.test(target.tagName) === false){
-            var xpath = getXPath(target);
-            if(xpath !== null){
-                GlobalEvents.emit('showXPath', xpath);
+            var path = getDomPath(target);
+            if(path !== null){
+                GlobalEvents.emit('showDomPath', path);
                 saveCommand('target', {
-                    xpath: xpath
+                    path: path
                 });
             }
         }
@@ -337,7 +457,11 @@
         if(divLoading){
             divLoading.style.display = 'none';
         }
-        frameId = getFrameId();
+        if(isIframe === false){
+            saveCommand('wait', {
+                path: 'body'
+            });
+        }
         if(isIframe && location.href === 'about:blank'){
             // 富文本延后初始化
             setTimeout(function(){
@@ -405,20 +529,22 @@
 
     // dom选择器hover事件
     GlobalEvents.on('selecterHover', function(event){
+        var frameId = getFrameId();
         if(frameId !== event.frame){
             // 清空选择器其余的iframe浮层
             divDomSelector.style.display = 'none';
         }
         if(isIframe === false){
-            // 主窗口显示xpath路径
-            spanShowXPath.innerHTML = event.xpath;
+            // 主窗口显示path路径
+            spanShowDomPath.innerHTML = event.path;
         }
     });
 
     // 添加悬停命令
     GlobalEvents.on('addHover', function(event){
+        var frameId = getFrameId();
         if(frameId === event.frame){
-            var elements = findXPathElement(event.xpath);
+            var elements = findDomPathElement(event.path);
             if(elements.length === 1){
                 var target = elements[0];
                 addActionTarget(target);
@@ -430,16 +556,17 @@
 
     // 插入变量
     GlobalEvents.on('setVar', function(event){
+        var frameId = getFrameId();
         if(frameId === event.frame){
-            var xpath = event.xpath;
-            var elements = findXPathElement(xpath);
+            var path = event.path;
+            var elements = findDomPathElement(path);
             if(elements.length === 1){
                 var target = elements[0];
                 target.focus();
                 target.value = event.value;
                 addActionTarget(target);
                 saveCommand('setvar', {
-                    xpath: xpath,
+                    path: path,
                     name: event.name
                 });
             }
@@ -449,8 +576,10 @@
     // 获取断言默认值
     GlobalEvents.on('getExpectValue', function(event){
         var domInfo = event.domInfo;
+        var frameId = getFrameId();
         if(frameId === domInfo.frame){
-            var elements = findXPathElement(domInfo.xpath);
+            var path = domInfo.path;
+            var elements = findDomPathElement(path);
             if(elements.length === 1){
                 var expectTarget = elements[0];
                 var type = event.type;
@@ -493,6 +622,7 @@
 
     // 添加断言命令
     GlobalEvents.on('addExpect', function(event){
+        var frameId = getFrameId();
         if(frameId === event.frame){
             saveCommand('expect', event.data);
         }
@@ -504,7 +634,7 @@
         GlobalEvents.on('selecterClick', function(event){
             domSelectorCallback({
                 frame: event.frame,
-                xpath: event.xpath
+                path: event.path
             }, event.ctrlKey);
         });
         // 返回断言默认值
@@ -519,9 +649,9 @@
                 param: param
             });
         }
-        // 显示target的xpath
-        GlobalEvents.on('showXPath', function(xpath){
-            spanShowXPath.innerHTML = xpath;
+        // 显示target的path
+        GlobalEvents.on('showDomPath', function(path){
+            spanShowDomPath.innerHTML = path;
         });
     }
 
@@ -533,10 +663,11 @@
         divDomSelector.innerHTML = '<style>#f2etest-selecter-mask{display:none;position:fixed;z-index:2147483550;background:rgba(151, 232, 81,0.5)}</style>';
         divDomSelector.addEventListener('click', function(event){
             if(lastSelectDom !== null){
+                var frameId = getFrameId();
                 setGlobalWorkMode('pauseAll');
                 GlobalEvents.emit('selecterClick', {
                     frame: frameId,
-                    xpath: getXPath(lastSelectDom),
+                    path: getDomPath(lastSelectDom),
                     ctrlKey: event.ctrlKey
                 });
             }
@@ -580,9 +711,10 @@
                         divDomSelector.style.top = rect.top+'px';
                         divDomSelector.style.width = rect.width+'px';
                         divDomSelector.style.height = rect.height+'px';
+                        var frameId = getFrameId();
                         GlobalEvents.emit('selecterHover', {
                             frame: frameId,
-                            xpath: getXPath(newSelectDom)
+                            path: getDomPath(newSelectDom)
                         });
                         lastSelectDom = newSelectDom;
                     }
@@ -626,11 +758,11 @@
                         saveParentsOffset(target);
                         addActionTarget(target);
                         var offset = target.getBoundingClientRect();
-                        var xpath = getXPath(target);
-                        if(xpath !== null){
+                        var path = getDomPath(target);
+                        if(path !== null){
                             addActionTarget(target);
                             saveCommand('mouseDown', {
-                                xpath: xpath,
+                                path: path,
                                 x: event.clientX-offset.left,
                                 y: event.clientY-offset.top,
                                 button: event.button
@@ -652,9 +784,9 @@
             mapParentsOffset = {};
             while(target !== null){
                 var nodeName = target.nodeName.toLowerCase();
-                var xpath = getXPath(target);
+                var path = getDomPath(target);
                 var rect = target.getBoundingClientRect();
-                mapParentsOffset[xpath] = {
+                mapParentsOffset[path] = {
                     left: rect.left,
                     top: rect.top
                 };
@@ -671,20 +803,20 @@
         function getFixedParent(target){
             var documentElement = document.documentElement;
             var node = target;
-            var nodeName, xpath, offset, left, top, savedParent;
+            var nodeName, path, offset, left, top, savedParent;
             while(node !== null){
                 nodeName = node.nodeName.toLowerCase();
-                xpath = getXPath(node);
-                if(xpath === null){
+                path = getDomPath(node);
+                if(path === null){
                     break;
                 }
                 offset = node.getBoundingClientRect();
                 left = offset.left;
                 top = offset.top;
-                savedParent = mapParentsOffset[xpath];
+                savedParent = mapParentsOffset[path];
                 if(savedParent && left === savedParent.left && top === savedParent.top){
                     return {
-                        xpath: xpath,
+                        path: path,
                         left: left,
                         top: top
                     };
@@ -696,11 +828,11 @@
                     node = node.parentNode;
                 }
             }
-            xpath = getXPath(target);
-            if(xpath !== null){
+            path = getDomPath(target);
+            if(path !== null){
                 offset = target.getBoundingClientRect();
                 return {
-                    xpath: xpath,
+                    path: path,
                     left: offset.left,
                     top: offset.top
                 };
@@ -721,7 +853,7 @@
                         if(fixedParent !== null){
                             addActionTarget(target);
                             saveCommand('mouseUp', {
-                                xpath: fixedParent.xpath,
+                                path: fixedParent.path,
                                 x: event.clientX-fixedParent.left,
                                 y: event.clientY-fixedParent.top,
                                 button: event.button
@@ -895,37 +1027,41 @@
             if(isNotInToolsPannel(target)){
                 if(isRecording){
                     if(isFileInput(target)){
-                        var xpath = getXPath(target);
+                        var path = getDomPath(target);
                         var filepath = target.value || '';
                         var match = filepath.match(/[^\\\/]+$/);
-                        if(xpath !== null && match !== null){
-                            GlobalEvents.emit('showXPath', xpath);
+                        if(path !== null && match !== null){
+                            GlobalEvents.emit('showDomPath', path);
                             saveCommand('uploadFile', {
-                                xpath: xpath,
+                                path: path,
                                 filename: match[0]
                             });
                         }
                     }
                     else if(target.tagName === 'SELECT'){
-                        var xpath = getXPath(target);
-                        if(xpath !== null){
-                            var index = target.selectedIndex;
-                            var option = target.options[index];
-                            var value = option.getAttribute('value');
-                            var type;
-                            if(value){
-                                type = 'value';
+                        var rect = target.getBoundingClientRect();
+                        if(rect.width > 0 && rect.height > 0){
+                            // no record invisible select
+                            var path = getDomPath(target);
+                            if(path !== null){
+                                var index = target.selectedIndex;
+                                var option = target.options[index];
+                                var value = option.getAttribute('value');
+                                var type;
+                                if(value){
+                                    type = 'value';
+                                }
+                                else{
+                                    type = 'index';
+                                    value = index;
+                                }
+                                addActionTarget(target);
+                                saveCommand('select', {
+                                    path: path,
+                                    type: type,
+                                    value: value
+                                });
                             }
-                            else{
-                                type = 'index';
-                                value = index;
-                            }
-                            addActionTarget(target);
-                            saveCommand('select', {
-                                xpath: xpath,
-                                type: type,
-                                value: value
-                            });
                         }
                     }
                 }
@@ -1010,9 +1146,9 @@
             divDomToolsPannel.id = 'f2etest-tools-pannel';
             divDomToolsPannel.className = 'f2etest-recorder';
             var arrHTML = [
-                '<div style="padding:5px;color:#666"><strong>XPath: </strong><span id="f2etest-xpath"></span></div>',
+                '<div style="padding:5px;color:#666"><strong>DomPath: </strong><span id="f2etest-path"></span></div>',
                 '<div><span class="f2etest-button"><a name="f2etest-hover"><img src="'+baseUrl+'img/hover.png" alt="">添加悬停</a></span><span class="f2etest-button"><a name="f2etest-expect"><img src="'+baseUrl+'img/expect.png" alt="">添加断言</a></span><span class="f2etest-button"><a name="f2etest-vars"><img src="'+baseUrl+'img/vars.png" alt="">插入变量</a></span><span class="f2etest-button"><a name="f2etest-end"><img src="'+baseUrl+'img/end.png" alt="">结束录制</a></span></div>',
-                '<style>#f2etest-tools-pannel{position:fixed;z-index:9999999;padding:20px;width:570px;box-sizing:border-box;border:1px solid #ccc;line-height:1;background:rgba(241,241,241,0.8);box-shadow: 5px 5px 10px #888888;bottom:20px;left:20px;cursor:move;}#f2etest-xpath{border-bottom: dashed 1px #ccc;padding:2px;color:#FF7159;}.f2etest-button{cursor:pointer;margin: 8px;}.f2etest-button a{text-decoration: none;color:#333333;font-family: arial, sans-serif;font-size: 13px;color: #777;text-shadow: 1px 1px 0px white;background: -webkit-linear-gradient(top, #ffffff 0%,#dfdfdf 100%);border-radius: 3px;box-shadow: 0 1px 3px 0px rgba(0,0,0,0.4);padding: 6px 12px;}.f2etest-button a:hover{background: -webkit-linear-gradient(top, #ffffff 0%,#eee 100%);box-shadow: 0 1px 3px 0px rgba(0,0,0,0.4);}.f2etest-button a:active{background: -webkit-linear-gradient(top, #dfdfdf 0%,#f1f1f1 100%);box-shadow: 0px 1px 1px 1px rgba(0,0,0,0.2) inset, 0px 1px 1px 0 rgba(255,255,255,1);}.f2etest-button a img{padding-right: 8px;position: relative;top: 2px;vertical-align:baseline;}</style>'
+                '<style>#f2etest-tools-pannel{position:fixed;z-index:9999999;padding:20px;width:570px;box-sizing:border-box;border:1px solid #ccc;line-height:1;background:rgba(241,241,241,0.8);box-shadow: 5px 5px 10px #888888;bottom:20px;left:20px;cursor:move;}#f2etest-path{border-bottom: dashed 1px #ccc;padding:2px;color:#FF7159;}.f2etest-button{cursor:pointer;margin: 8px;}.f2etest-button a{text-decoration: none;color:#333333;font-family: arial, sans-serif;font-size: 13px;color: #777;text-shadow: 1px 1px 0px white;background: -webkit-linear-gradient(top, #ffffff 0%,#dfdfdf 100%);border-radius: 3px;box-shadow: 0 1px 3px 0px rgba(0,0,0,0.4);padding: 6px 12px;}.f2etest-button a:hover{background: -webkit-linear-gradient(top, #ffffff 0%,#eee 100%);box-shadow: 0 1px 3px 0px rgba(0,0,0,0.4);}.f2etest-button a:active{background: -webkit-linear-gradient(top, #dfdfdf 0%,#f1f1f1 100%);box-shadow: 0px 1px 1px 1px rgba(0,0,0,0.2) inset, 0px 1px 1px 0 rgba(255,255,255,1);}.f2etest-button a img{padding-right: 8px;position: relative;top: 2px;vertical-align:baseline;}</style>'
             ];
             divDomToolsPannel.innerHTML = arrHTML.join('');
             var diffX = 0, diffY =0;
@@ -1081,7 +1217,7 @@
                             showVarsDailog(function(varInfo){
                                 GlobalEvents.emit('setVar', {
                                     frame: domInfo.frame,
-                                    xpath: domInfo.xpath,
+                                    path: domInfo.path,
                                     name: varInfo.name,
                                     value: varInfo.value
                                 });
@@ -1101,7 +1237,7 @@
                 setGlobalWorkMode('select');
             }
             document.body.appendChild(divDomToolsPannel);
-            spanShowXPath = document.getElementById('f2etest-xpath');
+            spanShowDomPath = document.getElementById('f2etest-path');
             // 对话框
             var divDomDialog = document.createElement("div");
             var okCallback = null;
@@ -1219,7 +1355,7 @@
                         }
                         // 初始化默认值
                         domExpectType.value = 'val';
-                        domExpectDom.value = expectTarget.xpath;
+                        domExpectDom.value = expectTarget.path;
                         domExpectParam.value = '';
                         domExpectCompare.value = 'equal';
                         domExpectTo.value = '';

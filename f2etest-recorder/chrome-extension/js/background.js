@@ -76,7 +76,7 @@ var allMouseMap = {};
 function saveCommand(windowId, frame, cmd, data){
     if( cmd === 'target'){
         // filter duplication target
-        var targetLocation = ''+windowId+frame+data.xpath;
+        var targetLocation = ''+windowId+frame+data.path;
         if(targetLocation === lastTargetLocation){
             return;
         }

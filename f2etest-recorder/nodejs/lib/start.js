@@ -67,7 +67,7 @@ function startRecorder(){
             'type': 'input',
             'name': 'xpathAttrs',
             'message': 'XPath属性配置',
-            'default': 'id,data-id,name,data-name,type,data-type,data-role'
+            'default': 'id,data-id,name,data-name,class,type,data-type,data-role'
         }
     ];
     inquirer.prompt(questions).then(function(anwsers){
@@ -201,47 +201,56 @@ function startRecorder(){
                         checkerBrowser && checkerBrowser.url(data.url).then(doNext).catch(catchError) || doNext();
                         break;
                     case 'closeWindow':
-                        pushTestCode('closeWindow:', 'yield browser.closeWindow();');
+                        pushTestCode('closeWindow: ', 'yield browser.closeWindow();');
                         checkerBrowser && checkerBrowser.closeWindow().then(doNext).catch(catchError) || doNext();
                         break;
                     case 'sleep':
-                        pushTestCode('sleep:' + data.time, 'yield browser.sleep('+data.time+');');
+                        pushTestCode('sleep: ' + data.time, 'yield browser.sleep('+data.time+');');
                         checkerBrowser && checkerBrowser.sleep(data.time).then(doNext).catch(catchError) || doNext();
+                        break;
+                    case 'wait':
+                        arrCodes = [];
+                        arrCodes.push('var element = yield browser.wait("'+data.path+'", 30000);');
+                        arrCodes.push('expect(element.length).to.be(1);');
+                        pushTestCode('wait: ' + data.path, arrCodes);
+                        checkerBrowser && checkerBrowser.wait(data.path, 10000).then(function(element){
+                            expect(element.length).to.be(1);
+                        }).then(doNext).catch(catchError) || doNext();
                         break;
                     case 'target':
                         arrCodes = [];
-                        arrCodes.push('var element = yield browser.wait("'+data.xpath+'", 30000);');
+                        arrCodes.push('var element = yield browser.wait("'+data.path+'", 30000);');
                         arrCodes.push('expect(element.length).to.be(1);');
-                        arrCodes.push('yield browser.mouseMove("'+data.xpath+'").sleep(100);');
-                        pushTestCode('target:' + data.xpath, arrCodes);
-                        checkerBrowser && checkerBrowser.wait(data.xpath, 10000).then(function(element){
+                        arrCodes.push('yield browser.mouseMove("'+data.path+'").sleep(100);');
+                        pushTestCode('target: ' + data.path, arrCodes);
+                        checkerBrowser && checkerBrowser.wait(data.path, 10000).then(function(element){
                             expect(element.length).to.be(1);
-                        }).mouseMove(data.xpath).then(doNext).catch(catchError) || doNext();
+                        }).mouseMove(data.path).then(doNext).catch(catchError) || doNext();
                         break;
                     case 'mouseMove':
                         if(data.x !== undefined){
-                            pushTestCode('mouseMove: '+data.xpath+', '+data.x+', '+data.y, 'yield browser.mouseMove("'+data.xpath+'", '+data.x+', '+data.y+');');
+                            pushTestCode('mouseMove: '+data.path+', '+data.x+', '+data.y, 'yield browser.mouseMove("'+data.path+'", '+data.x+', '+data.y+');');
                         }
                         else{
-                            pushTestCode('mouseMove: '+data.xpath, 'yield browser.mouseMove("'+data.xpath+'");');
+                            pushTestCode('mouseMove: '+data.path, 'yield browser.mouseMove("'+data.path+'");');
                         }
-                        checkerBrowser && checkerBrowser.mouseMove(data.xpath, data.x, data.y).then(doNext).catch(catchError) || doNext();
+                        checkerBrowser && checkerBrowser.mouseMove(data.path, data.x, data.y).then(doNext).catch(catchError) || doNext();
                         break;
                     case 'mouseDown':
-                        pushTestCode('mouseDown: ' + data.xpath + ', ' + data.x + ', ' + data.y + ', ' + data.button, 'yield browser.mouseMove("'+data.xpath+'", '+data.x+', '+data.y+').mouseDown('+data.button+');');
-                        checkerBrowser && checkerBrowser.mouseMove(data.xpath, data.x, data.y).mouseDown(data.button).then(doNext).catch(catchError) || doNext();
+                        pushTestCode('mouseDown: ' + data.path + ', ' + data.x + ', ' + data.y + ', ' + data.button, 'yield browser.mouseMove("'+data.path+'", '+data.x+', '+data.y+').mouseDown('+data.button+');');
+                        checkerBrowser && checkerBrowser.mouseMove(data.path, data.x, data.y).mouseDown(data.button).then(doNext).catch(catchError) || doNext();
                         break;
                     case 'mouseUp':
-                        pushTestCode('mouseUp: ' + data.xpath + ', ' + data.x + ', ' + data.y + ', ' + data.button, 'yield browser.mouseMove("'+data.xpath+'", '+data.x+', '+data.y+').mouseUp('+data.button+');');
-                        checkerBrowser && checkerBrowser.mouseMove(data.xpath, data.x, data.y).mouseUp(data.button).then(doNext).catch(catchError) || doNext();
+                        pushTestCode('mouseUp: ' + data.path + ', ' + data.x + ', ' + data.y + ', ' + data.button, 'yield browser.mouseMove("'+data.path+'", '+data.x+', '+data.y+').mouseUp('+data.button+');');
+                        checkerBrowser && checkerBrowser.mouseMove(data.path, data.x, data.y).mouseUp(data.button).then(doNext).catch(catchError) || doNext();
                         break;
                     case 'click':
-                        pushTestCode('click: ' + data.xpath + ', ' + data.x + ', ' + data.y + ', ' + data.button, 'yield browser.mouseMove("'+data.xpath+'", '+data.x+', '+data.y+').click('+data.button+');');
-                        checkerBrowser && checkerBrowser.mouseMove(data.xpath, data.x, data.y).click(data.button).then(doNext).catch(catchError) || doNext();
+                        pushTestCode('click: ' + data.path + ', ' + data.x + ', ' + data.y + ', ' + data.button, 'yield browser.mouseMove("'+data.path+'", '+data.x+', '+data.y+').click('+data.button+');');
+                        checkerBrowser && checkerBrowser.mouseMove(data.path, data.x, data.y).click(data.button).then(doNext).catch(catchError) || doNext();
                         break;
                     case 'dblClick':
-                        pushTestCode('dblClick: ' + data.xpath + ', ' + data.x + ', ' + data.y, 'yield browser.mouseMove("'+data.xpath+'", '+data.x+', '+data.y+').click().dblClick();');
-                        checkerBrowser && checkerBrowser.mouseMove(data.xpath, data.x, data.y).click().dblClick().then(doNext).catch(catchError) || doNext();
+                        pushTestCode('dblClick: ' + data.path + ', ' + data.x + ', ' + data.y, 'yield browser.mouseMove("'+data.path+'", '+data.x+', '+data.y+').click().click();');
+                        checkerBrowser && checkerBrowser.mouseMove(data.path, data.x, data.y).click().click().then(doNext).catch(catchError) || doNext();
                         break;
                     case 'sendKeys':
                         pushTestCode('sendKeys: ' + data.text, 'yield browser.sendKeys("'+data.text.replace(/"/g, '\\"')+'");');
@@ -261,14 +270,14 @@ function startRecorder(){
                         break;
                     case 'select':
                         arrCodes = [];
-                        arrCodes.push('yield browser.wait("'+data.xpath+'", 30000).then(function(element){');
+                        arrCodes.push('yield browser.wait("'+data.path+'", 30000).then(function(element){');
                         arrCodes.push('    return element.select({');
                         arrCodes.push('        type: "'+data.type+'",');
                         arrCodes.push('        value: "'+data.value+'"');
                         arrCodes.push('    });');
                         arrCodes.push('});');
-                        pushTestCode('select:' + data.xpath + ', ' + data.type + ', ' + data.value, arrCodes);
-                        checkerBrowser && checkerBrowser.wait(data.xpath, 10000).then(function(element){
+                        pushTestCode('select: ' + data.path + ', ' + data.type + ', ' + data.value, arrCodes);
+                        checkerBrowser && checkerBrowser.wait(data.path, 10000).then(function(element){
                             return element.select({
                                 type: data.type,
                                 value: data.value
@@ -289,11 +298,11 @@ function startRecorder(){
                         break;
                     case 'uploadFile':
                         arrCodes = [];
-                        arrCodes.push('yield browser.wait("'+data.xpath+'", {timeout: 30000, displayed: false}).then(function*(element){');
+                        arrCodes.push('yield browser.wait("'+data.path+'", {timeout: 30000, displayed: false}).then(function*(element){');
                         arrCodes.push('    yield element.sendKeys("c:/uploadFiles/'+data.filename+'");');
                         arrCodes.push('});');
-                        pushTestCode('uploadFile: ' + data.xpath + ', ' + data.filename, arrCodes);
-                        checkerBrowser && checkerBrowser.wait(data.xpath, {
+                        pushTestCode('uploadFile: ' + data.path + ', ' + data.filename, arrCodes);
+                        checkerBrowser && checkerBrowser.wait(data.path, {
                             timeout: 10000,
                             displayed: false
                         }, function*(error, element){
@@ -429,10 +438,10 @@ function startRecorder(){
                     // 设置变量
                     case 'setvar':
                         arrCodes = [];
-                        arrCodes.push('var element = yield browser.wait("'+data.xpath+'", 30000);');
+                        arrCodes.push('var element = yield browser.wait("'+data.path+'", 30000);');
                         arrCodes.push('yield element.val(testVars["'+data.name+'"]);');
-                        pushTestCode('setvar: ' + data.xpath + ', ' + data.name, arrCodes);
-                        checkerBrowser && checkerBrowser.wait(data.xpath, 10000, function(error, element){
+                        pushTestCode('setvar: ' + data.path + ', ' + data.name, arrCodes);
+                        checkerBrowser && checkerBrowser.wait(data.path, 10000, function(error, element){
                             return element.val(testVars[data.name]);
                         }).then(doNext).catch(catchError) || doNext();
                         break;
@@ -527,7 +536,7 @@ function startRecorder(){
                     if(cmd === 'mouseUp' &&
                         cmdInfo.window === lastCmdInfo1.window &&
                         cmdInfo.frame === lastCmdInfo1.frame &&
-                        lastCmdData.xpath === data.xpath &&
+                        lastCmdData.path === data.path &&
                         Math.abs(lastCmdData.x - data.x) < 20 &&
                         Math.abs(lastCmdData.y - data.y) < 20
                     ){
@@ -560,7 +569,7 @@ function startRecorder(){
                     if(cmd === 'click' &&
                         cmdInfo.window === lastCmdInfo2.window &&
                         cmdInfo.frame === lastCmdInfo2.frame &&
-                        lastCmdData.xpath === data.xpath &&
+                        lastCmdData.path === data.path &&
                         Math.abs(lastCmdData.x - data.x) < 20 &&
                         Math.abs(lastCmdData.y - data.y) < 20
                     ){
@@ -600,8 +609,8 @@ function startRecorder(){
                 checkerBrowser && checkerBrowser.close(function(){
                     checkerBrowser = null;
                     console.log('Checker browser closed.'.green);
-
-                });
+                    process.exit();
+                }) || process.exit();
             });
         }
         var recorderConfig = {

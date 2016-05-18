@@ -65,6 +65,8 @@
         return mapCookies[name];
     }
 
+    var reHoverClass = /(^|[^a-z0-9])(on)?(hover|over|active|current)([^a-z0-9]|$)/i;
+
     // get selector path or XPath
     function getDomPath(target){
         var selectorPath = getSelectorPath(target);
@@ -120,7 +122,7 @@
             var arrClass = classValue.split(/\s+/);
             for(var i in arrClass){
                 var className = arrClass[i];
-                if(className && /(over)/i.test(className) === false){
+                if(className && reHoverClass.test(className) === false){
                     tempPath = tagName + '.'+arrClass[i];
                     if(childPath){
                         tempPath += ' > ' + childPath;
@@ -206,7 +208,7 @@
             for(var i=0,len=arrXPathAttrs.length;i<len;i++){
                 attrName = arrXPathAttrs[i];
                 attrValue = mapAttrs[attrName];
-                if(attrName === 'class' && /\s+/.test(attrValue)){
+                if(attrName === 'class' && (/\s+/.test(attrValue) || reHoverClass.test(attrValue))){
                     attrValue = '';
                 }
                 if(attrValue){
@@ -423,13 +425,90 @@
         catch(e){}
     }
 
+    // 计算字节长度,中文两个字节
+    function byteLen(text){
+        var count = 0;
+        for(var i=0,len=text.length;i<len;i++){
+            char = text.charCodeAt(i);
+            count += char > 255 ? 2 : 1;
+        }
+        return count;
+    }
+
+    // 从左边读取限制长度的字符串
+    function leftstr(text, limit){
+        var substr = '';
+        var count = 0;
+        var char;
+        for(var i=0,len=text.length;i<len;i++){
+            char = text.charCodeAt(i);
+            substr += text.charAt(i);
+            count += char > 255 ? 2 : 1;
+            if(count >= limit){
+                return substr;
+            }
+        }
+        return substr;
+    }
+
+    function getTargetText(target){
+        var nodeName = target.nodeName;
+        var id = target.getAttribute('id');
+        var text = '';
+        if(nodeName === 'INPUT'){
+            var type = target.getAttribute('type');
+            switch(type){
+                case 'button':
+                case 'reset':
+                case 'submit':
+                    text = target.getAttribute('value');
+                    break;
+                default:
+                    var parentNode = target.parentNode;
+                    if(parentNode.nodeName === 'LABEL'){
+                        text = parentNode.textContent;
+                    }
+                    else if(id){
+                        var labelForElement = findXPathElement('//label[@for="'+id+'"]');
+                        if(labelForElement.length > 0){
+                            text = labelForElement[0].textContent;
+                        }
+                        else{
+                            text = target.getAttribute('name');
+                        }
+                    }
+                    else{
+                        text = target.getAttribute('name');
+                    }
+            }
+        }
+        else if(nodeName === 'SELECT'){
+            text = target.getAttribute('name');
+        }
+        else{
+            text = target.textContent;
+        }
+        text = text || '';
+        text = text.replace(/^\s+|\s+$/g, '');
+        text = text.replace(/\s*\r?\n\s*/g,' ');
+        var textLen = byteLen(text);
+        if(textLen <= 60){
+            text = textLen > 20 ? leftstr(text, 20) + '...' : text;
+        }
+        else{
+            text = '';
+        }
+        return text;
+    }
+
     function addActionTarget(target){
         if(/^(HTML|IFRAME)$/i.test(target.tagName) === false){
             var path = getDomPath(target);
             if(path !== null){
                 GlobalEvents.emit('showDomPath', path);
                 saveCommand('target', {
-                    path: path
+                    path: path,
+                    text: getTargetText(target)
                 });
             }
         }
@@ -446,6 +525,7 @@
     
     function onBodyReady(){
         isBodyReady = true;
+        hookAlert();
         if(isOnload === false && isIframe === false){
             // 主窗口显示loading
             showLoading();
@@ -567,7 +647,8 @@
                 addActionTarget(target);
                 saveCommand('setvar', {
                     path: path,
-                    name: event.name
+                    name: event.name,
+                    text: getTargetText(target)
                 });
             }
         }
@@ -655,6 +736,83 @@
         });
     }
 
+    function hookAlert(){
+        // eval with unsafe window
+        function unsafeEval(str){
+            var head = document.getElementsByTagName("head")[0];
+            var script = document.createElement("script");
+            script.innerHTML = '('+str+')();';
+            head.appendChild(script);
+            head.removeChild(script);
+        }
+
+        // hook alert, confirm, prompt
+        function hookAlertFunction(){
+            var rawAlert = window.alert;
+            function sendAlertCmd(cmd, data){
+                var cmdInfo = {
+                    cmd: cmd,
+                    data: data || {}
+                };
+                window.postMessage({
+                    'type': 'f2etestAlertCommand',
+                    'cmdInfo': cmdInfo
+                }, '*');
+            }
+            window.alert = function(str){
+                var ret = rawAlert.call(this, str);
+                sendAlertCmd('acceptAlert');
+                return ret;
+            }
+            var rawConfirm = window.confirm;
+            window.confirm = function(str){
+                var ret = rawConfirm.call(this, str);
+                sendAlertCmd(ret?'acceptAlert':'dismissAlert');
+                return ret;
+            }
+            var rawPrompt = window.prompt;
+            window.prompt = function(str){
+                var ret = rawPrompt.call(this, str);
+                if(ret === null){
+                    sendAlertCmd('dismissAlert');
+                }
+                else{
+                    sendAlertCmd('setAlert', {
+                        text: ret
+                    });
+                    sendAlertCmd('acceptAlert');
+                }
+                return ret;
+            }
+            function wrapBeforeUnloadListener(oldListener){
+                var newListener = function(e){
+                    var returnValue = oldListener(e);
+                    if(returnValue){
+                        sendAlertCmd('beforeUnload');
+                        setTimeout(function(){
+                            sendAlertCmd('cancelBeforeUnload');
+                        }, 500);
+                    }
+                    return returnValue;
+                }
+                return newListener;
+            }
+            var rawAddEventListener = window.addEventListener;
+            window.addEventListener = function(type, listener, useCapture){
+                if(type === 'beforeunload'){
+                    listener = wrapBeforeUnloadListener(listener);
+                }
+                return rawAddEventListener.call(window, type, listener, useCapture);
+            };
+            setTimeout(function(){
+                var oldBeforeunload = window.onbeforeunload;
+                if(oldBeforeunload){
+                    window.onbeforeunload = wrapBeforeUnloadListener(oldBeforeunload)
+                }
+            }, 500);
+        }
+        unsafeEval(hookAlertFunction.toString());
+    }
     // 初始化选择器
     function initDomSelecter(){
         divDomSelector = document.createElement("div");
@@ -765,7 +923,8 @@
                                 path: path,
                                 x: event.clientX-offset.left,
                                 y: event.clientY-offset.top,
-                                button: event.button
+                                button: event.button,
+                                text: getTargetText(target)
                             });
                         }
                     }
@@ -856,7 +1015,8 @@
                                 path: fixedParent.path,
                                 x: event.clientX-fixedParent.left,
                                 y: event.clientY-fixedParent.top,
-                                button: event.button
+                                button: event.button,
+                                text: getTargetText(target)
                             });
                         }
                     }
@@ -915,7 +1075,7 @@
                     else if(NonTextKey){
                         addActionTarget(target);
                         saveCommand('sendKeys', {
-                            text: '{'+NonTextKey+'}'
+                            keys: '{'+NonTextKey+'}'
                         });
                     }
                     else if(event.ctrlKey || event.altKey || event.shiftKey || event.metaKey){
@@ -923,7 +1083,7 @@
                         if(typedCharacter !== '' && /^[azcxv]$/i.test(typedCharacter) === true){
                             addActionTarget(target);
                             saveCommand('sendKeys', {
-                                text: typedCharacter.toLowerCase()
+                                keys: typedCharacter.toLowerCase()
                             });
                         }
                     }
@@ -970,7 +1130,7 @@
                     if(typedCharacter !== '' && /[\r\n]/.test(typedCharacter) === false){
                         addActionTarget(target);
                         saveCommand('sendKeys', {
-                            text: typedCharacter
+                            keys: typedCharacter
                         });
                     }
                 }
@@ -987,7 +1147,7 @@
                 if(isRecording){
                     addActionTarget(target);
                     saveCommand('sendKeys', {
-                        text:event.data
+                        keys:event.data
                     });
                 }
                 else if(isStopEvent){
@@ -998,6 +1158,7 @@
         }, true);
 
         var lastScroll = {};
+        var scrollEventTimer = null;
         document.addEventListener('scroll', function(event){
             var target = event.target;
             if(isNotInToolsPannel(target)){
@@ -1007,7 +1168,10 @@
                         y: window.pageYOffset
                     };
                     if(pageOffset.x !== lastScroll.x || pageOffset.y !== lastScroll.y){
-                        saveCommand('scrollTo', pageOffset);
+                        scrollEventTimer && clearTimeout(scrollEventTimer);
+                        scrollEventTimer = setTimeout(function(){
+                            saveCommand('scrollTo', pageOffset);
+                        }, 500);
                         lastScroll = pageOffset;
                     }
                 }
@@ -1034,7 +1198,8 @@
                             GlobalEvents.emit('showDomPath', path);
                             saveCommand('uploadFile', {
                                 path: path,
-                                filename: match[0]
+                                filename: match[0],
+                                text: getTargetText(target)
                             });
                         }
                     }
@@ -1059,7 +1224,8 @@
                                 saveCommand('select', {
                                     path: path,
                                     type: type,
-                                    value: value
+                                    value: value,
+                                    text: getTargetText(target)
                                 });
                             }
                         }
@@ -1071,56 +1237,6 @@
                 }
             }
         }, true);
-
-        // eval with unsafe window
-        function unsafeEval(str){
-            var head = document.getElementsByTagName("head")[0];
-            var script = document.createElement("script");
-            script.innerHTML = '('+str+')();';
-            head.appendChild(script);
-            head.removeChild(script);
-        }
-
-        // hook alert, confirm, prompt
-        function hookAlertFunction(){
-            var rawAlert = window.alert;
-            function sendAlertCmd(cmd, data){
-                var cmdInfo = {
-                    cmd: cmd,
-                    data: data || {}
-                };
-                window.postMessage({
-                    'type': 'f2etestAlertCommand',
-                    'cmdInfo': cmdInfo
-                }, '*');
-            }
-            window.alert = function(str){
-                var ret = rawAlert.call(this, str);
-                sendAlertCmd('acceptAlert');
-                return ret;
-            }
-            var rawConfirm = window.confirm;
-            window.confirm = function(str){
-                var ret = rawConfirm.call(this, str);
-                sendAlertCmd(ret?'acceptAlert':'dismissAlert');
-                return ret;
-            }
-            var rawPrompt = window.prompt;
-            window.prompt = function(str){
-                var ret = rawPrompt.call(this, str);
-                if(ret === null){
-                    sendAlertCmd('dismissAlert');
-                }
-                else{
-                    sendAlertCmd('setAlert', {
-                        text: ret
-                    });
-                    sendAlertCmd('acceptAlert');
-                }
-                return ret;
-            }
-        }
-        unsafeEval(hookAlertFunction.toString());
     }
 
     // 初始化dom

@@ -72,6 +72,7 @@ var lastTargetLocation = null;
 var lastWindow = null;
 var allKeyMap = {};
 var allMouseMap = {};
+var beforeUnloadCmdInfo = null;
 // save recoreded command
 function saveCommand(windowId, frame, cmd, data){
     if( cmd === 'target'){
@@ -103,6 +104,20 @@ function saveCommand(windowId, frame, cmd, data){
         case 'mouseUp':
             delete allMouseMap[data.button];
             break;
+        case 'beforeUnload':
+            cmdInfo.cmd = 'acceptAlert';
+            beforeUnloadCmdInfo = cmdInfo;
+            return;
+            break;
+        case 'cancelBeforeUnload':
+            beforeUnloadCmdInfo = null;
+            cmdInfo.cmd = 'dismissAlert';
+            break;
+    }
+
+    if(beforeUnloadCmdInfo){
+        execNextCommand(beforeUnloadCmdInfo);
+        beforeUnloadCmdInfo = null;
     }
 
     checkLostKey(windowId);

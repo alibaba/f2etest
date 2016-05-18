@@ -66,11 +66,11 @@ function initConfig(){
             vars: config.vars || {}
         };
         fs.writeFileSync(configFile, JSON.stringify(configJson, null, 4));
-        console.log('config.json'.bold+' writed.'.green);
+        console.log('config.json'.bold+'文件保存成功'.green);
         var hostsFile = path.resolve('hosts');
         if(fs.existsSync(hostsFile) === false){
             fs.writeFileSync(hostsFile, '');
-            console.log('hosts'.bold+' writed.'.green);
+            console.log('hosts'.bold+'文件已创建'.green);
         }
     });
 }

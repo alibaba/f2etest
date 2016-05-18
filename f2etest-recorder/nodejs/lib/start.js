@@ -81,7 +81,11 @@ function startRecorder(){
         var lastFrameId = null;
         var lastTestTitle = '';
         var arrLastTestCodes = [];
-        function pushTestCode(title, codes){
+        var allCaseCount = 0;
+        var failedCaseCount = 0;
+        function pushTestCode(cmd, text, ext, codes){
+            var title = cmd +': ';
+            title += text ? text + ' ( '+ext+' )' : ext;
             lastTestTitle = title;
             arrLastTestCodes = [];
             if(Array.isArray(codes)){
@@ -95,7 +99,7 @@ function startRecorder(){
             title = title.replace(/^\w+:/, function(all){
                 return all.cyan;
             });
-            console.log(title);
+            console.log('  '+title);
         }
         function saveTestCode(success){
             if(arrLastTestCodes.length > 0){
@@ -103,8 +107,10 @@ function startRecorder(){
                     title: lastTestTitle,
                     success: success
                 });
+                allCaseCount ++;
                 if(!success){
                     lastTestTitle = '\u00D7 ' + lastTestTitle;
+                    failedCaseCount ++;
                 }
                 arrTestCodes.push('it("'+lastTestTitle.replace(/"/g, '\\"').replace(/\n/g, '\\n')+'", function*(){');
                 arrTestCodes = arrTestCodes.concat(arrLastTestCodes);
@@ -123,14 +129,14 @@ function startRecorder(){
             arrTasks.push(function(callback){
                 function doNext(){
                     if(checkerBrowser){
-                        console.log(' '+symbols.ok.green+' Check successed.'.green);
+                        console.log('   '+symbols.ok.green+' 校验成功'.green);
                     }
                     saveTestCode(true);
                     callback();
                 }
                 function catchError(error){
                     if(checkerBrowser){
-                        console.log(' '+symbols.err.red+' Check failed!'.red, error);
+                        console.log('   '+symbols.err.red+' 校验失败'.red, error);
                     }
                     saveTestCode();
                     callback();
@@ -138,7 +144,7 @@ function startRecorder(){
                 if(window !== lastWindowId){
                     lastWindowId = window;
                     lastFrameId = null;
-                    pushTestCode('switchWindow: '+window, 'yield browser.switchWindow('+window+');')
+                    pushTestCode('switchWindow', '', window, 'yield browser.switchWindow('+window+');')
                     checkerBrowser && checkerBrowser.switchWindow(window).then(doNext).catch(catchError) || callback();
                 }
                 else{
@@ -148,14 +154,14 @@ function startRecorder(){
             arrTasks.push(function(callback){
                 function doNext(){
                     if(checkerBrowser){
-                        console.log(' '+symbols.ok.green+' Check successed.'.green);
+                        console.log('   '+symbols.ok.green+' 校验成功'.green);
                     }
                     saveTestCode(true);
                     callback();
                 }
                 function catchError(error){
                     if(checkerBrowser){
-                        console.log(' '+symbols.err.red+' Check failed!'.red, error);
+                        console.log('   '+symbols.err.red+' 校验失败'.red, error);
                     }
                     saveTestCode();
                     callback();
@@ -165,12 +171,12 @@ function startRecorder(){
                     var arrCodes = [];
                     arrCodes.push('yield browser.switchFrame(null);');
                     if(frame !== null){
-                        arrCodes.push('yield browser.wait("'+frame+'", 30000).switchFrame("'+frame+'");');
+                        arrCodes.push('yield browser.wait("'+frame+'", 30000).switchFrame("'+frame+'").wait("body");');
                     }
-                    pushTestCode('switchFrame: ' + frame, arrCodes);
+                    pushTestCode('switchFrame', '', frame, arrCodes);
                     checkerBrowser && checkerBrowser.switchFrame(null, function(error){
                         if(frame !== null){
-                            return checkerBrowser.wait(frame, 10000).switchFrame(frame);
+                            return checkerBrowser.wait(frame, 10000).switchFrame(frame).wait('body');
                         }
                     }).then(doNext).catch(catchError) || doNext();
                 }
@@ -182,14 +188,14 @@ function startRecorder(){
             arrTasks.push(function(callback){
                 function doNext(){
                     if(checkerBrowser){
-                        console.log(' '+symbols.ok.green+' Check successed.'.green);
+                        console.log('   '+symbols.ok.green+' 校验成功'.green);
                     }
                     saveTestCode(true);
                     callback();
                 }
                 function catchError(error){
                     if(checkerBrowser){
-                        console.log(' '+symbols.err.red+' Check failed!'.red, error);
+                        console.log('   '+symbols.err.red+' 校验失败'.red, error);
                     }
                     saveTestCode();
                     callback();
@@ -197,22 +203,22 @@ function startRecorder(){
                 var arrCodes = [];
                 switch(cmd){
                     case 'url':
-                        pushTestCode('url: ' + data.url, 'yield browser.url("'+data.url+'");');
+                        pushTestCode('url', '', data.url, 'yield browser.url("'+data.url+'");');
                         checkerBrowser && checkerBrowser.url(data.url).then(doNext).catch(catchError) || doNext();
                         break;
                     case 'closeWindow':
-                        pushTestCode('closeWindow: ', 'yield browser.closeWindow();');
+                        pushTestCode('closeWindow', '', '', 'yield browser.closeWindow();');
                         checkerBrowser && checkerBrowser.closeWindow().then(doNext).catch(catchError) || doNext();
                         break;
                     case 'sleep':
-                        pushTestCode('sleep: ' + data.time, 'yield browser.sleep('+data.time+');');
+                        pushTestCode('sleep', '', data.time, 'yield browser.sleep('+data.time+');');
                         checkerBrowser && checkerBrowser.sleep(data.time).then(doNext).catch(catchError) || doNext();
                         break;
                     case 'wait':
                         arrCodes = [];
                         arrCodes.push('var element = yield browser.wait("'+data.path+'", 30000);');
                         arrCodes.push('expect(element.length).to.be(1);');
-                        pushTestCode('wait: ' + data.path, arrCodes);
+                        pushTestCode('wait', '', data.path, arrCodes);
                         checkerBrowser && checkerBrowser.wait(data.path, 10000).then(function(element){
                             expect(element.length).to.be(1);
                         }).then(doNext).catch(catchError) || doNext();
@@ -221,51 +227,51 @@ function startRecorder(){
                         arrCodes = [];
                         arrCodes.push('var element = yield browser.wait("'+data.path+'", 30000);');
                         arrCodes.push('expect(element.length).to.be(1);');
-                        arrCodes.push('yield browser.mouseMove("'+data.path+'").sleep(100);');
-                        pushTestCode('target: ' + data.path, arrCodes);
+                        arrCodes.push('yield browser.sleep(300).mouseMove("'+data.path+'");');
+                        pushTestCode('target', data.text, data.path, arrCodes);
                         checkerBrowser && checkerBrowser.wait(data.path, 10000).then(function(element){
                             expect(element.length).to.be(1);
                         }).mouseMove(data.path).then(doNext).catch(catchError) || doNext();
                         break;
                     case 'mouseMove':
                         if(data.x !== undefined){
-                            pushTestCode('mouseMove: '+data.path+', '+data.x+', '+data.y, 'yield browser.mouseMove("'+data.path+'", '+data.x+', '+data.y+');');
+                            pushTestCode('mouseMove', data.text, data.path+', '+data.x+', '+data.y, 'yield browser.mouseMove("'+data.path+'", '+data.x+', '+data.y+');');
                         }
                         else{
-                            pushTestCode('mouseMove: '+data.path, 'yield browser.mouseMove("'+data.path+'");');
+                            pushTestCode('mouseMove', data.text, data.path, 'yield browser.mouseMove("'+data.path+'");');
                         }
                         checkerBrowser && checkerBrowser.mouseMove(data.path, data.x, data.y).then(doNext).catch(catchError) || doNext();
                         break;
                     case 'mouseDown':
-                        pushTestCode('mouseDown: ' + data.path + ', ' + data.x + ', ' + data.y + ', ' + data.button, 'yield browser.mouseMove("'+data.path+'", '+data.x+', '+data.y+').mouseDown('+data.button+');');
+                        pushTestCode('mouseDown', data.text, data.path + ', ' + data.x + ', ' + data.y + ', ' + data.button, 'yield browser.mouseMove("'+data.path+'", '+data.x+', '+data.y+').mouseDown('+data.button+');');
                         checkerBrowser && checkerBrowser.mouseMove(data.path, data.x, data.y).mouseDown(data.button).then(doNext).catch(catchError) || doNext();
                         break;
                     case 'mouseUp':
-                        pushTestCode('mouseUp: ' + data.path + ', ' + data.x + ', ' + data.y + ', ' + data.button, 'yield browser.mouseMove("'+data.path+'", '+data.x+', '+data.y+').mouseUp('+data.button+');');
+                        pushTestCode('mouseUp', data.text, data.path + ', ' + data.x + ', ' + data.y + ', ' + data.button, 'yield browser.mouseMove("'+data.path+'", '+data.x+', '+data.y+').mouseUp('+data.button+');');
                         checkerBrowser && checkerBrowser.mouseMove(data.path, data.x, data.y).mouseUp(data.button).then(doNext).catch(catchError) || doNext();
                         break;
                     case 'click':
-                        pushTestCode('click: ' + data.path + ', ' + data.x + ', ' + data.y + ', ' + data.button, 'yield browser.mouseMove("'+data.path+'", '+data.x+', '+data.y+').click('+data.button+');');
+                        pushTestCode('click', data.text, data.path + ', ' + data.x + ', ' + data.y + ', ' + data.button, 'yield browser.mouseMove("'+data.path+'", '+data.x+', '+data.y+').click('+data.button+');');
                         checkerBrowser && checkerBrowser.mouseMove(data.path, data.x, data.y).click(data.button).then(doNext).catch(catchError) || doNext();
                         break;
                     case 'dblClick':
-                        pushTestCode('dblClick: ' + data.path + ', ' + data.x + ', ' + data.y, 'yield browser.mouseMove("'+data.path+'", '+data.x+', '+data.y+').click().click();');
+                        pushTestCode('dblClick', data.text, data.path + ', ' + data.x + ', ' + data.y, 'yield browser.mouseMove("'+data.path+'", '+data.x+', '+data.y+').click().click();');
                         checkerBrowser && checkerBrowser.mouseMove(data.path, data.x, data.y).click().click().then(doNext).catch(catchError) || doNext();
                         break;
                     case 'sendKeys':
-                        pushTestCode('sendKeys: ' + data.text, 'yield browser.sendKeys("'+data.text.replace(/"/g, '\\"')+'");');
-                        checkerBrowser && checkerBrowser.sendKeys(data.text).then(doNext).catch(catchError) || doNext();
+                        pushTestCode('sendKeys', '', data.keys, 'yield browser.sendKeys("'+data.keys.replace(/"/g, '\\"')+'");');
+                        checkerBrowser && checkerBrowser.sendKeys(data.keys).then(doNext).catch(catchError) || doNext();
                         break;
                     case 'keyDown':
-                        pushTestCode('keyDown: ' + data.character, 'yield browser.keyDown("'+data.character+'");');
+                        pushTestCode('keyDown', '', data.character, 'yield browser.keyDown("'+data.character+'");');
                         checkerBrowser && checkerBrowser.keyDown(data.character).then(doNext).catch(catchError) || doNext();
                         break;
                     case 'keyUp':
-                        pushTestCode('keyUp: ' + data.character, 'yield browser.keyUp("'+data.character+'");');
+                        pushTestCode('keyUp', '', data.character, 'yield browser.keyUp("'+data.character+'");');
                         checkerBrowser && checkerBrowser.keyUp(data.character).then(doNext).catch(catchError) || doNext();
                         break;
                     case 'scrollTo':
-                        pushTestCode('scrollTo: '+ data.x + ', ' + data.y, 'yield browser.scrollTo('+data.x+', '+data.y+');');
+                        pushTestCode('scrollTo', '', data.x + ', ' + data.y, 'yield browser.scrollTo('+data.x+', '+data.y+');');
                         checkerBrowser && checkerBrowser.scrollTo(data.x, data.y).then(doNext).catch(catchError) || doNext();
                         break;
                     case 'select':
@@ -276,7 +282,7 @@ function startRecorder(){
                         arrCodes.push('        value: "'+data.value+'"');
                         arrCodes.push('    });');
                         arrCodes.push('});');
-                        pushTestCode('select: ' + data.path + ', ' + data.type + ', ' + data.value, arrCodes);
+                        pushTestCode('select', data.text, data.path + ', ' + data.type + ', ' + data.value, arrCodes);
                         checkerBrowser && checkerBrowser.wait(data.path, 10000).then(function(element){
                             return element.select({
                                 type: data.type,
@@ -285,15 +291,15 @@ function startRecorder(){
                         }).then(doNext).catch(catchError) || doNext();
                         break;
                     case 'acceptAlert':
-                        pushTestCode('acceptAlert: ', 'yield browser.acceptAlert();');
+                        pushTestCode('acceptAlert', '', '', 'yield browser.acceptAlert();');
                         checkerBrowser && checkerBrowser.acceptAlert().then(doNext).catch(catchError) || doNext();
                         break;
                     case 'dismissAlert':
-                        pushTestCode('dismissAlert: ', 'yield browser.dismissAlert();');
+                        pushTestCode('dismissAlert', '', '', 'yield browser.dismissAlert();');
                         checkerBrowser && checkerBrowser.dismissAlert().then(doNext).catch(catchError) || doNext();
                         break;
                     case 'setAlert':
-                        pushTestCode('setAlert: ' + data.text, 'yield browser.setAlert("'+data.text+'");');
+                        pushTestCode('setAlert', '', data.text, 'yield browser.setAlert("'+data.text+'");');
                         checkerBrowser && checkerBrowser.setAlert(data.text).then(doNext).catch(catchError) || doNext();
                         break;
                     case 'uploadFile':
@@ -301,7 +307,7 @@ function startRecorder(){
                         arrCodes.push('yield browser.wait("'+data.path+'", {timeout: 30000, displayed: false}).then(function*(element){');
                         arrCodes.push('    yield element.sendKeys("c:/uploadFiles/'+data.filename+'");');
                         arrCodes.push('});');
-                        pushTestCode('uploadFile: ' + data.path + ', ' + data.filename, arrCodes);
+                        pushTestCode('uploadFile', data.text, data.path + ', ' + data.filename, arrCodes);
                         checkerBrowser && checkerBrowser.wait(data.path, {
                             timeout: 10000,
                             displayed: false
@@ -375,7 +381,7 @@ function startRecorder(){
                                     arrCodes.push('expect(value).to.match('+codeExpectTo+');');
                                     break;
                             }
-                            pushTestCode('expect: ' + expectType + ', ' + JSON.stringify(expectParams) + ', ' + expectCompare + ', ' + expectTo, arrCodes);
+                            pushTestCode('expect', '', expectType + ', ' + JSON.stringify(expectParams) + ', ' + expectCompare + ', ' + expectTo, arrCodes);
                             if(checkerBrowser){
                                 var element, value;
                                 if(reDomRequire.test(expectType)){
@@ -440,7 +446,7 @@ function startRecorder(){
                         arrCodes = [];
                         arrCodes.push('var element = yield browser.wait("'+data.path+'", 30000);');
                         arrCodes.push('yield element.val(testVars["'+data.name+'"]);');
-                        pushTestCode('setvar: ' + data.path + ', ' + data.name, arrCodes);
+                        pushTestCode('setvar', data.text, data.path + ', ' + data.name, arrCodes);
                         checkerBrowser && checkerBrowser.wait(data.path, 10000, function(error, element){
                             return element.val(testVars[data.name]);
                         }).then(doNext).catch(catchError) || doNext();
@@ -462,8 +468,11 @@ function startRecorder(){
                 var browserId = browerInfo['f2etest.browserId'];
                 var f2etestUrl = 'http://'+f2etestConfig.server+'/openWdBrowser?browserId='+browserId;
                 browserId && openUrl(f2etestUrl);
-                console.log('Recorder browser opened:'.green, f2etestUrl);
-                pushTestCode('maximize: ', 'yield browser.maximize();');
+                console.log('录制浏览器已开启:'.green, f2etestUrl);
+                console.log('');
+                console.log('------------------------------------------------------------------'.green);
+                console.log('');
+                pushTestCode('maximize', '', '', 'yield browser.maximize();');
                 saveTestCode(true);
                 for(var i=0;i<900;i++){
                     if(recorderBrowser){
@@ -483,7 +492,7 @@ function startRecorder(){
                     var browserId = browerInfo['f2etest.browserId'];
                     var f2etestUrl = 'http://'+f2etestConfig.server+'/openWdBrowser?browserId='+browserId;
                     browserId && openUrl(f2etestUrl);
-                    console.log('Checker browser opened:'.green, f2etestUrl);
+                    console.log('校验浏览器已开启: '.green, f2etestUrl);
                     for(var i=0;i<900;i++){
                         if(checkerBrowser){
                             yield checkerBrowser.size();
@@ -507,8 +516,8 @@ function startRecorder(){
                 // 合并连续的sendKeys
                 var cmd = cmdInfo.cmd;
                 var data = cmdInfo.data;
-                if(cmd === 'sendKeys' && /\{\w+\}/.test(data.text) === false){
-                    arrSendKeys.push(data.text);
+                if(cmd === 'sendKeys' && /\{\w+\}/.test(data.keys) === false){
+                    arrSendKeys.push(data.keys);
                 }
                 else{
                     if(arrSendKeys.length > 0){
@@ -518,7 +527,7 @@ function startRecorder(){
                             frame: lastCmdInfo0.frame,
                             cmd: 'sendKeys',
                             data: {
-                                text: arrSendKeys.join('')
+                                keys: arrSendKeys.join('')
                             }
                         });
                         arrSendKeys = [];
@@ -542,10 +551,11 @@ function startRecorder(){
                     ){
                         // 条件满足，合并为click
                         cmdInfo = {
-                            window : cmdInfo.window,
-                            frame : cmdInfo.frame,
+                            window: cmdInfo.window,
+                            frame: cmdInfo.frame,
                             cmd: 'click',
-                            data: data
+                            data: data,
+                            text: cmdInfo.text
                         };
                     }
                     else{
@@ -575,10 +585,11 @@ function startRecorder(){
                     ){
                         // 条件满足，合并为click
                         cmdInfo = {
-                            window : cmdInfo.window,
-                            frame : cmdInfo.frame,
+                            window: cmdInfo.window,
+                            frame: cmdInfo.frame,
                             cmd: 'dblClick',
-                            data: data
+                            data: data,
+                            text: cmdInfo.text
                         };
                     }
                     else{
@@ -604,11 +615,14 @@ function startRecorder(){
         function onEnd(){
             recorderBrowser.close(function(){
                 recorderBrowser = null;
+                console.log('');
+                console.log('------------------------------------------------------------------'.green);
+                console.log('');
                 saveTestFile();
-                console.log('Recorder browser closed.'.green);
+                console.log('录制服务器已关闭'.green);
                 checkerBrowser && checkerBrowser.close(function(){
                     checkerBrowser = null;
-                    console.log('Checker browser closed.'.green);
+                    console.log('校验服务器已关闭'.green);
                     process.exit();
                 }) || process.exit();
             });
@@ -633,7 +647,14 @@ function startRecorder(){
                 return all;
             });
             fs.writeFileSync(testFile, templateContent);
-            console.log('Test file: '.green+fileName.bold+' saved.'.green);
+            if(checkerBrowser){
+                console.log('共录制%s个步骤，其中校验通过: %s个，校验失败: %s'.green+'个'.green, String(allCaseCount).bold, String(allCaseCount-failedCaseCount).bold, String(failedCaseCount).bold.red);
+            }
+            else{
+                console.log('共录制%s个步骤 (未经过校验)'.green, String(allCaseCount).bold);
+            }
+            console.log('录制用例已保存: '.green+fileName.bold);
+            console.log('');
         }
     });
 }
@@ -643,7 +664,8 @@ function startRecorderServer(config, onReady, onCommand, onEnd){
     var serverPort = 9765;
     var server = http.createServer();
     server.listen(serverPort, function(){
-        console.log('Recorder server listend on %s'.green, serverPort);
+        console.log('');
+        console.log('录制服务器监听在端口：%s'.green, serverPort);
         onReady();
     });
     wsServer = new WebSocketServer({
@@ -667,7 +689,6 @@ function startRecorderServer(config, onReady, onCommand, onEnd){
                 case 'end':
                     wsConnection.close();
                     server.close(function(){
-                        console.log('Recorder server closed.'.green);
                         onEnd();
                     });
                     break;

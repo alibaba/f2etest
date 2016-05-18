@@ -1,6 +1,6 @@
 {
   "name": "f2etest-recorder",
-  "version": "0.9.24",
+  "version": "0.9.27",
   "description": "Nodejs client for f2etest-recorder",
   "main": "./index",
   "bin": {
@@ -13,7 +13,7 @@
     "commander": "2.9.0",
     "expect.js": "0.3.1",
     "inquirer": "1.0.2",
-    "jwebdriver": "1.0.8",
+    "jwebdriver": "1.0.9",
     "websocket": "1.0.22"
   },
   "devDependencies": {},

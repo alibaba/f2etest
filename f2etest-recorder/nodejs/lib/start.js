@@ -305,7 +305,7 @@ function startRecorder(){
                     case 'uploadFile':
                         arrCodes = [];
                         arrCodes.push('yield browser.wait("'+data.path+'", {timeout: 30000, displayed: false}).then(function*(element){');
-                        arrCodes.push('    yield element.sendKeys("c:/uploadFiles/'+data.filename+'");');
+                        arrCodes.push('    yield element.sendKeys("c:\\\\uploadFiles\\\\'+data.filename+'");');
                         arrCodes.push('});');
                         pushTestCode('uploadFile', data.text, data.path + ', ' + data.filename, arrCodes);
                         checkerBrowser && checkerBrowser.wait(data.path, {
@@ -313,7 +313,7 @@ function startRecorder(){
                             displayed: false
                         }, function*(error, element){
                             if(!error){
-                                yield element.sendKeys('c:/uploadFiles/'+data.filename);
+                                yield element.sendKeys('c:\\uploadFiles\\'+data.filename);
                             }
                         }).then(doNext).catch(catchError) || doNext();
                         break;

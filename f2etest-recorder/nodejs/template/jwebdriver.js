@@ -8,6 +8,7 @@ var config = require('./config.json');
 var f2etestConfig = config.f2etest;
 var testVars = config.vars;
 var browsers = f2etestConfig.browsers;
+browsers = browsers.replace(/^\s+|\s+$/g, '');
 
 // read hosts
 var hostsPath = './hosts';
@@ -16,7 +17,7 @@ if(fs.existsSync(hostsPath)){
     hosts = fs.readFileSync(hostsPath).toString();
 }
 
-browsers.split(/,\s*/).forEach(function(browser){
+browsers.split(/\s*,\s*/).forEach(function(browser){
     var browserInfo = browser.split(' ');
     var browserName = browserInfo[0];
     var browserVersion = browserInfo[1];

@@ -106,7 +106,7 @@ function newWdSession(headers, json, callback){
         if(isSuccess){
             WebDriver.applyWdNode(userid, browserName, browserVersion, function(error, nodeInfo){
                 if(error){
-                    endRes(error);
+                    callback(error);
                 }
                 else{
                     var browserId = nodeInfo.browserId;
@@ -197,7 +197,7 @@ function newWdSession(headers, json, callback){
             });
         }
         else{
-            endRes('ApiKey check failed!');
+            callback('ApiKey check failed!');
         }
     });
 }

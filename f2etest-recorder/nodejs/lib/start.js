@@ -51,7 +51,7 @@ function startRecorder(){
         {
             'type': 'input',
             'name': 'fileName',
-            'message': '请输入测试文件名',
+            'message': '请输入用例文件名',
             'default': 'test.spec.js',
             'validate': function(input){
                 return input !== '';
@@ -65,15 +65,15 @@ function startRecorder(){
         },
         {
             'type': 'input',
-            'name': 'xpathAttrs',
-            'message': 'XPath属性配置',
-            'default': 'id,data-id,name,data-name,class,type,data-type,data-role'
+            'name': 'pathAttrs',
+            'message': 'Path扩展属性配置,除id,name,class之外',
+            'default': 'data-id,data-name,type,data-type,data-role,data-value'
         }
     ];
     inquirer.prompt(questions).then(function(anwsers){
         var fileName = anwsers.fileName;
         var openChecker = anwsers.checker;
-        var xpathAttrs = anwsers.xpathAttrs;
+        var pathAttrs = anwsers.pathAttrs;
 
         var arrTestCodes = [];
         var recorderBrowser, checkerBrowser;
@@ -112,7 +112,7 @@ function startRecorder(){
                     lastTestTitle = '\u00D7 ' + lastTestTitle;
                     failedCaseCount ++;
                 }
-                arrTestCodes.push('it("'+lastTestTitle.replace(/"/g, '\\"').replace(/\n/g, '\\n')+'", function*(){');
+                arrTestCodes.push('it(\''+lastTestTitle.replace(/'/g, '\\\'').replace(/\n/g, '\\n')+'\', function*(){');
                 arrTestCodes = arrTestCodes.concat(arrLastTestCodes);
                 arrTestCodes.push("});");
                 arrTestCodes.push("");
@@ -216,7 +216,7 @@ function startRecorder(){
                         break;
                     case 'wait':
                         arrCodes = [];
-                        arrCodes.push('var element = yield browser.wait("'+data.path+'", 30000);');
+                        arrCodes.push('var element = yield browser.wait(\''+data.path+'\', 30000);');
                         arrCodes.push('expect(element.length).to.be(1);');
                         pushTestCode('wait', '', data.path, arrCodes);
                         checkerBrowser && checkerBrowser.wait(data.path, 10000).then(function(element){
@@ -225,9 +225,9 @@ function startRecorder(){
                         break;
                     case 'target':
                         arrCodes = [];
-                        arrCodes.push('var element = yield browser.wait("'+data.path+'", 30000);');
+                        arrCodes.push('var element = yield browser.wait(\''+data.path+'\', 30000);');
                         arrCodes.push('expect(element.length).to.be(1);');
-                        arrCodes.push('yield browser.sleep(300).mouseMove("'+data.path+'");');
+                        arrCodes.push('yield browser.sleep(300).mouseMove(\''+data.path+'\');');
                         pushTestCode('target', data.text, data.path, arrCodes);
                         checkerBrowser && checkerBrowser.wait(data.path, 10000).then(function(element){
                             expect(element.length).to.be(1);
@@ -235,27 +235,27 @@ function startRecorder(){
                         break;
                     case 'mouseMove':
                         if(data.x !== undefined){
-                            pushTestCode('mouseMove', data.text, data.path+', '+data.x+', '+data.y, 'yield browser.mouseMove("'+data.path+'", '+data.x+', '+data.y+');');
+                            pushTestCode('mouseMove', data.text, data.path+', '+data.x+', '+data.y, 'yield browser.mouseMove(\''+data.path+'\', '+data.x+', '+data.y+');');
                         }
                         else{
-                            pushTestCode('mouseMove', data.text, data.path, 'yield browser.mouseMove("'+data.path+'");');
+                            pushTestCode('mouseMove', data.text, data.path, 'yield browser.mouseMove(\''+data.path+'\');');
                         }
                         checkerBrowser && checkerBrowser.mouseMove(data.path, data.x, data.y).then(doNext).catch(catchError) || doNext();
                         break;
                     case 'mouseDown':
-                        pushTestCode('mouseDown', data.text, data.path + ', ' + data.x + ', ' + data.y + ', ' + data.button, 'yield browser.mouseMove("'+data.path+'", '+data.x+', '+data.y+').mouseDown('+data.button+');');
+                        pushTestCode('mouseDown', data.text, data.path + ', ' + data.x + ', ' + data.y + ', ' + data.button, 'yield browser.mouseMove(\''+data.path+'\', '+data.x+', '+data.y+').mouseDown('+data.button+');');
                         checkerBrowser && checkerBrowser.mouseMove(data.path, data.x, data.y).mouseDown(data.button).then(doNext).catch(catchError) || doNext();
                         break;
                     case 'mouseUp':
-                        pushTestCode('mouseUp', data.text, data.path + ', ' + data.x + ', ' + data.y + ', ' + data.button, 'yield browser.mouseMove("'+data.path+'", '+data.x+', '+data.y+').mouseUp('+data.button+');');
+                        pushTestCode('mouseUp', data.text, data.path + ', ' + data.x + ', ' + data.y + ', ' + data.button, 'yield browser.mouseMove(\''+data.path+'\', '+data.x+', '+data.y+').mouseUp('+data.button+');');
                         checkerBrowser && checkerBrowser.mouseMove(data.path, data.x, data.y).mouseUp(data.button).then(doNext).catch(catchError) || doNext();
                         break;
                     case 'click':
-                        pushTestCode('click', data.text, data.path + ', ' + data.x + ', ' + data.y + ', ' + data.button, 'yield browser.mouseMove("'+data.path+'", '+data.x+', '+data.y+').click('+data.button+');');
+                        pushTestCode('click', data.text, data.path + ', ' + data.x + ', ' + data.y + ', ' + data.button, 'yield browser.mouseMove(\''+data.path+'\', '+data.x+', '+data.y+').click('+data.button+');');
                         checkerBrowser && checkerBrowser.mouseMove(data.path, data.x, data.y).click(data.button).then(doNext).catch(catchError) || doNext();
                         break;
                     case 'dblClick':
-                        pushTestCode('dblClick', data.text, data.path + ', ' + data.x + ', ' + data.y, 'yield browser.mouseMove("'+data.path+'", '+data.x+', '+data.y+').click().click();');
+                        pushTestCode('dblClick', data.text, data.path + ', ' + data.x + ', ' + data.y, 'yield browser.mouseMove(\''+data.path+'\', '+data.x+', '+data.y+').click().click();');
                         checkerBrowser && checkerBrowser.mouseMove(data.path, data.x, data.y).click().click().then(doNext).catch(catchError) || doNext();
                         break;
                     case 'sendKeys':
@@ -276,7 +276,7 @@ function startRecorder(){
                         break;
                     case 'select':
                         arrCodes = [];
-                        arrCodes.push('yield browser.wait("'+data.path+'", 30000).then(function(element){');
+                        arrCodes.push('yield browser.wait(\''+data.path+'\', 30000).then(function(element){');
                         arrCodes.push('    return element.select({');
                         arrCodes.push('        type: "'+data.type+'",');
                         arrCodes.push('        value: "'+data.value+'"');
@@ -304,7 +304,7 @@ function startRecorder(){
                         break;
                     case 'uploadFile':
                         arrCodes = [];
-                        arrCodes.push('yield browser.wait("'+data.path+'", {timeout: 30000, displayed: false}).then(function*(element){');
+                        arrCodes.push('yield browser.wait(\''+data.path+'\', {timeout: 30000, displayed: false}).then(function*(element){');
                         arrCodes.push('    yield element.sendKeys("c:\\\\uploadFiles\\\\'+data.filename+'");');
                         arrCodes.push('});');
                         pushTestCode('uploadFile', data.text, data.path + ', ' + data.filename, arrCodes);
@@ -444,7 +444,7 @@ function startRecorder(){
                     // 设置变量
                     case 'setvar':
                         arrCodes = [];
-                        arrCodes.push('var element = yield browser.wait("'+data.path+'", 30000);');
+                        arrCodes.push('var element = yield browser.wait(\''+data.path+'\', 30000);');
                         arrCodes.push('yield element.val(testVars["'+data.name+'"]);');
                         pushTestCode('setvar', data.text, data.path + ', ' + data.name, arrCodes);
                         checkerBrowser && checkerBrowser.wait(data.path, 10000, function(error, element){
@@ -602,11 +602,11 @@ function startRecorder(){
                     cmdQueue.push(cmdInfo);
                 }
                 else{
-                    // 500毫秒以内才进行dblClick合并
+                    // 400毫秒以内才进行dblClick合并
                     dblClickFilterTimer = setTimeout(function(){
                         cmdQueue.push(lastCmdInfo2);
                         lastCmdInfo2 = null;
-                    }, 500);
+                    }, 400);
                 }
                 lastCmdInfo2 = cmdInfo;
             }
@@ -620,15 +620,16 @@ function startRecorder(){
                 console.log('');
                 saveTestFile();
                 console.log('录制服务器已关闭'.green);
+                console.log('录制浏览器已关闭'.green);
                 checkerBrowser && checkerBrowser.close(function(){
                     checkerBrowser = null;
-                    console.log('校验服务器已关闭'.green);
+                    console.log('校验浏览器已关闭'.green);
                     process.exit();
                 }) || process.exit();
             });
         }
         var recorderConfig = {
-            xpathAttrs : xpathAttrs,
+            pathAttrs : pathAttrs,
             testVars: testVars
         };
         startRecorderServer(recorderConfig, onReady, onCommand, onEnd);
@@ -651,7 +652,7 @@ function startRecorder(){
                 console.log('共录制%s个步骤，其中校验通过: %s个，校验失败: %s'.green+'个'.green, String(allCaseCount).bold, String(allCaseCount-failedCaseCount).bold, String(failedCaseCount).bold.red);
             }
             else{
-                console.log('共录制%s个步骤 (未经过校验)'.green, String(allCaseCount).bold);
+                console.log('共录制%s个步骤 (%s)'.green, String(allCaseCount).bold, '未经过校验'.yellow);
             }
             console.log('录制用例已保存: '.green+fileName.bold);
             console.log('');

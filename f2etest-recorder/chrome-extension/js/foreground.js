@@ -15,7 +15,7 @@
 
     // 全局配置
     var testVars = {};
-    var arrXPathAttrs = ['id', 'data-id', 'name', 'data-name', 'type', 'data-type', 'data-role'];
+    var arrPathAttrs = ['data-id', 'data-name', 'type', 'data-type', 'data-role', 'data-value'];
 
     // 全局事件
     var mapGlobalEvents = {};
@@ -50,8 +50,8 @@
         if(config.testVars){
             testVars = config.testVars;
         }
-        if(config.xpathAttrs){
-            arrXPathAttrs = config.xpathAttrs.split(',');
+        if(config.pathAttrs){
+            arrPathAttrs = config.pathAttrs.split(',');
         }
     });
 
@@ -67,35 +67,58 @@
 
     var reHoverClass = /(^|[^a-z0-9])(on)?(hover|over|active|current)([^a-z0-9]|$)/i;
 
-    // get selector path or XPath
+    // get selector path
     function getDomPath(target){
-        var selectorPath = getSelectorPath(target);
-        var XPath = getXPath(target);
-        if(selectorPath){
-            var match = selectorPath.match(/>/g);
-            var selectorLevelCount = match ? match.length + 1 : 1;
-            match = XPath.match(/\//g);
-            var XPathLevelCount = match ? match.length - 1 : 1;
-            return XPathLevelCount === 1 && selectorLevelCount > 1 ? XPath : selectorPath;
+        var relativeNode = target.ownerDocument, relativePath = '';
+        var tagName = target.nodeName.toLowerCase();
+        var tempPath;
+        var idValue = target.getAttribute && target.getAttribute('id');
+        var nameValue = target.getAttribute && target.getAttribute('name');
+        var typeValue = target.getAttribute && target.getAttribute('type');
+        var valueValue = target.getAttribute && target.getAttribute('value');
+        // 检查目标元素自身是否有唯一id
+        if(idValue && checkUniqueSelector(relativeNode, '#'+idValue)){
+            // id定位
+            return '#'+idValue;
+        }
+        else if(tagName === 'input'){
+            // 表单项特殊校验
+            tempPath = nameValue ? tagName + '[name="'+nameValue+'"]' : tagName;
+            switch(typeValue){
+                case 'radio':
+                case 'checkbox':
+                    tempPath += '[value="'+valueValue+'"]';
+                    break;
+            }
+            tempPath += (childPath ? ' > ' + childPath : '');
+            if(checkUniqueSelector(relativeNode, tempPath)){
+                return tempPath;
+            }
+        }
+        else if(nameValue){
+            // 非input，但有name值
+            tempPath = tagName + '[name="'+nameValue+'"]'
+            if(tempPath && checkUniqueSelector(relativeNode, tempPath)){
+                return tempPath;
+            }
         }
         else{
-            return XPath;
+            // 检查目标是否有父容器有唯一id
+            var idNodeInfo = getClosestIdNode(target);
+            if(idNodeInfo){
+                relativeNode = idNodeInfo.node;
+                relativePath = idNodeInfo.path + ' ';
+            }
         }
-    }
-
-    // get selector path
-    function getSelectorPath(target){
         var current = target;
-        var selectorPath = '';
-        var levelCount = 0;
-        while(current !== null && levelCount < 4){
-            if(current.nodeName !== 'HTML'){
-                selectorPath = getSelectorElement(current, selectorPath);
-                if(selectorPath.substr(0,1) === '!'){
-                    return selectorPath.substr(1);
+        var childPath = '';
+        while(current !== null){
+            if(current !== relativeNode){
+                childPath = getSelectorElement(current, relativeNode, childPath);
+                if(childPath.substr(0,1) === '!'){
+                    return relativePath + childPath.substr(1);
                 }
                 current = current.parentNode;
-                levelCount ++;
             }
             else{
                 current = null;
@@ -103,35 +126,50 @@
         }
         return null;
     }
-    function getSelectorElement(target, childPath){
-        var tagName = target.nodeName.toLowerCase();
-        var tempPath;
-        var relativeClass = null;
-        var idValue = target.getAttribute && target.getAttribute('id');
-        if(idValue && /^[a-z]/i.test(idValue)){
-            tempPath = '#'+idValue;
-            if(childPath){
-                tempPath += ' > ' + childPath;
+    // 读取最近的id唯一节点
+    function getClosestIdNode(target){
+        var current = target;
+        var body = target.ownerDocument.body;
+        while(current !== null){
+            if(current.nodeName !== 'HTML'){
+                var idValue = current.getAttribute && current.getAttribute('id');
+                if(idValue && checkUniqueSelector(body, '#'+idValue)){
+                    return {
+                        node: current,
+                        path: '#'+idValue
+                    };
+                }
+                current = current.parentNode;
             }
-            if(checkUniqueSelector(tempPath)){
-                return '!' + tempPath;
-            }
+            else{
+                current = null;
+            }           
         }
+        return null;
+    }
+    // 获取节点CSS选择器
+    function getSelectorElement(target, relativeNode, childPath){
+        var tagName = target.nodeName.toLowerCase();
+        var elementPath = tagName, tempPath;
+        // 校验tagName是否能唯一定位
+        tempPath = elementPath + (childPath ? ' > ' + childPath : '');
+        if(checkUniqueSelector(relativeNode, tempPath)){
+            return '!' + tempPath;
+        }
+        // 校验class能否定位
+        var relativeClass = null;
         var classValue = target.getAttribute && target.getAttribute('class');
         if(classValue){
             var arrClass = classValue.split(/\s+/);
             for(var i in arrClass){
                 var className = arrClass[i];
                 if(className && reHoverClass.test(className) === false){
-                    tempPath = tagName + '.'+arrClass[i];
-                    if(childPath){
-                        tempPath += ' > ' + childPath;
-                    }
-                    if(checkUniqueSelector(tempPath)){
+                    tempPath = elementPath + '.'+arrClass[i] + (childPath ? ' > ' + childPath : '');
+                    if(checkUniqueSelector(relativeNode, tempPath)){
                         return '!' + tempPath;
                     }
-                    // 无法绝对定位,再次测试是否可以在父节点中相对定位自身
                     else{
+                        // 无法绝对定位,再次测试是否可以在父节点中相对定位自身
                         var parent = target.parentNode;
                         if(parent){
                             var element = parent.querySelectorAll('.'+className);
@@ -143,154 +181,56 @@
                 }
             }
         }
-        tempPath = tagName;
-        if(relativeClass){
-            tempPath += '.' + relativeClass;
-        }
-        else{
-            var index = getElementIndex(target);
-            if(index !== -1){
-                tempPath += ':nth-child('+(index+1)+')';
+        // 校验属性是否能定位
+        var attrName, attrValue;
+        for(var i in arrPathAttrs){
+            attrName = arrPathAttrs[i];
+            attrValue = target.getAttribute && target.getAttribute(attrName);
+            if(attrValue){
+                elementPath += '['+attrName+'="'+attrValue+'"]';
+                tempPath = elementPath + (childPath ? ' > ' + childPath : '');
+                if(checkUniqueSelector(relativeNode, tempPath)){
+                    return '!' + tempPath;
+                }
             }
         }
-        if(childPath){
-            tempPath += ' > ' + childPath;
+        // 父元素定位
+        if(relativeClass){
+            elementPath += '.' + relativeClass;
         }
-        if(checkUniqueSelector(tempPath) && /^\w+:nth-child/.test(tempPath) === false){
-            tempPath = '!' + tempPath;
+        else{
+            var index = getChildIndex(target);
+            if(index !== -1){
+                elementPath += ':nth-child('+index+')';
+            }
+        }
+        tempPath = elementPath + (childPath ? ' > ' + childPath : '');
+        if(checkUniqueSelector(relativeNode, tempPath)){
+            return '!' + tempPath;
         }
         return tempPath;
     }
-    function checkUniqueSelector(path){
-        var elements = document.querySelectorAll(path);
-        return elements.length === 1 && /[\.#]/.test(path);
-    }
-    function findDomPathElement(path){
-        return /^\/\//.test(path) ? findXPathElement(path) : document.querySelectorAll(path);
-    }
-
-    // XPath tools
-    function getXPath(target){
-        var current = target;
-        var path = '';
-        while(current !== null){
-            if(current.nodeName !== 'HTML'){
-                path  = getElementXPath(target, current, path);
-                if(/^\/\//.test(path)){
-                    return path;
-                }
-                current = current.parentNode;
-            }
-            else{
-                current = null;
-            }
+    function checkUniqueSelector(relativeNode, path){
+        try{
+            var elements = relativeNode.querySelectorAll(path);
+            return elements.length === 1;
         }
-        return null;
+        catch(e){return false;}
     }
-    function getElementXPath(target, el, path){
-        var newPath = null;
-        if(el.attributes){
-            // make map
-            var mapAttrs = {};
-            var attrs = el.attributes;
-            var attr;
-            for (var i = 0, len=attrs.length; i < len; i++) {
-                attr = attrs[i];
-                mapAttrs[attr.name] = attr.value;
-            }
-            // test locator
-            var document = target.ownerDocument;
-            var ownerSVGElement = target.ownerSVGElement;
-            var nodeName = el.nodeName.toLowerCase();
-            var arrAttrs = [];
-            var attrName, attrValue;
-            var arrResults;
-            for(var i=0,len=arrXPathAttrs.length;i<len;i++){
-                attrName = arrXPathAttrs[i];
-                attrValue = mapAttrs[attrName];
-                if(attrName === 'class' && (/\s+/.test(attrValue) || reHoverClass.test(attrValue))){
-                    attrValue = '';
-                }
-                if(attrValue){
-                    arrAttrs.push({
-                        name: attrName,
-                        value: attrValue
-                    });
-                    if(checkAttrsUnique(el, arrAttrs)){
-                        if(el.ownerSVGElement !== undefined){
-                            newPath = '/*[name()="'+nodeName+'" and '+arrAttrs.map(function(attr){
-                                return '@' + attr.name + "=" + encodeAttrValue(attr.value);
-                            }).join(' and ')+']' + path;
-                        }
-                        else{
-                            newPath = '/' + nodeName + '['+arrAttrs.map(function(attr){
-                                return '@' + attr.name + "=" + encodeAttrValue(attr.value);
-                            }).join(' and ')+']' + path;
-                        }
-                        arrResults = findXPathElement('/'+newPath, document);
-                        if(arrResults.length === 1 && arrResults[0] == target){
-                            return '/'+newPath;
-                        }
-                    }
-                }
-            }
-            // index mode
-            if(newPath === null){
-                var index = getElementIndex(el);
-                if(el.ownerSVGElement !== undefined){
-                    newPath = '/*[name()="'+nodeName+'"]'+ (index>-1?'['+(index+1)+']':'') + path;
-                }
-                else{
-                    newPath = '/'+ nodeName + (index>-1?'['+(index+1)+']':'') + path;
-                }
-                // index模式非body不允许作为根
-                if(nodeName === 'body'){
-                    arrResults = findXPathElement('/'+newPath, document);
-                    // 必需有属性值，或者是从/body开始的绝对路径
-                    if(arrResults.length === 1 && arrResults[0] == target && (/@/.test(newPath) || /^\/body/.test(newPath))){
-                        return '/'+newPath;
-                    }
-                }
-            }
-        }
-        return newPath;
-    }
-    function checkAttrsUnique(el, arrAttrs){
-        var nodeName = el.nodeName;
-        var childNodes = el.parentNode.childNodes;
-        var brother;
-        var brotherCount = 0;
-        var attrDiffCount = 0;
-        for (var i = 0, len1=childNodes.length; i < len1; i++) {
-            brother = childNodes[i];
-            if(brother.nodeName === nodeName){
-                attrDiffCount = 0;
-                for(var j=0,len2 = arrAttrs.length;j<len2;j++){
-                    var attr = arrAttrs[j];
-                    if(attr.value !== brother.getAttribute(attr.name)){
-                        attrDiffCount ++;
-                    }
-                }
-                if(attrDiffCount === 0){
-                    brotherCount ++;
-                }
-            }
-        }
-        return brotherCount===1?true:false;
-    }
-    function getElementIndex(el){
+    function getChildIndex(el){
         var index = -1;
         var parentNode = el.parentNode;
         if(parentNode){
             var childNodes = parentNode.childNodes;
             var total = 0;
+            var node;
             for (var i = 0, len=childNodes.length; i < len; i++) {
-                var child = childNodes[i];
-                if (child.nodeName == el.nodeName) {
-                    if (child == el) {
+                node = childNodes[i];
+                if(node.nodeType === 1){
+                    total++;
+                    if ( node === el) {
                         index = total;
                     }
-                    total++;
                 }
             }
         }
@@ -299,48 +239,9 @@
         }
         return index;
     }
-    function encodeAttrValue(value){
-        if (value.indexOf("'") < 0) {
-            return "'" + value + "'";
-        } else if (value.indexOf('"') < 0) {
-            return '"' + value + '"';
-        } else {
-            var result = 'concat(';
-            var part = "";
-            while (true) {
-                var apos = value.indexOf("'");
-                var quot = value.indexOf('"');
-                if (apos < 0) {
-                    result += "'" + value + "'";
-                    break;
-                } else if (quot < 0) {
-                    result += '"' + value + '"';
-                    break;
-                } else if (quot < apos) {
-                    part = value.substring(0, apos);
-                    result += "'" + part + "'";
-                    value = value.substring(part.length);
-                } else {
-                    part = value.substring(0, quot);
-                    result += '"' + part + '"';
-                    value = value.substring(part.length);
-                }
-                result += ',';
-            }
-            result += ')';
-            return result;
-        }
-    }
-    function findXPathElement(locator, doc){
-        doc = doc || document;
-        var arrResults = [];
-        try {
-            var xpath_obj = doc.evaluate(locator, doc, null, XPathResult.UNORDERED_NODE_SNAPSHOT_TYPE, null);
-            for(var i=0,len=xpath_obj.snapshotLength;i<len;i++){
-                arrResults.push(xpath_obj.snapshotItem(i));
-            }
-        } catch (e) {}
-        return arrResults;
+
+    function findDomPathElement(path){
+        return document.querySelectorAll(path);
     }
 
     // get frame id
@@ -469,7 +370,7 @@
                         text = parentNode.textContent;
                     }
                     else if(id){
-                        var labelForElement = findXPathElement('//label[@for="'+id+'"]');
+                        var labelForElement = findDomPathElement('label[for="'+id+'"]');
                         if(labelForElement.length > 0){
                             text = labelForElement[0].textContent;
                         }
@@ -499,6 +400,44 @@
             text = '';
         }
         return text;
+    }
+
+    // 调整label为for的表单DOM,以增加PATH稳定性
+    function getLabelTarget(target){
+        var labelDom;
+        if(target.nodeName !== 'INPUT'){
+            if(target.nodeName === 'LABEL'){
+                labelDom = target;
+            }
+            else if(target.parentNode.nodeName === 'LABEL'){
+                labelDom = target.parentNode;
+            }
+        }
+        if(labelDom){
+            // label标签，替换为目标表单项
+            var forValue = labelDom.getAttribute && labelDom.getAttribute('for');
+            var labelTargets;
+            if(forValue){
+                // 有指定for
+                labelTargets = findDomPathElement('#'+forValue);
+                if(labelTargets.length === 1 && isDomVisible(labelTargets[0])){
+                    return labelTargets[0];
+                }
+            }
+            else{
+                // 没有指定for
+                labelTargets = labelDom.querySelectorAll('input');
+                if(labelTargets.length === 1 && isDomVisible(labelTargets[0])){
+                    return labelTargets[0];
+                }
+            }
+        }
+    }
+
+    // 检测dom是否可见
+    function isDomVisible(target){
+        var offset = target.getBoundingClientRect();
+        return offset.width > 0 && offset.height > 0;
     }
 
     function addActionTarget(target){
@@ -913,16 +852,29 @@
             if(isNotInToolsPannel(target)){
                 if(isRecording){
                     if(/^(html|select|optgroup|option)$/i.test(target.tagName) === false && isFileInput(target) === false){
+                        var labelTarget = getLabelTarget(target);
+                        if(labelTarget){
+                            target = labelTarget;
+                        }
                         saveParentsOffset(target);
                         addActionTarget(target);
-                        var offset = target.getBoundingClientRect();
                         var path = getDomPath(target);
                         if(path !== null){
                             addActionTarget(target);
+                            var offset = target.getBoundingClientRect();
+                            var x,y;
+                            if(labelTarget){
+                                x = Math.floor(offset.width / 2);
+                                y = Math.floor(offset.height / 2);
+                            }
+                            else{
+                                x = event.clientX-offset.left;
+                                y = event.clientY-offset.top;
+                            }
                             saveCommand('mouseDown', {
                                 path: path,
-                                x: event.clientX-offset.left,
-                                y: event.clientY-offset.top,
+                                x: x,
+                                y: y,
                                 button: event.button,
                                 text: getTargetText(target)
                             });
@@ -1008,13 +960,27 @@
                     var tagName = target.tagName;
                     if(/^(html|select|optgroup|option)$/i.test(tagName) === false && isFileInput(target) === false){
                         // get offset of the fixed parent
+                        var labelTarget = getLabelTarget(target);
+                        if(labelTarget){
+                            target = labelTarget;
+                        }
                         var fixedParent = getFixedParent(target);
                         if(fixedParent !== null){
                             addActionTarget(target);
+                            var offset = target.getBoundingClientRect();
+                            var x,y;
+                            if(labelTarget){
+                                x = Math.floor(offset.width / 2);
+                                y = Math.floor(offset.height / 2);
+                            }
+                            else{
+                                x = event.clientX-fixedParent.left;
+                                y = event.clientY-fixedParent.top;
+                            }
                             saveCommand('mouseUp', {
                                 path: fixedParent.path,
-                                x: event.clientX-fixedParent.left,
-                                y: event.clientY-fixedParent.top,
+                                x: x,
+                                y: y,
                                 button: event.button,
                                 text: getTargetText(target)
                             });
@@ -1204,8 +1170,7 @@
                         }
                     }
                     else if(target.tagName === 'SELECT'){
-                        var rect = target.getBoundingClientRect();
-                        if(rect.width > 0 && rect.height > 0){
+                        if(isDomVisible(target)){
                             // no record invisible select
                             var path = getDomPath(target);
                             if(path !== null){

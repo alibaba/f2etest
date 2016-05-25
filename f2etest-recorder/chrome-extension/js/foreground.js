@@ -50,8 +50,11 @@
         if(config.testVars){
             testVars = config.testVars;
         }
-        if(config.pathAttrs){
-            arrPathAttrs = config.pathAttrs.split(',');
+        var pathAttrs = config.pathAttrs;
+        if(pathAttrs){
+            pathAttrs = pathAttrs.replace(/^\s+|\s+$/g, '');
+            arrPathAttrs = pathAttrs.split(/\s*,\s*/);
+            arrPathAttrs.unshift('name');
         }
     });
 
@@ -1021,6 +1024,7 @@
 
         // catch keydown event
         var lastModifierKeydown = null;
+        var isModifierKeyRecord = false; // 是否记录控制键
         document.addEventListener('keydown', function(event){
             var target = event.target;
             if(isNotInToolsPannel(target)){
@@ -1028,9 +1032,22 @@
                 var modifierKey = modifierKeys[keyCode];
                 var NonTextKey = NonTextKeys[keyCode];
                 if(isRecording){
+                    var stickModifierKey;
+                    if(event.ctrlKey){
+                        stickModifierKey = 'CTRL';
+                    }
+                    else if(event.altKey){
+                        stickModifierKey = 'ALT';
+                    }
+                    else if(event.shiftKey){
+                        stickModifierKey = 'SHIFT';
+                    }
+                    else if(event.metaKey){
+                        stickModifierKey = 'META';
+                    }
                     if(modifierKey){
                         // 控制键只触发一次keyDown
-                        if(modifierKey !== lastModifierKeydown){
+                        if(isModifierKeyRecord && modifierKey !== lastModifierKeydown){
                             lastModifierKeydown = modifierKey;
                             addActionTarget(target);
                             saveCommand('keyDown', {
@@ -1039,14 +1056,26 @@
                         }
                     }
                     else if(NonTextKey){
+                        if(stickModifierKey && isModifierKeyRecord === false){
+                            isModifierKeyRecord = true;
+                            saveCommand('keyDown', {
+                                character: stickModifierKey
+                            });
+                        }
                         addActionTarget(target);
                         saveCommand('sendKeys', {
                             keys: '{'+NonTextKey+'}'
                         });
                     }
-                    else if(event.ctrlKey || event.altKey || event.shiftKey || event.metaKey){
+                    else if(stickModifierKey === 'CTRL'){
                         var typedCharacter = String.fromCharCode(keyCode);
-                        if(typedCharacter !== '' && /^[azcxv]$/i.test(typedCharacter) === true){
+                        if(/^[azcxv]$/i.test(typedCharacter)){
+                            if(isModifierKeyRecord === false){
+                                isModifierKeyRecord = true;
+                                saveCommand('keyDown', {
+                                    character: stickModifierKey
+                                });
+                            }
                             addActionTarget(target);
                             saveCommand('sendKeys', {
                                 keys: typedCharacter.toLowerCase()
@@ -1067,7 +1096,8 @@
             if(isNotInToolsPannel(target)){
                 var modifierKey = modifierKeys[event.keyCode];
                 if(isRecording){
-                    if(modifierKey){
+                    if(isModifierKeyRecord && modifierKey){
+                        isModifierKeyRecord = false;
                         lastModifierKeydown = null;
                         addActionTarget(target);
                         saveCommand('keyUp', {

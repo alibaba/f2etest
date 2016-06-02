@@ -51,7 +51,6 @@ module.exports = function(app, config) {
                 result = results[i];
                 if(!result || result.ret !== 'ok'){
                     allOk = false;
-                    arrFailed.push(result.ip);
                 }
             }
             callback(username, allOk);

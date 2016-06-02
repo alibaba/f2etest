@@ -26,12 +26,7 @@ var applyQueue = async.queue(function(applyInfo, next) {
             var browserVersion = row.browser_version;
             var browserNameId = browserName + browserVersion;
             if(browserName === 'IE'){
-                if(mapNodeWait[browserNameId]){
-                    setTimeout(function(){
-                        applyWdNode(userid, browserName, browserVersion, endApply);
-                    }, 1000);
-                }
-                else{
+                function endIeApply(){
                     mapNodeWait[browserNameId] = true;
                     doNodeCallback(userid, row, function(error, result){
                         endApply(error, result);
@@ -40,11 +35,21 @@ var applyQueue = async.queue(function(applyInfo, next) {
                         }, 6000);
                     });
                 }
+                if(mapNodeWait[browserNameId]){
+                    var _waitTimer = setInterval(function(){
+                        if(mapNodeWait[browserNameId] === false){
+                            clearInterval(_waitTimer);
+                            endIeApply();
+                        }
+                    }, 1000);
+                }
+                else{
+                    endIeApply();
+                }
             }
             else{
                 doNodeCallback(userid, row, endApply);
             }
-            
         }
         else{
             endApply('No matched idle browser, please try again later.');

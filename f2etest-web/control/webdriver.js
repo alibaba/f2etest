@@ -128,36 +128,39 @@ module.exports = function(app, config) {
         var rdp = query['rdp'] || '';
         var status = query['status'] || '';
         var browsers = query['browsers'] || '';
-        if(status){
+        if(clientIp && nodeName !== '' && rdp !== '' && status !== '' && browsers !== ''){
             status = parseInt(status, 10);
+            pool.query('update wd_nodes set work_status = ?, last_report_time = now() where node_ip = ? and node_name = ? and (isnull(last_apply_time) or timestampdiff(second,last_apply_time, now()) > 30)', [status, clientIp, nodeName], function(error, result){
+                if(!error && result.changedRows === 0){
+                    var mapInsert = {
+                        work_status: status,
+                        node_ip: clientIp,
+                        node_name: nodeName,
+                        rdp_support: rdp
+                    };
+                    pool.query('insert into wd_nodes set last_report_time = now(), ?', mapInsert, function(error, result){
+                        if(!error && result){
+                            var nodeId = result.insertId;
+                            var arrBrowsers = browsers.split(/,\s*/);
+                            arrBrowsers.forEach(function(browser){
+                                var arrBrowserInfo = browser.split(' ');
+                                var browserName = arrBrowserInfo[0];
+                                var brwoserVersion = arrBrowserInfo[1] || '';
+                                var mapInsert = {
+                                    browser_name: browserName,
+                                    browser_version: brwoserVersion,
+                                    node_id: nodeId
+                                };
+                                pool.query('insert into wd_browsers set ?', mapInsert);
+                            });
+                        }
+                    });
+                }
+            });
+            res.end('ok');
         }
-        pool.query('update wd_nodes set work_status = ?, last_report_time = now() where node_ip = ? and node_name = ? and (isnull(last_apply_time) or timestampdiff(second,last_apply_time, now()) > 30)', [status, clientIp, nodeName], function(error, result){
-            if(!error && result.changedRows === 0){
-                var mapInsert = {
-                    work_status: status,
-                    node_ip: clientIp,
-                    node_name: nodeName,
-                    rdp_support: rdp
-                };
-                pool.query('insert into wd_nodes set last_report_time = now(), ?', mapInsert, function(error, result){
-                    if(!error && result){
-                        var nodeId = result.insertId;
-                        var arrBrowsers = browsers.split(/,\s*/);
-                        arrBrowsers.forEach(function(browser){
-                            var arrBrowserInfo = browser.split(' ');
-                            var browserName = arrBrowserInfo[0];
-                            var brwoserVersion = arrBrowserInfo[1] || '';
-                            var mapInsert = {
-                                browser_name: browserName,
-                                browser_version: brwoserVersion,
-                                node_id: nodeId
-                            };
-                            pool.query('insert into wd_browsers set ?', mapInsert);
-                        });
-                    }
-                });
-            }
-        });
-        res.end('ok');
+        else{
+            res.end('error');
+        }
     });
 }

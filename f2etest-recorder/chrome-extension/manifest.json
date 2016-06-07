@@ -12,7 +12,7 @@
       "all_frames": true,
       "match_about_blank": true,
       "run_at": "document_start",
-      "js": ["js/foreground.js"]
+      "js": ["js/faker.js", "js/foreground.js"]
    }],
    "web_accessible_resources": [
       "js/foreground.js",

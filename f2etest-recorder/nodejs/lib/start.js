@@ -9,6 +9,7 @@ var JWebDriver = require('jwebdriver');
 var async = require('async');
 var co = require('co');
 var expect = require('expect.js');
+var faker = require('faker');
 var WebSocketServer = require('websocket').server;
 require('colors');
 
@@ -144,7 +145,7 @@ function startRecorder(){
                 if(window !== lastWindowId){
                     lastWindowId = window;
                     lastFrameId = null;
-                    pushTestCode('switchWindow', '', window, 'yield browser.switchWindow('+window+');')
+                    pushTestCode('switchWindow', '', window, 'yield browser.sleep(500).switchWindow('+window+');')
                     checkerBrowser && checkerBrowser.switchWindow(window).then(doNext).catch(catchError) || callback();
                 }
                 else{
@@ -171,12 +172,14 @@ function startRecorder(){
                     var arrCodes = [];
                     arrCodes.push('yield browser.switchFrame(null);');
                     if(frame !== null){
-                        arrCodes.push('yield browser.wait("'+frame+'", 30000).switchFrame("'+frame+'").wait("body");');
+                        arrCodes.push('var element = yield browser.wait(\''+frame+'\', 30000);');
+                        arrCodes.push('yield browser.switchFrame(element).wait(\'body\');');
                     }
                     pushTestCode('switchFrame', '', frame, arrCodes);
-                    checkerBrowser && checkerBrowser.switchFrame(null, function(error){
+                    checkerBrowser && checkerBrowser.switchFrame(null, function*(error){
                         if(frame !== null){
-                            return checkerBrowser.wait(frame, 10000).switchFrame(frame).wait('body');
+                            var element = yield checkerBrowser.wait(frame, 10000);
+                            yield checkerBrowser.switchFrame(element).wait('body');
                         }
                     }).then(doNext).catch(catchError) || doNext();
                 }
@@ -214,49 +217,68 @@ function startRecorder(){
                         pushTestCode('sleep', '', data.time, 'yield browser.sleep('+data.time+');');
                         checkerBrowser && checkerBrowser.sleep(data.time).then(doNext).catch(catchError) || doNext();
                         break;
-                    case 'wait':
-                        arrCodes = [];
-                        arrCodes.push('var element = yield browser.wait(\''+data.path+'\', 30000);');
-                        arrCodes.push('expect(element.length).to.be(1);');
-                        pushTestCode('wait', '', data.path, arrCodes);
-                        checkerBrowser && checkerBrowser.wait(data.path, 10000).then(function(element){
-                            expect(element.length).to.be(1);
-                        }).then(doNext).catch(catchError) || doNext();
-                        break;
-                    case 'target':
-                        arrCodes = [];
-                        arrCodes.push('var element = yield browser.wait(\''+data.path+'\', 30000);');
-                        arrCodes.push('expect(element.length).to.be(1);');
-                        arrCodes.push('yield browser.sleep(300).mouseMove(\''+data.path+'\');');
-                        pushTestCode('target', data.text, data.path, arrCodes);
-                        checkerBrowser && checkerBrowser.wait(data.path, 10000).then(function(element){
-                            expect(element.length).to.be(1);
-                        }).mouseMove(data.path).then(doNext).catch(catchError) || doNext();
+                    case 'waitBody':
+                        pushTestCode('waitBody', '', '', 'yield browser.sleep(500).wait(\'body\', 30000);');
+                        checkerBrowser && checkerBrowser.sleep(500).wait('body', 10000).then(doNext).catch(catchError) || doNext();
                         break;
                     case 'mouseMove':
+                        arrCodes = [];
+                        arrCodes.push('var element = yield browser.sleep(300).wait(\''+data.path+'\', 30000);');
                         if(data.x !== undefined){
-                            pushTestCode('mouseMove', data.text, data.path+', '+data.x+', '+data.y, 'yield browser.mouseMove(\''+data.path+'\', '+data.x+', '+data.y+');');
+                            arrCodes.push('yield browser.sleep(300).mouseMove(element, '+data.x+', '+data.y+');');
                         }
                         else{
-                            pushTestCode('mouseMove', data.text, data.path, 'yield browser.mouseMove(\''+data.path+'\');');
+                            arrCodes.push('yield browser.sleep(300).mouseMove(element);');
                         }
-                        checkerBrowser && checkerBrowser.mouseMove(data.path, data.x, data.y).then(doNext).catch(catchError) || doNext();
+                        pushTestCode('mouseMove', data.text, data.path+(data.x !== undefined?', '+data.x+', '+data.y:''), arrCodes);
+                        checkerBrowser && checkerBrowser.sleep(300).wait(data.path, 10000).then(function*(element){
+                            yield checkerBrowser.sleep(300).mouseMove(element, data.x, data.y);
+                        }).then(doNext).catch(catchError) || doNext();
                         break;
                     case 'mouseDown':
-                        pushTestCode('mouseDown', data.text, data.path + ', ' + data.x + ', ' + data.y + ', ' + data.button, 'yield browser.mouseMove(\''+data.path+'\', '+data.x+', '+data.y+').mouseDown('+data.button+');');
-                        checkerBrowser && checkerBrowser.mouseMove(data.path, data.x, data.y).mouseDown(data.button).then(doNext).catch(catchError) || doNext();
+                        arrCodes = [];
+                        arrCodes.push('var element = yield browser.sleep(300).wait(\''+data.path+'\', 30000);');
+                        arrCodes.push('yield browser.sleep(300).mouseMove(element, '+data.x+', '+data.y+').mouseDown('+data.button+');');
+                        pushTestCode('mouseDown', data.text, data.path + ', ' + data.x + ', ' + data.y + ', ' + data.button, arrCodes);
+                        checkerBrowser && checkerBrowser.sleep(300).wait(data.path, 10000).then(function*(element){
+                            yield checkerBrowser.sleep(300).mouseMove(element, data.x, data.y).mouseDown(data.button);
+                        }).then(doNext).catch(catchError) || doNext();
                         break;
                     case 'mouseUp':
-                        pushTestCode('mouseUp', data.text, data.path + ', ' + data.x + ', ' + data.y + ', ' + data.button, 'yield browser.mouseMove(\''+data.path+'\', '+data.x+', '+data.y+').mouseUp('+data.button+');');
-                        checkerBrowser && checkerBrowser.mouseMove(data.path, data.x, data.y).mouseUp(data.button).then(doNext).catch(catchError) || doNext();
+                        arrCodes = [];
+                        arrCodes.push('var element = yield browser.sleep(300).wait(\''+data.path+'\', 30000);');
+                        arrCodes.push('yield browser.sleep(300).mouseMove(element, '+data.x+', '+data.y+').mouseUp('+data.button+');');
+                        pushTestCode('mouseUp', data.text, data.path + ', ' + data.x + ', ' + data.y + ', ' + data.button, arrCodes);
+                        checkerBrowser && checkerBrowser.sleep(300).wait(data.path, 10000).then(function*(element){
+                            yield checkerBrowser.sleep(300).mouseMove(element, data.x, data.y).mouseUp(data.button);
+                        }).then(doNext).catch(catchError) || doNext();
                         break;
                     case 'click':
-                        pushTestCode('click', data.text, data.path + ', ' + data.x + ', ' + data.y + ', ' + data.button, 'yield browser.mouseMove(\''+data.path+'\', '+data.x+', '+data.y+').click('+data.button+');');
-                        checkerBrowser && checkerBrowser.mouseMove(data.path, data.x, data.y).click(data.button).then(doNext).catch(catchError) || doNext();
+                        arrCodes = [];
+                        arrCodes.push('var element = yield browser.sleep(300).wait(\''+data.path+'\', 30000);');
+                        arrCodes.push('yield browser.sleep(300).mouseMove(element, '+data.x+', '+data.y+').click('+data.button+');');
+                        pushTestCode('click', data.text, data.path + ', ' + data.x + ', ' + data.y + ', ' + data.button, arrCodes);
+                        checkerBrowser && checkerBrowser.sleep(300).wait(data.path, 10000).then(function*(element){
+                            yield checkerBrowser.sleep(300).mouseMove(element, data.x, data.y).click(data.button);
+                        }).then(doNext).catch(catchError) || doNext();
+                        break;
+                    case 'touchClick':
+                        arrCodes = [];
+                        arrCodes.push('var element = yield browser.sleep(300).wait(\''+data.path+'\', 30000);');
+                        arrCodes.push('yield element.sleep(300).touchClick();');
+                        pushTestCode('touchClick', data.text, data.path, arrCodes);
+                        checkerBrowser && checkerBrowser.sleep(300).wait(data.path, 10000).then(function*(element){
+                            yield element.sleep(300).touchClick();
+                        }).then(doNext).catch(catchError) || doNext();
                         break;
                     case 'dblClick':
-                        pushTestCode('dblClick', data.text, data.path + ', ' + data.x + ', ' + data.y, 'yield browser.mouseMove(\''+data.path+'\', '+data.x+', '+data.y+').click().click();');
-                        checkerBrowser && checkerBrowser.mouseMove(data.path, data.x, data.y).click().click().then(doNext).catch(catchError) || doNext();
+                        arrCodes = [];
+                        arrCodes.push('var element = yield browser.sleep(300).wait(\''+data.path+'\', 30000);');
+                        arrCodes.push('yield browser.sleep(300).mouseMove(element, '+data.x+', '+data.y+').click().click();');
+                        pushTestCode('dblClick', data.text, data.path + ', ' + data.x + ', ' + data.y + ', ' + data.button, arrCodes);
+                        checkerBrowser && checkerBrowser.sleep(300).wait(data.path, 10000).then(function*(element){
+                            yield checkerBrowser.sleep(300).mouseMove(element, data.x, data.y).click().click();
+                        }).then(doNext).catch(catchError) || doNext();
                         break;
                     case 'sendKeys':
                         pushTestCode('sendKeys', '', data.keys, 'yield browser.sendKeys("'+data.keys.replace(/"/g, '\\"')+'");');
@@ -276,15 +298,14 @@ function startRecorder(){
                         break;
                     case 'select':
                         arrCodes = [];
-                        arrCodes.push('yield browser.wait(\''+data.path+'\', 30000).then(function(element){');
-                        arrCodes.push('    return element.select({');
-                        arrCodes.push('        type: "'+data.type+'",');
-                        arrCodes.push('        value: "'+data.value+'"');
-                        arrCodes.push('    });');
+                        arrCodes.push('var element = yield browser.sleep(300).wait(\''+data.path+'\', 30000);');
+                        arrCodes.push('yield element.sleep(300).select({');
+                        arrCodes.push('    type: \''+data.type+'\',');
+                        arrCodes.push('    value: \''+data.value+'\'');
                         arrCodes.push('});');
                         pushTestCode('select', data.text, data.path + ', ' + data.type + ', ' + data.value, arrCodes);
-                        checkerBrowser && checkerBrowser.wait(data.path, 10000).then(function(element){
-                            return element.select({
+                        checkerBrowser && checkerBrowser.sleep(300).wait(data.path, 10000).then(function*(element){
+                            yield element.sleep(300).select({
                                 type: data.type,
                                 value: data.value
                             });
@@ -304,17 +325,14 @@ function startRecorder(){
                         break;
                     case 'uploadFile':
                         arrCodes = [];
-                        arrCodes.push('yield browser.wait(\''+data.path+'\', {timeout: 30000, displayed: false}).then(function*(element){');
-                        arrCodes.push('    yield element.sendKeys("c:\\\\uploadFiles\\\\'+data.filename+'");');
-                        arrCodes.push('});');
+                        arrCodes.push('var element = yield browser.sleep(300).wait(\''+data.path+'\', {timeout: 30000, displayed: false});');
+                        arrCodes.push('yield element.sleep(300).sendKeys(\'c:\\\\uploadFiles\\\\'+data.filename+'\');');
                         pushTestCode('uploadFile', data.text, data.path + ', ' + data.filename, arrCodes);
-                        checkerBrowser && checkerBrowser.wait(data.path, {
+                        checkerBrowser && checkerBrowser.sleep(300).wait(data.path, {
                             timeout: 10000,
                             displayed: false
-                        }, function*(error, element){
-                            if(!error){
-                                yield element.sendKeys('c:\\uploadFiles\\'+data.filename);
-                            }
+                        }).then(function*(element){
+                            yield element.sleep(300).sendKeys('c:\\uploadFiles\\'+data.filename);
                         }).then(doNext).catch(catchError) || doNext();
                         break;
                     // 添加断言
@@ -328,8 +346,7 @@ function startRecorder(){
                             var reDomRequire = /^(val|text|displayed|enabled|selected|attr|css)$/;
                             var reParamRequire = /^(attr|css|cookie|localStorage|sessionStorage)$/;
                             if(reDomRequire.test(expectType)){
-                                arrCodes.push('var element = yield browser.wait("'+expectParams[0]+'", 30000);');
-                                arrCodes.push('expect(element.length).to.be(1);');
+                                arrCodes.push('var element = yield browser.sleep(300).wait(\''+expectParams[0]+'\', 30000);');
                             }
                             switch(expectType){
                                 case 'val':
@@ -348,10 +365,10 @@ function startRecorder(){
                                     arrCodes.push('var value = yield element.selected();');
                                     break;
                                 case 'attr':
-                                    arrCodes.push('var value = yield element.attr("'+expectParams[1]+'");');
+                                    arrCodes.push('var value = yield element.attr(\''+expectParams[1]+'\');');
                                     break;
                                 case 'css':
-                                    arrCodes.push('var value = yield element.css("'+expectParams[1]+'");');
+                                    arrCodes.push('var value = yield element.css(\''+expectParams[1]+'\');');
                                     break;
                                 case 'url':
                                     arrCodes.push('var value = yield browser.url();');
@@ -360,22 +377,22 @@ function startRecorder(){
                                     arrCodes.push('var value = yield browser.title();');
                                     break;
                                 case 'cookie':
-                                    arrCodes.push('var value = yield browser.cookie("'+expectParams[0]+'");');
+                                    arrCodes.push('var value = yield browser.cookie(\''+expectParams[0]+'\');');
                                     break;
                                 case 'localStorage':
-                                    arrCodes.push('var value = yield browser.localStorage("'+expectParams[0]+'");');
+                                    arrCodes.push('var value = yield browser.localStorage(\''+expectParams[0]+'\');');
                                     break;
                                 case 'sessionStorage':
-                                    arrCodes.push('var value = yield browser.sessionStorage("'+expectParams[0]+'");');
+                                    arrCodes.push('var value = yield browser.sessionStorage(\''+expectParams[0]+'\');');
                                     break;
                             }
                             var codeExpectTo = expectTo.replace(/"/g, '\\"').replace(/\n/g, '\\n');
                             switch(expectCompare){
                                 case 'equal':
-                                    arrCodes.push('expect(value).to.equal('+(/^(true|false)$/.test(codeExpectTo)?codeExpectTo:'"'+codeExpectTo+'"')+');');
+                                    arrCodes.push('expect(value).to.equal('+(/^(true|false)$/.test(codeExpectTo)?codeExpectTo:'\''+codeExpectTo+'\'')+');');
                                     break;
                                 case 'contain':
-                                    arrCodes.push('expect(value).to.contain("'+codeExpectTo+'");');
+                                    arrCodes.push('expect(value).to.contain(\''+codeExpectTo+'\');');
                                     break;
                                 case 'regexp':
                                     arrCodes.push('expect(value).to.match('+codeExpectTo+');');
@@ -385,8 +402,7 @@ function startRecorder(){
                             if(checkerBrowser){
                                 var element, value;
                                 if(reDomRequire.test(expectType)){
-                                    element = yield checkerBrowser.wait(expectParams[0], 10000);
-                                    expect(element.length).to.be(1);
+                                    element = yield checkerBrowser.sleep(300).wait(expectParams[0], 10000);
                                 }
                                 switch(expectType){
                                     case 'val':
@@ -442,13 +458,28 @@ function startRecorder(){
                         }).then(doNext).catch(catchError);
                         break;
                     // 设置变量
-                    case 'setvar':
+                    case 'setVar':
+                        var varinfo = data.varinfo;
+                        var varType = varinfo.type;
                         arrCodes = [];
-                        arrCodes.push('var element = yield browser.wait(\''+data.path+'\', 30000);');
-                        arrCodes.push('yield element.val(testVars["'+data.name+'"]);');
-                        pushTestCode('setvar', data.text, data.path + ', ' + data.name, arrCodes);
-                        checkerBrowser && checkerBrowser.wait(data.path, 10000, function(error, element){
-                            return element.val(testVars[data.name]);
+                        arrCodes.push('var element = yield browser.sleep(300).wait(\''+data.path+'\', 30000);');
+                        if(varType ==='faker'){
+                            arrCodes.push('faker.locale = \'' + varinfo.lang + '\';');
+                            arrCodes.push('yield element.val(faker.fake(\''+varinfo.str+'\'));');
+                            pushTestCode('setFaker', data.text, data.path + ', ' + varinfo.lang + ', ' + varinfo.str, arrCodes);
+                        }
+                        else{
+                            arrCodes.push('yield element.val(testVars[\''+varinfo.name+'\']);');
+                            pushTestCode('setVar', data.text, data.path + ', ' + varinfo.name, arrCodes);
+                        }
+                        checkerBrowser && checkerBrowser.sleep(300).wait(data.path, 10000).then(function*(element){
+                            if(varType === 'faker'){
+                                faker.locale = varinfo.lang;
+                                yield element.val(faker.fake(varinfo.str));
+                            }
+                            else{
+                                yield element.val(testVars[varinfo.name]);
+                            }
                         }).then(doNext).catch(catchError) || doNext();
                         break;
                 }
@@ -463,7 +494,7 @@ function startRecorder(){
             // recorder browser
             newChromeBrowser(f2etestConfig, hosts, true, function*(browser){
                 recorderBrowser = browser;
-                yield browser.url('chrome-extension://njkfhfdkecbpjlnfmminhmdcakopmcnc/start.html');
+                yield browser.url('chrome-extension://njkfhfdkecbpjlnfmminhmdcakopmcnc/start.html');// pjnogcehfcicpmolniddckcagldcfjcl
                 var browerInfo = yield recorderBrowser.info();
                 var browserId = browerInfo['f2etest.browserId'];
                 var f2etestUrl = 'http://'+f2etestConfig.server+'/openWdBrowser?browserId='+browserId;
@@ -725,7 +756,7 @@ function newChromeBrowser(f2etestConfig, hosts, isRecorder, callback){
         var crxPath = path.resolve(__dirname, '../chrome-extension/f2etest-recorder.crx');
         var extContent = fs.readFileSync(crxPath).toString('base64');
         capabilities.chromeOptions = {
-            // args:['disable-bundled-ppapi-flash', 'load-extension=E:\\github\\f2etest\\f2etest-recorder\\chrome-extension'],
+            // args:['disable-bundled-ppapi-flash', 'load-extension=E:\\github\\f2etest\\f2etest-recorder\\chrome-extension']
             args: ['disable-bundled-ppapi-flash'],
             extensions: [extContent]
         };

@@ -1,7 +1,8 @@
 var JWebDriver = require('jwebdriver');
-var expect  = require("expect.js");
+var expect  = require('expect.js');
 require('mocha-generators').install();
 var fs = require('fs');
+var faker  = require('faker');
 
 // read config
 var config = require('./config.json');

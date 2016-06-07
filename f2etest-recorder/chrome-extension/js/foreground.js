@@ -6,7 +6,6 @@
     var isOnload = false;
 
     // dom selector
-    var isDomSelecter = false;
     var divDomSelector = null;
     var lastSelectDom = null;
     var domSelectorCallback = null;
@@ -393,8 +392,8 @@
             text = target.textContent;
         }
         text = text || '';
-        text = text.replace(/^\s+|\s+$/g, '');
         text = text.replace(/\s*\r?\n\s*/g,' ');
+        text = text.replace(/^\s+|\s+$/g, '');
         var textLen = byteLen(text);
         if(textLen <= 60){
             text = textLen > 20 ? leftstr(text, 20) + '...' : text;
@@ -443,19 +442,6 @@
         return offset.width > 0 && offset.height > 0;
     }
 
-    function addActionTarget(target){
-        if(/^(HTML|IFRAME)$/i.test(target.tagName) === false){
-            var path = getDomPath(target);
-            if(path !== null){
-                GlobalEvents.emit('showDomPath', path);
-                saveCommand('target', {
-                    path: path,
-                    text: getTargetText(target)
-                });
-            }
-        }
-    }
-
     // show loading
     var divLoading;
     function showLoading(){
@@ -480,9 +466,7 @@
             divLoading.style.display = 'none';
         }
         if(isIframe === false){
-            saveCommand('wait', {
-                path: 'body'
-            });
+            saveCommand('waitBody');
         }
         if(isIframe && location.href === 'about:blank'){
             // 富文本延后初始化
@@ -520,28 +504,24 @@
     GlobalEvents.on('modeChange', function(mode){
         switch(mode){
             case 'record':
-                removeDomSelecter();
+                removeSelector();
                 isRecording = true;
                 isStopEvent = false;
-                isDomSelecter = false;
                 break;
             case 'pauseAll':
-                removeDomSelecter();
+                removeSelector();
                 isRecording = false;
                 isStopEvent = true;
-                isDomSelecter = false;
                 break;
             case 'pauseRecord':
-                removeDomSelecter();
+                removeSelector();
                 isRecording = false;
                 isStopEvent = false;
-                isDomSelecter = false;
                 break;
             case 'select':
                 initDomSelecter();
                 isRecording = false;
                 isStopEvent = true;
-                isDomSelecter = true;
         }
     });
     // 设置全局工作模式
@@ -569,7 +549,10 @@
             var elements = findDomPathElement(event.path);
             if(elements.length === 1){
                 var target = elements[0];
-                addActionTarget(target);
+                saveCommand('mouseMove', {
+                    path: event.path,
+                    text: getTargetText(target)
+                });
                 simulateMouseEvent(target, 'mouseover', true, true, null);
                 simulateMouseEvent(target, 'mousemove', true, true, null, 1, event.screenX, event.screenY, event.clientX, event.clientY);
             }
@@ -585,11 +568,11 @@
             if(elements.length === 1){
                 var target = elements[0];
                 target.focus();
-                target.value = event.value;
-                addActionTarget(target);
-                saveCommand('setvar', {
+                var varinfo = event.varinfo;
+                target.value = varinfo.value;
+                saveCommand('setVar', {
                     path: path,
-                    name: event.name,
+                    varinfo: varinfo,
                     text: getTargetText(target)
                 });
             }
@@ -760,25 +743,52 @@
         divDomSelector = document.createElement("div");
         divDomSelector.id = 'f2etest-selecter-mask';
         divDomSelector.className = 'f2etest-recorder';
-        divDomSelector.innerHTML = '<style>#f2etest-selecter-mask{display:none;position:fixed;z-index:2147483550;background:rgba(151, 232, 81,0.5)}</style>';
+        divDomSelector.innerHTML = '<style>#f2etest-selecter-mask{display:none;background:rgba(151, 232, 81,0.5);position:fixed;z-index:2147483550;}</style>';
         divDomSelector.addEventListener('click', function(event){
-            if(lastSelectDom !== null){
-                var frameId = getFrameId();
-                setGlobalWorkMode('pauseAll');
-                GlobalEvents.emit('selecterClick', {
-                    frame: frameId,
-                    path: getDomPath(lastSelectDom),
-                    ctrlKey: event.ctrlKey
-                });
-            }
             event.stopPropagation();
             event.preventDefault();
+            endDomSelector();
         });
         document.body.appendChild(divDomSelector);
     }
 
-    // 卸载选择器
-    function removeDomSelecter(){
+    // 显示当前hover的dom
+    function showSelecterHover(clientX, clientY){
+        divDomSelector.style.display = 'none';
+        var newSelectDom = document.elementFromPoint(clientX, clientY);
+        if(newSelectDom && isNotInToolsPannel(newSelectDom) && /^(HTML|IFRAME)$/i.test(newSelectDom.tagName) === false){
+            divDomSelector.style.display = 'block';
+            if(newSelectDom !== lastSelectDom){
+                var rect = newSelectDom.getBoundingClientRect();
+                divDomSelector.style.left = rect.left+'px';
+                divDomSelector.style.top = rect.top+'px';
+                divDomSelector.style.width = rect.width+'px';
+                divDomSelector.style.height = rect.height+'px';
+                var frameId = getFrameId();
+                GlobalEvents.emit('selecterHover', {
+                    frame: frameId,
+                    path: getDomPath(newSelectDom)
+                });
+                lastSelectDom = newSelectDom;
+            }
+        }
+    }
+
+    // 结束DOM选择器
+    function endDomSelector(){
+        if(lastSelectDom !== null){
+            var frameId = getFrameId();
+            setGlobalWorkMode('pauseAll');
+            GlobalEvents.emit('selecterClick', {
+                frame: frameId,
+                path: getDomPath(lastSelectDom),
+                ctrlKey: event.ctrlKey
+            });
+        }
+    }
+
+    // 清除dom选择器
+    function removeSelector(){
         if(divDomSelector){
             document.body.removeChild(divDomSelector);
             divDomSelector = null;
@@ -798,29 +808,13 @@
 
     // 初始化事件
     function initRecorderEvent(){
+
         document.addEventListener('mousemove', function(event){
             var target = event.target;
-            if(isDomSelecter){
-                divDomSelector.style.display = 'none';
-                var newSelectDom = document.elementFromPoint(event.clientX, event.clientY);
-                if(isNotInToolsPannel(newSelectDom) && /^(HTML|IFRAME)$/i.test(newSelectDom.tagName) === false){
-                    divDomSelector.style.display = 'block';
-                    if(newSelectDom !== lastSelectDom){
-                        var rect = newSelectDom.getBoundingClientRect();
-                        divDomSelector.style.left = rect.left+'px';
-                        divDomSelector.style.top = rect.top+'px';
-                        divDomSelector.style.width = rect.width+'px';
-                        divDomSelector.style.height = rect.height+'px';
-                        var frameId = getFrameId();
-                        GlobalEvents.emit('selecterHover', {
-                            frame: frameId,
-                            path: getDomPath(newSelectDom)
-                        });
-                        lastSelectDom = newSelectDom;
-                    }
-                }
+            if(divDomSelector){
                 event.stopPropagation();
                 event.preventDefault();
+                showSelecterHover(event.clientX, event.clientY);
             }
             else if(isNotInToolsPannel(target) && !isRecording && isStopEvent){
                 event.stopPropagation();
@@ -848,7 +842,6 @@
                 event.preventDefault();
             }
         }, true);
-
         // catch event
         document.addEventListener('mousedown', function(event){
             var target = event.target;
@@ -860,10 +853,8 @@
                             target = labelTarget;
                         }
                         saveParentsOffset(target);
-                        addActionTarget(target);
                         var path = getDomPath(target);
                         if(path !== null){
-                            addActionTarget(target);
                             var offset = target.getBoundingClientRect();
                             var x,y;
                             if(labelTarget){
@@ -890,6 +881,105 @@
                 }
             }
         }, true);
+
+        document.addEventListener('mouseup', function(event){
+            var target = event.target;
+            if(isNotInToolsPannel(target)){
+                if(isRecording){
+                    var tagName = target.tagName;
+                    if(/^(html|select|optgroup|option)$/i.test(tagName) === false && isFileInput(target) === false){
+                        // get offset of the fixed parent
+                        var labelTarget = getLabelTarget(target);
+                        if(labelTarget){
+                            target = labelTarget;
+                        }
+                        var fixedParent = getFixedParent(target);
+                        if(fixedParent !== null){
+                            var offset = target.getBoundingClientRect();
+                            var x,y;
+                            if(labelTarget){
+                                x = Math.floor(offset.width / 2);
+                                y = Math.floor(offset.height / 2);
+                            }
+                            else{
+                                x = event.clientX-fixedParent.left;
+                                y = event.clientY-fixedParent.top;
+                            }
+                            saveCommand('mouseUp', {
+                                path: fixedParent.path,
+                                x: x,
+                                y: y,
+                                button: event.button,
+                                text: getTargetText(target)
+                            });
+                        }
+                    }
+                }
+                else if(isStopEvent){
+                    event.stopPropagation();
+                    event.preventDefault();
+                }
+            }
+        }, true);
+
+        // mobile event
+        document.addEventListener('touchstart', function(event){
+            var touchEvent = event.targetTouches[0];
+            var target = touchEvent.target;
+            if(isNotInToolsPannel(target)){
+                if(isRecording){
+
+                }
+                else{
+                    if(divDomSelector){
+                        showSelecterHover(touchEvent.clientX, touchEvent.clientY);
+                    }
+                    if(isStopEvent){
+                        event.stopPropagation();
+                        event.preventDefault();
+                    }
+                }
+            }
+        }, true);
+
+        document.addEventListener('touchmove', function(event){
+            var touchEvent = event.targetTouches[0];
+            var target = touchEvent.target;
+            if(isNotInToolsPannel(target)){
+                if(isRecording){
+
+                }
+                else{
+                    if(divDomSelector){
+                        showSelecterHover(touchEvent.clientX, touchEvent.clientY);
+                    }
+                    if(isStopEvent){
+                        event.stopPropagation();
+                        event.preventDefault();
+                    }
+                }
+            }
+        }, true);
+
+        document.addEventListener('touchend', function(event){
+            var touchEvent = event.changedTouches[0];
+            var target = touchEvent.target;
+            if(isNotInToolsPannel(target)){
+                if(isRecording){
+
+                }
+                else{
+                    if(divDomSelector){
+                        endDomSelector();
+                    }
+                    if(isStopEvent){
+                        event.stopPropagation();
+                        event.preventDefault();
+                    }
+                }
+            }
+        }, true);
+
 
         // save all parents offset
         var mapParentsOffset = {};
@@ -956,47 +1046,6 @@
             }
         }
 
-        document.addEventListener('mouseup', function(event){
-            var target = event.target;
-            if(isNotInToolsPannel(target)){
-                if(isRecording){
-                    var tagName = target.tagName;
-                    if(/^(html|select|optgroup|option)$/i.test(tagName) === false && isFileInput(target) === false){
-                        // get offset of the fixed parent
-                        var labelTarget = getLabelTarget(target);
-                        if(labelTarget){
-                            target = labelTarget;
-                        }
-                        var fixedParent = getFixedParent(target);
-                        if(fixedParent !== null){
-                            addActionTarget(target);
-                            var offset = target.getBoundingClientRect();
-                            var x,y;
-                            if(labelTarget){
-                                x = Math.floor(offset.width / 2);
-                                y = Math.floor(offset.height / 2);
-                            }
-                            else{
-                                x = event.clientX-fixedParent.left;
-                                y = event.clientY-fixedParent.top;
-                            }
-                            saveCommand('mouseUp', {
-                                path: fixedParent.path,
-                                x: x,
-                                y: y,
-                                button: event.button,
-                                text: getTargetText(target)
-                            });
-                        }
-                    }
-                }
-                else if(isStopEvent){
-                    event.stopPropagation();
-                    event.preventDefault();
-                }
-            }
-        }, true);    
-
         var modifierKeys = {
             17: 'CTRL', // Ctrl
             18: 'ALT', // Alt
@@ -1049,7 +1098,6 @@
                         // 控制键只触发一次keyDown
                         if(isModifierKeyRecord && modifierKey !== lastModifierKeydown){
                             lastModifierKeydown = modifierKey;
-                            addActionTarget(target);
                             saveCommand('keyDown', {
                                 character: modifierKey
                             });
@@ -1062,7 +1110,6 @@
                                 character: stickModifierKey
                             });
                         }
-                        addActionTarget(target);
                         saveCommand('sendKeys', {
                             keys: '{'+NonTextKey+'}'
                         });
@@ -1076,7 +1123,6 @@
                                     character: stickModifierKey
                                 });
                             }
-                            addActionTarget(target);
                             saveCommand('sendKeys', {
                                 keys: typedCharacter.toLowerCase()
                             });
@@ -1099,7 +1145,6 @@
                     if(isModifierKeyRecord && modifierKey){
                         isModifierKeyRecord = false;
                         lastModifierKeydown = null;
-                        addActionTarget(target);
                         saveCommand('keyUp', {
                             character: modifierKey
                         });
@@ -1124,7 +1169,6 @@
                 if(isRecording){
                     var typedCharacter = String.fromCharCode(event.keyCode);
                     if(typedCharacter !== '' && /[\r\n]/.test(typedCharacter) === false){
-                        addActionTarget(target);
                         saveCommand('sendKeys', {
                             keys: typedCharacter
                         });
@@ -1141,7 +1185,6 @@
             var target = event.target;
             if(isNotInToolsPannel(target)){
                 if(isRecording){
-                    addActionTarget(target);
                     saveCommand('sendKeys', {
                         keys:event.data
                     });
@@ -1215,7 +1258,6 @@
                                     type = 'index';
                                     value = index;
                                 }
-                                addActionTarget(target);
                                 saveCommand('select', {
                                     path: path,
                                     type: type,
@@ -1263,33 +1305,43 @@
             ];
             divDomToolsPannel.innerHTML = arrHTML.join('');
             var diffX = 0, diffY =0;
-            var isDrag = false;
+            var isDrag = false, isMove = false;
             divDomToolsPannel.addEventListener('selectstart', function(event){
                 event.stopPropagation();
                 event.preventDefault();
             });
-            divDomToolsPannel.addEventListener('mousedown', function(event){
-                diffX = event.clientX - divDomToolsPannel.offsetLeft;
-                diffY = event.clientY - divDomToolsPannel.offsetTop;
+            function onMouseDown(event){
+                var touchEvent = event.targetTouches ? event.targetTouches[0] : event;
+                diffX = touchEvent.clientX - divDomToolsPannel.offsetLeft;
+                diffY = touchEvent.clientY - divDomToolsPannel.offsetTop;
                 isDrag = true;
-                event.stopPropagation();
-                event.preventDefault();
-            });
-            document.addEventListener('mousemove', function(event){
-                if(isDrag && event.x > 0 && event.y > 0){
-                    divDomToolsPannel.style.left = event.clientX - diffX + 'px';
-                    divDomToolsPannel.style.top = event.clientY - diffY + 'px';
+            }
+            divDomToolsPannel.addEventListener('mousedown', onMouseDown);
+            divDomToolsPannel.addEventListener('touchstart', onMouseDown);
+            function onMouseMove(event){
+                var touchEvent = event.targetTouches ? event.targetTouches[0] : event;
+                if(isDrag && touchEvent.clientX > 0 && touchEvent.clientY > 0){
+                    isMove = true;
+                    event.stopPropagation();
+                    event.preventDefault();
+                    divDomToolsPannel.style.left = touchEvent.clientX - diffX + 'px';
+                    divDomToolsPannel.style.top = touchEvent.clientY - diffY + 'px';
                     divDomToolsPannel.style.bottom = 'auto';
                     divDomToolsPannel.style.right = 'auto';
+                }
+            }
+            document.addEventListener('mousemove', onMouseMove);
+            document.addEventListener('touchmove', onMouseMove);
+            function onMouseUp(event){
+                if(isMove){
                     event.stopPropagation();
                     event.preventDefault();
                 }
-            });
-            divDomToolsPannel.addEventListener('mouseup', function(event){
+                isMove = false;
                 isDrag = false;
-                event.stopPropagation();
-                event.preventDefault();
-            });
+            }
+            divDomToolsPannel.addEventListener('mouseup', onMouseUp);
+            divDomToolsPannel.addEventListener('touchend', onMouseUp);
             divDomToolsPannel.addEventListener('click', function(event){
                 event.stopPropagation();
                 event.preventDefault();
@@ -1329,8 +1381,7 @@
                                 GlobalEvents.emit('setVar', {
                                     frame: domInfo.frame,
                                     path: domInfo.path,
-                                    name: varInfo.name,
-                                    value: varInfo.value
+                                    varinfo: varInfo
                                 });
                                 setGlobalWorkMode(requirePause?'pauseAll':'record');
                             });
@@ -1359,7 +1410,7 @@
                 '<h2 id="f2etest-dialog-title"></h2>',
                 '<div id="f2etest-dialog-content"></div>',
                 '<div style="padding-bottom:10px;text-align:center;"><span class="f2etest-button"><a name="f2etest-ok"><img src="'+baseUrl+'img/ok.png" alt="">确认添加</a></span><span class="f2etest-button"><a name="f2etest-cancel"><img src="'+baseUrl+'img/cancel.png" alt="">取消添加</a></span></div>',
-                '<style>#f2etest-dialog{display:none;position:fixed;z-index:9999999;padding:20px;top:50%;left:50%;width:450px;margin-left:-225px;margin-top:-160px;box-sizing:border-box;border:1px solid #ccc;background:rgba(241,241,241,1);box-shadow: 5px 5px 10px #888888;}#f2etest-dialog h2{padding-bottom:10px;border-bottom: solid 1px #ccc;margin-bottom:10px;color:#333;}#f2etest-dialog ul{list-style:none;padding:0;}#f2etest-dialog li{padding: 5px 0 5px 30px;}#f2etest-dialog li label{display:inline-block;width:80px;color:#666}#f2etest-dialog li input,#f2etest-dialog li select,#f2etest-dialog li textarea{font-size:16px;border:1px solid #ccc;border-radius:2px;padding:5px;}#f2etest-dialog li input,#f2etest-dialog li textarea{width:250px;}</style>'
+                '<style>#f2etest-dialog{display:none;position:fixed;z-index:9999999;padding:20px;top:50%;left:50%;width:480px;margin-left:-240px;margin-top:-160px;box-sizing:border-box;border:1px solid #ccc;background:rgba(241,241,241,1);box-shadow: 5px 5px 10px #888888;}#f2etest-dialog h2{padding-bottom:10px;border-bottom: solid 1px #ccc;margin-bottom:10px;color:#333;}#f2etest-dialog ul{list-style:none;padding:0;}#f2etest-dialog li{padding: 5px 0 5px 30px;}#f2etest-dialog li label{display:inline-block;width:100px;color:#666}#f2etest-dialog li input,#f2etest-dialog li select,#f2etest-dialog li textarea{display:inline-block;font-size:16px;border:1px solid #ccc;border-radius:2px;padding:5px;}#f2etest-dialog li input,#f2etest-dialog li textarea{width:250px;}</style>'
             ];
             divDomDialog.innerHTML = arrHTML.join('');
             document.body.appendChild(divDomDialog);
@@ -1504,20 +1555,50 @@
             function showVarsDailog(callback){
                 var arrHtmls = [
                     '<ul>',
+                    '<li><label>变量类型: </label><select id="f2etest-vars-type"><option value="standard" selected>标准变量</option><option value="faker">Faker变量</option></select></li>',
                     '<li><label>变量名: </label><select id="f2etest-vars-name" value="">',
                 ];
                 for(var name in testVars){
                     arrHtmls.push('<option>'+name+'</option>');
                 }
                 arrHtmls.push('</select></li>');
+                arrHtmls.push('<li style="display:none"><label>Faker语言: </label><select id="f2etest-vars-faker-lang" value="en"><option value="en_AU">Australia (English)</option><option value="en_au_ocker">Australia Ocker (English)</option><option value="en_BORK">Bork (English)</option><option value="en_CA">Canada (English)</option><option value="fr_CA">Canada (French)</option><option value="zh_CN">Chinese</option><option value="zh_TW">Chinese (Taiwan)</option><option value="nl">Dutch</option><option value="en" selected>English</option><option value="fa">Farsi</option><option value="fr">French</option><option value="ge">Georgian</option><option value="de">German</option><option value="de_AT">German (Austria)</option><option value="de_CH">German (Switzerland)</option><option value="en_GB">Great Britain (English)</option><option value="en_IND">India (English)</option><option value="id_ID">Indonesia</option><option value="en_IE">Ireland (English)</option><option value="it">Italian</option><option value="ja">Japanese</option><option value="ko">Korean</option><option value="nep">Nepalese</option><option value="nb_NO">Norwegian</option><option value="pl">Polish</option><option value="pt_BR">Portuguese (Brazil)</option><option value="ru">Russian</option><option value="sk">Slovakian</option><option value="es">Spanish</option><option value="es_MX">Spanish Mexico</option><option value="sv">Swedish</option><option value="tr">Turkish</option><option value="uk">Ukrainian</option><option value="en_US">United States (English)</option><option value="vi">Vietnamese</option></select></li>');
+                arrHtmls.push('<li style="display:none"><label>Faker字符: </label><input id="f2etest-vars-faker-str" type="text" value="{{name.lastName}} {{name.firstName}}" /></li>');
                 arrHtmls.push('<li><label>变量值: </label><input id="f2etest-vars-value" type="text" readonly /></li>');
                 arrHtmls.push('</ul>');
-                var domVarsName, domVarsValue;
+                var domVarsType, domVarsName, domVarsFakerLang, domVarsFakerStr, domVarsValue;
                 showDialog('插入变量：', arrHtmls.join(''), {
                     onInit: function(){
                         // 初始化dom及事件
+                        domVarsType = document.getElementById('f2etest-vars-type');
                         domVarsName = document.getElementById('f2etest-vars-name');
+                        domVarsFakerLang = document.getElementById('f2etest-vars-faker-lang');
+                        domVarsFakerStr = document.getElementById('f2etest-vars-faker-str');
                         domVarsValue = document.getElementById('f2etest-vars-value');
+                        domVarsType.onchange = function(){
+                            if(domVarsType.value === 'faker'){
+                                domVarsName.parentNode.style.display = 'none';
+                                domVarsFakerLang.parentNode.style.display = 'block';
+                                domVarsFakerStr.parentNode.style.display = 'block';
+                            }
+                            else{
+                                domVarsName.parentNode.style.display = 'block';
+                                domVarsFakerLang.parentNode.style.display = 'none';
+                                domVarsFakerStr.parentNode.style.display = 'none';
+                            }
+                            makeFaker();
+                        }
+                        function makeFaker(){
+                            var fakerResult = '';
+                            try{
+                                faker.locale = domVarsFakerLang.value;
+                                fakerResult = faker.fake(domVarsFakerStr.value);
+                            }
+                            catch(e){}
+                            domVarsValue.value = fakerResult;
+                        }
+                        domVarsFakerLang.onchange = makeFaker;
+                        domVarsFakerStr.onkeyup = makeFaker;
                         domVarsName.onchange = function(){
                             var value = testVars[domVarsName.value];
                             domVarsValue.value = value;
@@ -1525,11 +1606,22 @@
                         domVarsName.onchange();
                     },
                     onOk: function(){
-                        var varName = domVarsName.value;
-                        callback({
-                            name: varName,
-                            value: testVars[varName]
-                        });
+                        var type = domVarsType.value;
+                        if(type === 'faker'){
+                            callback({
+                                type: type,
+                                lang: domVarsFakerLang.value,
+                                str: domVarsFakerStr.value,
+                                value: domVarsValue.value
+                            });
+                        }
+                        else{
+                            callback({
+                                type: type,
+                                name: domVarsName.value,
+                                value: domVarsValue.value
+                            });
+                        }
                     },
                     onCancel: function(){
                         setGlobalWorkMode('record');

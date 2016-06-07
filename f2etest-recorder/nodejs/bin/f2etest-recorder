@@ -21,15 +21,11 @@ program
     .option('--no-color', 'disable colors');
 program.command('init')
     .description('Init f2etest recorder config file')
-    .action(function () {
-        F2etestRecorder.checkUpdate(F2etestRecorder.init);
-    });
+    .action(F2etestRecorder.init);
 
 program.command('start')
     .description('Start recorder')
-    .action(function () {
-        F2etestRecorder.checkUpdate(F2etestRecorder.start);
-    })
+    .action(F2etestRecorder.start)
 
 
 program.parse(process.argv);

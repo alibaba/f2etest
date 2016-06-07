@@ -24,7 +24,7 @@ Quick start
 
     > npm install mocha -g
 
-    > npm install jwebdriver expect.js mocha-generators --save-dev
+    > npm install jwebdriver expect.js mocha-generators faker --save-dev
 
     > mocha test.spec.js
 
@@ -61,5 +61,6 @@ Thanks
 * colors: [https://github.com/Marak/colors.js](https://github.com/Marak/colors.js)
 * commander: [https://github.com/tj/commander.js](https://github.com/tj/commander.js)
 * inquirer: [https://github.com/sboudrias/Inquirer.js](https://github.com/sboudrias/Inquirer.js)
-* jwebdriver: [https://github.com/yaniswang/jWebDriver](https://github.com/yaniswang/jWebDriver)
+* jWebDriver: [https://github.com/yaniswang/jWebDriver](https://github.com/yaniswang/jWebDriver)
 * async: [https://github.com/caolan/async](https://github.com/caolan/async)
+* Faker.js: [https://github.com/marak/Faker.js/](https://github.com/marak/Faker.js/)

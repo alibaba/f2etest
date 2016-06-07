@@ -68,21 +68,12 @@ function setRecorderWork(enable){
 }
 
 var arrTasks = [];
-var lastTargetLocation = null;
 var lastWindow = null;
 var allKeyMap = {};
 var allMouseMap = {};
 var beforeUnloadCmdInfo = null;
 // save recoreded command
 function saveCommand(windowId, frame, cmd, data){
-    if( cmd === 'target'){
-        // filter duplication target
-        var targetLocation = ''+windowId+frame+data.path;
-        if(targetLocation === lastTargetLocation){
-            return;
-        }
-        lastTargetLocation = targetLocation;
-    }
     var cmdInfo = {
         window: windowId,
         frame: frame,
@@ -152,7 +143,6 @@ function checkLostKey(windowId){
         }
         allMouseMap = {};
         lastWindow = windowId;
-        lastTargetLocation = null;
     }
 }
 

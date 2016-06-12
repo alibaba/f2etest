@@ -204,9 +204,12 @@ function startRecorder(){
                     callback();
                 }
                 var arrCodes = [];
+                function eacapeStr(str){
+                    return str.replace(/\'/g, "\\'");
+                }
                 switch(cmd){
                     case 'url':
-                        pushTestCode('url', '', data.url, 'yield browser.url("'+data.url+'");');
+                        pushTestCode('url', '', data.url, 'yield browser.url(\''+eacapeStr(data.url)+'\');');
                         checkerBrowser && checkerBrowser.url(data.url).then(doNext).catch(catchError) || doNext();
                         break;
                     case 'closeWindow':
@@ -223,7 +226,7 @@ function startRecorder(){
                         break;
                     case 'mouseMove':
                         arrCodes = [];
-                        arrCodes.push('var element = yield browser.sleep(300).wait(\''+data.path+'\', 30000);');
+                        arrCodes.push('var element = yield browser.sleep(300).wait(\''+eacapeStr(data.path)+'\', 30000);');
                         if(data.x !== undefined){
                             arrCodes.push('yield browser.sleep(300).mouseMove(element, '+data.x+', '+data.y+');');
                         }
@@ -237,7 +240,7 @@ function startRecorder(){
                         break;
                     case 'mouseDown':
                         arrCodes = [];
-                        arrCodes.push('var element = yield browser.sleep(300).wait(\''+data.path+'\', 30000);');
+                        arrCodes.push('var element = yield browser.sleep(300).wait(\''+eacapeStr(data.path)+'\', 30000);');
                         arrCodes.push('yield browser.sleep(300).mouseMove(element, '+data.x+', '+data.y+').mouseDown('+data.button+');');
                         pushTestCode('mouseDown', data.text, data.path + ', ' + data.x + ', ' + data.y + ', ' + data.button, arrCodes);
                         checkerBrowser && checkerBrowser.sleep(300).wait(data.path, 10000).then(function*(element){
@@ -246,7 +249,7 @@ function startRecorder(){
                         break;
                     case 'mouseUp':
                         arrCodes = [];
-                        arrCodes.push('var element = yield browser.sleep(300).wait(\''+data.path+'\', 30000);');
+                        arrCodes.push('var element = yield browser.sleep(300).wait(\''+eacapeStr(data.path)+'\', 30000);');
                         arrCodes.push('yield browser.sleep(300).mouseMove(element, '+data.x+', '+data.y+').mouseUp('+data.button+');');
                         pushTestCode('mouseUp', data.text, data.path + ', ' + data.x + ', ' + data.y + ', ' + data.button, arrCodes);
                         checkerBrowser && checkerBrowser.sleep(300).wait(data.path, 10000).then(function*(element){
@@ -255,7 +258,7 @@ function startRecorder(){
                         break;
                     case 'click':
                         arrCodes = [];
-                        arrCodes.push('var element = yield browser.sleep(300).wait(\''+data.path+'\', 30000);');
+                        arrCodes.push('var element = yield browser.sleep(300).wait(\''+eacapeStr(data.path)+'\', 30000);');
                         arrCodes.push('yield browser.sleep(300).mouseMove(element, '+data.x+', '+data.y+').click('+data.button+');');
                         pushTestCode('click', data.text, data.path + ', ' + data.x + ', ' + data.y + ', ' + data.button, arrCodes);
                         checkerBrowser && checkerBrowser.sleep(300).wait(data.path, 10000).then(function*(element){
@@ -264,7 +267,7 @@ function startRecorder(){
                         break;
                     case 'touchClick':
                         arrCodes = [];
-                        arrCodes.push('var element = yield browser.sleep(300).wait(\''+data.path+'\', 30000);');
+                        arrCodes.push('var element = yield browser.sleep(300).wait(\''+eacapeStr(data.path)+'\', 30000);');
                         arrCodes.push('yield element.sleep(300).touchClick();');
                         pushTestCode('touchClick', data.text, data.path, arrCodes);
                         checkerBrowser && checkerBrowser.sleep(300).wait(data.path, 10000).then(function*(element){
@@ -273,7 +276,7 @@ function startRecorder(){
                         break;
                     case 'dblClick':
                         arrCodes = [];
-                        arrCodes.push('var element = yield browser.sleep(300).wait(\''+data.path+'\', 30000);');
+                        arrCodes.push('var element = yield browser.sleep(300).wait(\''+eacapeStr(data.path)+'\', 30000);');
                         arrCodes.push('yield browser.sleep(300).mouseMove(element, '+data.x+', '+data.y+').click().click();');
                         pushTestCode('dblClick', data.text, data.path + ', ' + data.x + ', ' + data.y + ', ' + data.button, arrCodes);
                         checkerBrowser && checkerBrowser.sleep(300).wait(data.path, 10000).then(function*(element){
@@ -281,15 +284,15 @@ function startRecorder(){
                         }).then(doNext).catch(catchError) || doNext();
                         break;
                     case 'sendKeys':
-                        pushTestCode('sendKeys', '', data.keys, 'yield browser.sendKeys("'+data.keys.replace(/"/g, '\\"')+'");');
+                        pushTestCode('sendKeys', '', data.keys, 'yield browser.sendKeys(\''+eacapeStr(data.keys)+'\');');
                         checkerBrowser && checkerBrowser.sendKeys(data.keys).then(doNext).catch(catchError) || doNext();
                         break;
                     case 'keyDown':
-                        pushTestCode('keyDown', '', data.character, 'yield browser.keyDown("'+data.character+'");');
+                        pushTestCode('keyDown', '', data.character, 'yield browser.keyDown(\''+eacapeStr(data.character)+'\');');
                         checkerBrowser && checkerBrowser.keyDown(data.character).then(doNext).catch(catchError) || doNext();
                         break;
                     case 'keyUp':
-                        pushTestCode('keyUp', '', data.character, 'yield browser.keyUp("'+data.character+'");');
+                        pushTestCode('keyUp', '', data.character, 'yield browser.keyUp(\''+eacapeStr(data.character)+'\');');
                         checkerBrowser && checkerBrowser.keyUp(data.character).then(doNext).catch(catchError) || doNext();
                         break;
                     case 'scrollTo':
@@ -298,7 +301,7 @@ function startRecorder(){
                         break;
                     case 'select':
                         arrCodes = [];
-                        arrCodes.push('var element = yield browser.sleep(300).wait(\''+data.path+'\', 30000);');
+                        arrCodes.push('var element = yield browser.sleep(300).wait(\''+eacapeStr(data.path)+'\', 30000);');
                         arrCodes.push('yield element.sleep(300).select({');
                         arrCodes.push('    type: \''+data.type+'\',');
                         arrCodes.push('    value: \''+data.value+'\'');
@@ -325,7 +328,7 @@ function startRecorder(){
                         break;
                     case 'uploadFile':
                         arrCodes = [];
-                        arrCodes.push('var element = yield browser.sleep(300).wait(\''+data.path+'\', {timeout: 30000, displayed: false});');
+                        arrCodes.push('var element = yield browser.sleep(300).wait(\''+eacapeStr(data.path)+'\', {timeout: 30000, displayed: false});');
                         arrCodes.push('yield element.sleep(300).sendKeys(\'c:\\\\uploadFiles\\\\'+data.filename+'\');');
                         pushTestCode('uploadFile', data.text, data.path + ', ' + data.filename, arrCodes);
                         checkerBrowser && checkerBrowser.sleep(300).wait(data.path, {
@@ -346,7 +349,7 @@ function startRecorder(){
                             var reDomRequire = /^(val|text|displayed|enabled|selected|attr|css)$/;
                             var reParamRequire = /^(attr|css|cookie|localStorage|sessionStorage)$/;
                             if(reDomRequire.test(expectType)){
-                                arrCodes.push('var element = yield browser.sleep(300).wait(\''+expectParams[0]+'\', 30000);');
+                                arrCodes.push('var element = yield browser.sleep(300).wait(\''+eacapeStr(expectParams[0])+'\', 30000);');
                             }
                             switch(expectType){
                                 case 'val':
@@ -365,10 +368,10 @@ function startRecorder(){
                                     arrCodes.push('var value = yield element.selected();');
                                     break;
                                 case 'attr':
-                                    arrCodes.push('var value = yield element.attr(\''+expectParams[1]+'\');');
+                                    arrCodes.push('var value = yield element.attr(\''+eacapeStr(expectParams[1])+'\');');
                                     break;
                                 case 'css':
-                                    arrCodes.push('var value = yield element.css(\''+expectParams[1]+'\');');
+                                    arrCodes.push('var value = yield element.css(\''+eacapeStr(expectParams[1])+'\');');
                                     break;
                                 case 'url':
                                     arrCodes.push('var value = yield browser.url();');
@@ -377,25 +380,25 @@ function startRecorder(){
                                     arrCodes.push('var value = yield browser.title();');
                                     break;
                                 case 'cookie':
-                                    arrCodes.push('var value = yield browser.cookie(\''+expectParams[0]+'\');');
+                                    arrCodes.push('var value = yield browser.cookie(\''+eacapeStr(expectParams[0])+'\');');
                                     break;
                                 case 'localStorage':
-                                    arrCodes.push('var value = yield browser.localStorage(\''+expectParams[0]+'\');');
+                                    arrCodes.push('var value = yield browser.localStorage(\''+eacapeStr(expectParams[0])+'\');');
                                     break;
                                 case 'sessionStorage':
-                                    arrCodes.push('var value = yield browser.sessionStorage(\''+expectParams[0]+'\');');
+                                    arrCodes.push('var value = yield browser.sessionStorage(\''+eacapeStr(expectParams[0])+'\');');
                                     break;
                             }
                             var codeExpectTo = expectTo.replace(/"/g, '\\"').replace(/\n/g, '\\n');
                             switch(expectCompare){
                                 case 'equal':
-                                    arrCodes.push('expect(value).to.equal('+(/^(true|false)$/.test(codeExpectTo)?codeExpectTo:'\''+codeExpectTo+'\'')+');');
+                                    arrCodes.push('expect(value).to.equal('+(/^(true|false)$/.test(codeExpectTo)?codeExpectTo:'\''+eacapeStr(codeExpectTo)+'\'')+');');
                                     break;
                                 case 'contain':
-                                    arrCodes.push('expect(value).to.contain(\''+codeExpectTo+'\');');
+                                    arrCodes.push('expect(value).to.contain(\''+eacapeStr(codeExpectTo)+'\');');
                                     break;
                                 case 'regexp':
-                                    arrCodes.push('expect(value).to.match('+codeExpectTo+');');
+                                    arrCodes.push('expect(value).to.match('+eacapeStr(codeExpectTo)+');');
                                     break;
                             }
                             pushTestCode('expect', '', expectType + ', ' + JSON.stringify(expectParams) + ', ' + expectCompare + ', ' + expectTo, arrCodes);
@@ -462,14 +465,14 @@ function startRecorder(){
                         var varinfo = data.varinfo;
                         var varType = varinfo.type;
                         arrCodes = [];
-                        arrCodes.push('var element = yield browser.sleep(300).wait(\''+data.path+'\', 30000);');
+                        arrCodes.push('var element = yield browser.sleep(300).wait(\''+eacapeStr(data.path)+'\', 30000);');
                         if(varType ==='faker'){
                             arrCodes.push('faker.locale = \'' + varinfo.lang + '\';');
-                            arrCodes.push('yield element.val(faker.fake(\''+varinfo.str+'\'));');
+                            arrCodes.push('yield element.val(faker.fake(\''+eacapeStr(varinfo.str)+'\'));');
                             pushTestCode('setFaker', data.text, data.path + ', ' + varinfo.lang + ', ' + varinfo.str, arrCodes);
                         }
                         else{
-                            arrCodes.push('yield element.val(testVars[\''+varinfo.name+'\']);');
+                            arrCodes.push('yield element.val(testVars[\''+eacapeStr(varinfo.name)+'\']);');
                             pushTestCode('setVar', data.text, data.path + ', ' + varinfo.name, arrCodes);
                         }
                         checkerBrowser && checkerBrowser.sleep(300).wait(data.path, 10000).then(function*(element){

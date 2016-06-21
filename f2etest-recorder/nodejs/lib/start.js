@@ -550,7 +550,7 @@ function startRecorder(){
                 // 合并连续的sendKeys
                 var cmd = cmdInfo.cmd;
                 var data = cmdInfo.data;
-                if(cmd === 'sendKeys' && /\{\w+\}/.test(data.keys) === false){
+                if(cmd === 'sendKeys'){
                     arrSendKeys.push(data.keys);
                 }
                 else{

@@ -447,24 +447,21 @@
     function showLoading(){
         divLoading = document.createElement("div");
         divLoading.id = 'f2etest-loading';
-        divLoading.innerHTML = '<style>#f2etest-loading{display:block;position:fixed;z-index:999999999;left:0;top:0;width:100%;height:100%;}#f2etest-loading div{z-index:0;background:#000;width:100%;height:100%;opacity:0.6}#f2etest-loading span{z-index:1;position:fixed;top:50%;left:50%;margin-left:-165px;margin-top:-20px;color:white;font-size:30px;}</style><div></div><span>正在等待加载，请稍候……</span>';
+        divLoading.innerHTML = '<style>#f2etest-loading{display:block;position:fixed;z-index:999999999;left:0;top:0;width:100%;height:100%;}#f2etest-loading div{z-index:0;background:#000;width:100%;height:100%;opacity:0.6}#f2etest-loading span{z-index:1;position:fixed;top:50%;left:50%;margin-left:-80px;margin-top:-20px;color:white;font-size:30px;}</style><div></div><span>等待加载……</span>';
         document.body.appendChild(divLoading);
     }
     
     function onBodyReady(){
-        isBodyReady = true;
-        hookAlert();
-        if(isOnload === false && isIframe === false){
-            // 主窗口显示loading
+        if(isBodyReady === false){
+            isBodyReady = true;
+            hookAlert();
             showLoading();
         }
     }
 
     function onLoad(){
+        onBodyReady();
         isOnload = true;
-        if(divLoading){
-            divLoading.style.display = 'none';
-        }
         if(isIframe === false){
             saveCommand('waitBody');
         }
@@ -473,11 +470,13 @@
             setTimeout(function(){
                 initRecorderEvent();
                 initRecorderDom();
+                divLoading.style.display = 'none';
             }, 500);
         }
         else{
             initRecorderEvent();
             initRecorderDom();
+            divLoading.style.display = 'none';
         }
     }
 

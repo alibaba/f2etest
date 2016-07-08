@@ -61,6 +61,10 @@ function initConfig(){
         }
     ];
     inquirer.prompt(questions).then(function(anwsers){
+        anwsers.server = anwsers.server.replace(/^\s+|\s+$/g, '');
+        anwsers.userid = anwsers.userid.replace(/^\s+|\s+$/g, '');
+        anwsers.apiKey = anwsers.apiKey.replace(/^\s+|\s+$/g, '');
+        anwsers.browsers = anwsers.browsers.replace(/^\s+|\s+$/g, '');
         var configJson = {
             f2etest: anwsers,
             vars: config.vars || {}

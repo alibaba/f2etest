@@ -13,7 +13,7 @@ var LOGOUT_URL = SSO_SERVER + 'logout?ver=1';
 var AUTH_URL = SSO_SERVER + 'getUser?ver=1';
 
 // 需要强制登录的URL
-var reRequireLoginUrl = /^\/($|initUser|openapp|help|install|stat|changelog|api|local|install\.bat|getAllBrowsers)/;
+var reRequireLoginUrl = /^\/($|initUser|openapp|help|install|stat|statteam|statuser|changelog|api|local|install\.bat|getAllBrowsers|webdriver|wd_api|wd_nodejs|jsunit|jsunit_nodejs|jsunit_browser|jsunit_api|autotest)/;
 
 module.exports = function(app) {
 

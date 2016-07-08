@@ -1,0 +1,68 @@
+
+<!DOCTYPE HTML>
+<html>
+<head>
+    <meta charset="UTF-8">
+	<meta name="renderer" content="webkit"> 
+    <title><%=siteName + ' - ' + siteAbout%></title>
+    <link rel="icon" type="image/icon" href="<%=siteIcon%>">
+    <link rel="stylesheet" type="text/css" href="css/index.css" />
+    <script type="text/javascript" src="js/jquery-1.8.3.min.js"></script>
+</head>
+<body>
+    <% include header.html %>
+    <div id="doc-container">
+        <div id="doc-bg"></div>
+        <div id="doc-area">
+            <h3>什么是F2etest自测云？</h3>
+            <p>F2etest自测云是一款几乎零成本的整体自动化测试解决方案，自测云 = 自动化测试云</p>
+            <p>我们的目标：<strong>让自测不要重复测！让自动化变成零成本！让自测云持续保障您的业务！</strong></p>
+            <p>以下是本产品的特点：</p>
+            <ol>
+                <li><strong>自测 = 自动化测试</strong>：对于开发人员来讲，自测是开发流程中缺一不可的过程，我们要实现的目标就是自测过程中即可同步的录制出自动化脚本，实现真正的零成本自动化</li>
+                <li><strong>无干扰录制</strong>：所作操作均无需交互干扰，鼠标、键盘、alert弹框、文件上传，完全按照正常自测流程操作即可(以下操作除外：悬停事件、断言、变量)</li>
+                <li><strong>云录制</strong>：仅需安装一个npm包，即可完成录制，所有依赖均部署在F2etest云中，几乎零安装成本，快速上手自动化</li>
+                <li><strong>本地生成脚本</strong>：录制的脚本存储在用户本机，用户可以自行在录制的基础上进行修改定制，更自由更开放</li>
+                <li><strong>丰富的断言</strong>：支持以下断言类型，val、text、displayed、enabled、selected、attr、css、url、title、cookie、localStorage、sessionStorage</li>
+                <li><strong>支持数据Mock</strong>：我们支持<a href="https://github.com/marak/Faker.js/" target="_blank">Faker变量</a>功能，支持强大的数据Mock</li>
+            </ol>
+            <h3>我如何快速开始？</h3>
+            <ol>
+                <li><strong>安装Nodejs</strong>: <a href="https://nodejs.org/" target="_blank">https://nodejs.org/</a></li>
+                <li><strong>安装关键依赖</strong>：npm install f2etest-recorder mocha -g</li>
+                <li><strong>安装相关依赖</strong>：npm install jwebdriver expect.js mocha-generators faker --save-dev</li>
+                <li><strong>初始化配置</strong>：f2etest-recorder init</li>
+                <li><strong>开始录制</strong>：f2etest-recorder start</li>
+                <li><strong>运行用例</strong>：mocha test.spec.js</li>
+            </ol>
+            <p>视频教程：<a href="http://v.youku.com/v_show/id_XMTYzMjgyNzExMg==.html" target="_blank">http://v.youku.com/v_show/id_XMTYzMjgyNzExMg==.html</a></p>
+            <p>初始化时提交的必要参数：</p>
+            <ol>
+                <li>f2etest域名: <strong><%=host%></strong></li>
+                <li>f2etest userid: <strong><%=userid%></strong></li>
+                <li>f2etest apiKey: <strong><%=apiKey%></strong></li>
+                <li>浏览器列表: 请根据需要填写，体验录制流程请使用默认值，支持的浏览器列表请查看：<a href="/webdriver#wdListTitle">WebDriver云</a></li>
+            </ol>
+            <h3>录制注意事项：</h3>
+            <ol>
+                <li>请使用超链接或者功能触发URL变更，不要人肉的修改地址栏URL</li>
+                <li>请使用鼠标点击来切换焦点，不要使用Tab切换，IE低版本浏览器不支持tab切换焦点</li>
+                <li>请勿使用鼠标双击，WebDriver的双击兼容性比较差</li>
+                <li>Hover悬停事件必需手工添加</li>
+                <li>不支持拖动选择文字，WebDriver无法支持</li>
+                <li>不支持非原生的文件上传，必需为&lt;input type=&quot;file&quot;&gt;在顶层，选择文件时不要双击，双击会导致body上触发多余事件</li>
+                <li>不允许关闭非当前窗口，不允许手动切换窗口（必需以正常关闭或者超链接导航）</li>
+                <li>不要点击无关区域，防止DOM结构不友好造成自动化不稳定</li>
+            </ol>
+            <h3>如何开发对自动化友好的代码？</h3>
+            <ol>
+                <li>id,name等标识性属性不能用随机值,id值页面中不允许重复</li>
+                <li>DOM尽量按照功能来规划区块，并为之设置业务相关的独立id</li>
+                <li>每个表单项如果设置label标签，将会使生成的用例可读性更高</li>
+                <li>事件绑定尽量使用click，不要使用mousedown来触发行为，mousedown会导致mouseup事件漏触发到背景DOM</li>
+            </ol>
+        </div>
+    </div>
+    <% include footer.html %>
+</body>
+</html>

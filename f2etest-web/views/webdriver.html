@@ -70,7 +70,7 @@
                             var browserVersion = browser.browserVersion;
                             if(browserVersion){
                                 browserName += ' ' + browserVersion;
-                                appId += browserVersion;
+                                if(appId === 'ie')appId += browserVersion;
                             }
                             var arrLine = ['<p><span class="name">'+browserName+':</span>'];
                             var workStatus = browser.workStatus;
@@ -111,8 +111,8 @@
                                     2: 'run'
                                 };
                                 var mapTitle = {
-                                    0: '走散了……',
-                                    1: '让我休息会……',
+                                    0: '歇菜了……',
+                                    1: '休息中……',
                                     2: '玩命工作中……'
                                 }
                                 arrLine.push('<a href="/openWdBrowser?browserId='+browserId+'" target="_blank"><span class="browser '+mapClass[status]+'" title="'+mapTitle[status]+'"><span></span><img src="/imgs/app/'+appId+'.png"></span></a> ');

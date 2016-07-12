@@ -85,6 +85,16 @@
     1. 为了方便用户使用，建议安装nginx等软件做反向代理，将80端口反向到3000端口，以将3000端口号隐藏起来。
     2. 建议使用pm2或forever等组件实现系统开机自动运行。
 
+    nginx反向配置如下：
+
+        location / {
+            proxy_pass       http://127.0.0.1:3000;
+            proxy_set_header Host      $host;
+            proxy_set_header X-Real-IP $remote_addr;
+            proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+            proxy_buffering off;
+        }
+
 6. 安装windows server机群
 
     * 1号机：Server 2003: IE6

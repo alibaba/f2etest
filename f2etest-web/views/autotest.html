@@ -25,6 +25,7 @@
                 <li><strong>本地生成脚本</strong>：录制的脚本存储在用户本机，用户可以自行在录制的基础上进行修改定制，更自由更开放</li>
                 <li><strong>丰富的断言</strong>：支持以下断言类型，val、text、displayed、enabled、selected、attr、css、url、title、cookie、localStorage、sessionStorage</li>
                 <li><strong>支持数据Mock</strong>：我们支持<a href="https://github.com/marak/Faker.js/" target="_blank">Faker变量</a>功能，支持强大的数据Mock</li>
+                <li><strong>支持公共用例</strong>: 用例之间允许相互引用，可以将某些公用的操作步骤录制为公用用例，以进一步提升录制效率(f2etest-recorder v0.9.38以上版本支持)</li>
             </ol>
             <h3>我如何快速开始？</h3>
             <ol>
@@ -60,6 +61,13 @@
                 <li>DOM尽量按照功能来规划区块，并为之设置业务相关的独立id</li>
                 <li>每个表单项如果设置label标签，将会使生成的用例可读性更高</li>
                 <li>事件绑定尽量使用click，不要使用mousedown来触发行为，mousedown会导致mouseup事件漏触发到背景DOM</li>
+            </ol>
+            <h3>公共用例如何使用？</h3>
+            <ol>
+                <li>用例之间可以相互引用，公共用例实际上就是普通用例，仅需要在文件名上对用例进行区分</li>
+                <li>对于公共用例，文件名建议使用：<strong>xxx.mod.js</strong></li>
+                <li>标准业务用例，文件名建议使用：<strong>xxx.spec.js</strong></li>
+                <li>批量执行业务用例：<strong>mocha test/*.spec.js</strong></li>
             </ol>
         </div>
     </div>

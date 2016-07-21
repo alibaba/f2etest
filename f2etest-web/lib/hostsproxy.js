@@ -147,7 +147,7 @@ HostsProxyServerPrototype.listen = function(port, callback){
         var remoteSocket = net.connect(urlInfo.port, self._getNewHostname(urlInfo.hostname), function () {
             reqSocket.write("HTTP/1.1 200 Connection established\r\n\r\n");
             remoteSocket.pipe(reqSocket).pipe(remoteSocket);
-        });
+        }); 
         remoteSocket.on('error', function (err) {
             reqSocket.end();
             self.emit('error', err);

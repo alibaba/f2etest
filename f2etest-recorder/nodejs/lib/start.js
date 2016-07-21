@@ -48,6 +48,15 @@ function startRecorder(){
     if(fs.existsSync(hostsFile)){
         hosts = fs.readFileSync(hostsFile).toString();
     }
+    // read spec list
+    var dirList = fs.readdirSync(process.cwd());
+    var specLists = [];
+    dirList.forEach(function(item){
+        if(/.*\.js$/.test(item)){
+            specLists.push(item);
+        }
+    });
+
     var questions = [
         {
             'type': 'input',
@@ -102,16 +111,26 @@ function startRecorder(){
             });
             console.log('  '+title);
         }
-        function saveTestCode(success){
+        function saveTestCode(success, error){
+            if(checkerBrowser){
+                if(success){
+                    console.log('   '+symbols.ok.green+' 校验成功'.green);
+                }
+                else{
+                    console.log('   '+symbols.err.red+' 校验失败'.red, error);
+                }
+            }
+            allCaseCount ++;
+            if(!success){
+                failedCaseCount ++;
+            }
             if(arrLastTestCodes.length > 0){
                 checkerBrowser && sendWsMessage('checkResult', {
                     title: lastTestTitle,
                     success: success
                 });
-                allCaseCount ++;
                 if(!success){
                     lastTestTitle = '\u00D7 ' + lastTestTitle;
-                    failedCaseCount ++;
                 }
                 arrTestCodes.push('it(\''+lastTestTitle.replace(/'/g, '\\\'').replace(/\n/g, '\\n')+'\', function*(){');
                 arrTestCodes = arrTestCodes.concat(arrLastTestCodes);
@@ -129,17 +148,11 @@ function startRecorder(){
             var arrTasks = [];
             arrTasks.push(function(callback){
                 function doNext(){
-                    if(checkerBrowser){
-                        console.log('   '+symbols.ok.green+' 校验成功'.green);
-                    }
                     saveTestCode(true);
                     callback();
                 }
                 function catchError(error){
-                    if(checkerBrowser){
-                        console.log('   '+symbols.err.red+' 校验失败'.red, error);
-                    }
-                    saveTestCode();
+                    saveTestCode(false, error);
                     callback();
                 }
                 if(window !== lastWindowId){
@@ -154,17 +167,11 @@ function startRecorder(){
             });
             arrTasks.push(function(callback){
                 function doNext(){
-                    if(checkerBrowser){
-                        console.log('   '+symbols.ok.green+' 校验成功'.green);
-                    }
                     saveTestCode(true);
                     callback();
                 }
                 function catchError(error){
-                    if(checkerBrowser){
-                        console.log('   '+symbols.err.red+' 校验失败'.red, error);
-                    }
-                    saveTestCode();
+                    saveTestCode(false, error);
                     callback();
                 }
                 if(frame !== lastFrameId){
@@ -190,17 +197,11 @@ function startRecorder(){
             });
             arrTasks.push(function(callback){
                 function doNext(){
-                    if(checkerBrowser){
-                        console.log('   '+symbols.ok.green+' 校验成功'.green);
-                    }
                     saveTestCode(true);
                     callback();
                 }
                 function catchError(error){
-                    if(checkerBrowser){
-                        console.log('   '+symbols.err.red+' 校验失败'.red, error);
-                    }
-                    saveTestCode();
+                    saveTestCode(false, error);
                     callback();
                 }
                 var arrCodes = [];
@@ -485,8 +486,72 @@ function startRecorder(){
                             }
                         }).then(doNext).catch(catchError) || doNext();
                         break;
+                    // 插入用例
+                    case 'module':
+                        co(function*(){
+                            console.log(('  -------------- load '+data+' start --------------').gray);
+                            sendWsMessage('moduleStart', {
+                                file: data
+                            });
+                            var arrTasks = [runSpec(data, recorderBrowser, testVars, function(title, errorMsg){
+                                title = title.replace(/^\w+:/, function(all){
+                                    return all.cyan;
+                                });
+                                console.log('  '+title);
+                                console.log('   '+(errorMsg?symbols.err.red+' 执行失败'.red + '\t' + errorMsg:symbols.ok.green+' 执行成功'.green));
+                            })];
+                            if(checkerBrowser){
+                                arrTasks.push(runSpec(data, checkerBrowser, testVars))
+                            }
+                            yield arrTasks;
+                            yield recorderBrowser.sleep(1000);
+                            yield recorderBrowser.eval(function(done){
+                                setInterval(function(){
+                                    if(document.readyState==='complete')done()
+                                }, 10);
+                            });
+                            sendWsMessage('moduleEnd', {
+                                file: data,
+                                success: true
+                            });
+                            arrTestCodes.push('callSpec(\''+data+'\');\r\n');
+                            console.log(('  -------------- load '+data+' end --------------').gray);
+                            console.log('  module'.cyan+': ', data);
+                        }).then(doNext).catch(function(err){
+                            console.log(('  -------------- load '+data+' failed --------------').gray);
+                            sendWsMessage('moduleEnd', {
+                                file: data,
+                                success: false
+                            });
+                            catchError(err);
+                        });
+                        break;
                 }
             });
+            function* runSpec(name, browser, testVars, callback){
+                global.before = function(){}
+                global.describe = function(){}
+                var arrSpecs = [];
+                global.it = function(title, func){
+                    arrSpecs.push({
+                        title: title,
+                        func: func
+                    });
+                }
+                require(path.resolve(process.cwd(), name))(browser, testVars);
+                var spec;
+                for(var i in arrSpecs){
+                    spec = arrSpecs[i];
+                    var errorMsg = null;
+                    try{
+                        yield spec.func();
+                    }
+                    catch(e){
+                        errorMsg = e;
+                    }
+                    callback && callback(spec.title, errorMsg);
+                }
+            }
             async.series(arrTasks, function(){
                 next();
             });
@@ -506,8 +571,6 @@ function startRecorder(){
                 console.log('');
                 console.log('------------------------------------------------------------------'.green);
                 console.log('');
-                pushTestCode('maximize', '', '', 'yield browser.maximize();');
-                saveTestCode(true);
                 for(var i=0;i<900;i++){
                     if(recorderBrowser){
                         yield recorderBrowser.size();
@@ -664,7 +727,8 @@ function startRecorder(){
         }
         var recorderConfig = {
             pathAttrs : pathAttrs,
-            testVars: testVars
+            testVars: testVars,
+            specLists: specLists
         };
         startRecorderServer(recorderConfig, onReady, onCommand, onEnd);
         function saveTestFile(){
@@ -672,7 +736,7 @@ function startRecorder(){
             var templateContent = fs.readFileSync(tempalteFile).toString();
             var testFile = path.resolve(fileName);
             arrTestCodes = arrTestCodes.map(function(line){
-                return '        '+ line;
+                return '    '+ line;
             });
             templateContent = templateContent.replace(/\{\$(\w+)\}/g, function(all, name){
                 switch(name){
@@ -777,6 +841,9 @@ function newChromeBrowser(f2etestConfig, hosts, isRecorder, callback){
         }
         else{
             yield browser.maximize();
+            yield browser.config({
+                asyncScriptTimeout: 10000
+            });
             yield callback(browser);
         }
     }).catch(function(e){});

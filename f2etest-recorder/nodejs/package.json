@@ -1,6 +1,6 @@
 {
   "name": "f2etest-recorder",
-  "version": "0.9.37",
+  "version": "0.9.38",
   "description": "Nodejs client for f2etest-recorder",
   "main": "./index",
   "bin": {

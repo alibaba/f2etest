@@ -7,6 +7,7 @@ var isWorking = true;
 var workIcon = 1;
 var workIconTimer = null;
 var recordConfig = null;
+var isModuleLoading = false;
 
 // websocket to f2etest recorder server
 var wsSocket = new WebSocket(F2ETESTAPI, "protocolOne");
@@ -33,10 +34,29 @@ wsSocket.onmessage = function (message) {
                 message: data.title
             });
             break;
+        case 'moduleStart':
+            isModuleLoading = true;
+            chrome.notifications.create('moduleStart', {
+                type: 'basic',
+                iconUrl: 'img/warn.png',
+                title: '用例加载开始',
+                message: '开始加载用例: '+data.file+'，加载过程中请勿进行任何键盘和鼠标操作。'
+            });
+            break;
+        case 'moduleEnd':
+            isModuleLoading = false;
+            chrome.notifications.create('moduleEnd', {
+                type: 'basic',
+                iconUrl: 'img/'+(data.success?'success':'fail')+'.png',
+                title: '用例加载结束',
+                message: '用例加载'+(data.success?'成功':'失败')+': '+data.file+'，请继续录制操作。'
+            });
+            break;
     }
 }
 wsSocket.onclose = function(){
     wsSocket = null;
+    console.log('ws closed!');
 }
 
 function sendWsMessage(type, data){
@@ -74,6 +94,9 @@ var allMouseMap = {};
 var beforeUnloadCmdInfo = null;
 // save recoreded command
 function saveCommand(windowId, frame, cmd, data){
+    if(isModuleLoading){
+        return;
+    }
     var cmdInfo = {
         window: windowId,
         frame: frame,

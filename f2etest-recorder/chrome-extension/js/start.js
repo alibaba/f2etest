@@ -20,8 +20,18 @@
             });
             location.href = url;
         }
+        else if(/\.js$/.test(url)){
+            chrome.runtime.sendMessage({
+                type: 'command',
+                data: {
+                    frame: null,
+                    cmd: 'module',
+                    data: url
+                }
+            });
+        }
         else{
-            alert('请输入标准的url。');
+            alert('请输入标准的url或用例文件名。');
         }
         return false;
     }

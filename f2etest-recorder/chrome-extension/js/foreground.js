@@ -15,6 +15,7 @@
     // 全局配置
     var testVars = {};
     var arrPathAttrs = ['data-id', 'data-name', 'type', 'data-type', 'data-role', 'data-value'];
+    var specLists = [];
 
     // 全局事件
     var mapGlobalEvents = {};
@@ -55,6 +56,8 @@
             arrPathAttrs = pathAttrs.split(/\s*,\s*/);
             arrPathAttrs.unshift('name');
         }
+        specLists = config.specLists;
+        console.log(specLists)
     });
 
     // 读取cookie
@@ -1299,8 +1302,8 @@
             divDomToolsPannel.className = 'f2etest-recorder';
             var arrHTML = [
                 '<div style="padding:5px;color:#666"><strong>DomPath: </strong><span id="f2etest-path"></span></div>',
-                '<div><span class="f2etest-button"><a name="f2etest-hover"><img src="'+baseUrl+'img/hover.png" alt="">添加悬停</a></span><span class="f2etest-button"><a name="f2etest-expect"><img src="'+baseUrl+'img/expect.png" alt="">添加断言</a></span><span class="f2etest-button"><a name="f2etest-vars"><img src="'+baseUrl+'img/vars.png" alt="">插入变量</a></span><span class="f2etest-button"><a name="f2etest-end"><img src="'+baseUrl+'img/end.png" alt="">结束录制</a></span></div>',
-                '<style>#f2etest-tools-pannel{position:fixed;z-index:9999999;padding:20px;width:570px;box-sizing:border-box;border:1px solid #ccc;line-height:1;background:rgba(241,241,241,0.8);box-shadow: 5px 5px 10px #888888;bottom:20px;left:20px;cursor:move;}#f2etest-path{border-bottom: dashed 1px #ccc;padding:2px;color:#FF7159;}.f2etest-button{cursor:pointer;margin: 8px;}.f2etest-button a{text-decoration: none;color:#333333;font-family: arial, sans-serif;font-size: 13px;color: #777;text-shadow: 1px 1px 0px white;background: -webkit-linear-gradient(top, #ffffff 0%,#dfdfdf 100%);border-radius: 3px;box-shadow: 0 1px 3px 0px rgba(0,0,0,0.4);padding: 6px 12px;}.f2etest-button a:hover{background: -webkit-linear-gradient(top, #ffffff 0%,#eee 100%);box-shadow: 0 1px 3px 0px rgba(0,0,0,0.4);}.f2etest-button a:active{background: -webkit-linear-gradient(top, #dfdfdf 0%,#f1f1f1 100%);box-shadow: 0px 1px 1px 1px rgba(0,0,0,0.2) inset, 0px 1px 1px 0 rgba(255,255,255,1);}.f2etest-button a img{padding-right: 8px;position: relative;top: 2px;vertical-align:baseline;}</style>'
+                '<div><span class="f2etest-button"><a name="f2etest-hover"><img src="'+baseUrl+'img/hover.png" alt="">添加悬停</a></span><span class="f2etest-button"><a name="f2etest-expect"><img src="'+baseUrl+'img/expect.png" alt="">添加断言</a></span><span class="f2etest-button"><a name="f2etest-vars"><img src="'+baseUrl+'img/vars.png" alt="">插入变量</a></span><span class="f2etest-button"><a name="f2etest-module"><img src="'+baseUrl+'img/module.png" alt="">插入用例</a></span><span class="f2etest-button"><a name="f2etest-end"><img src="'+baseUrl+'img/end.png" alt="">结束录制</a></span></div>',
+                '<style>#f2etest-tools-pannel{position:fixed;z-index:9999999;padding:20px;width:702px;box-sizing:border-box;border:1px solid #ccc;line-height:1;background:rgba(241,241,241,0.8);box-shadow: 5px 5px 10px #888888;bottom:10px;left:10px;cursor:move;}#f2etest-path{border-bottom: dashed 1px #ccc;padding:2px;color:#FF7159;}.f2etest-button{cursor:pointer;margin: 8px;}.f2etest-button a{text-decoration: none;color:#333333;font-family: arial, sans-serif;font-size: 13px;color: #777;text-shadow: 1px 1px 0px white;background: -webkit-linear-gradient(top, #ffffff 0%,#dfdfdf 100%);border-radius: 3px;box-shadow: 0 1px 3px 0px rgba(0,0,0,0.4);padding: 6px 12px;}.f2etest-button a:hover{background: -webkit-linear-gradient(top, #ffffff 0%,#eee 100%);box-shadow: 0 1px 3px 0px rgba(0,0,0,0.4);}.f2etest-button a:active{background: -webkit-linear-gradient(top, #dfdfdf 0%,#f1f1f1 100%);box-shadow: 0px 1px 1px 1px rgba(0,0,0,0.2) inset, 0px 1px 1px 0 rgba(255,255,255,1);}.f2etest-button a img{padding-right: 8px;position: relative;top: 2px;vertical-align:baseline;}</style>'
             ];
             divDomToolsPannel.innerHTML = arrHTML.join('');
             var diffX = 0, diffY =0;
@@ -1384,6 +1387,11 @@
                                 });
                                 setGlobalWorkMode(requirePause?'pauseAll':'record');
                             });
+                        });
+                        break;
+                    case 'f2etest-module':
+                        showModuleDailog(function(specName){
+                            saveCommand('module', specName);
                         });
                         break;
                     case 'f2etest-end':
@@ -1621,6 +1629,33 @@
                                 value: domVarsValue.value
                             });
                         }
+                    },
+                    onCancel: function(){
+                        setGlobalWorkMode('record');
+                    }
+                });
+            }
+
+            function showModuleDailog(callback){
+                var arrHtmls = [
+                    '<ul>',
+                    '<li><label>用例文件名: </label><select id="f2etest-spec-name" value="">',
+                ];
+                for(var i in specLists){
+                    arrHtmls.push('<option>'+specLists[i]+'</option>');
+                }
+                arrHtmls.push('</select></li>');
+                arrHtmls.push('</ul>');
+                setGlobalWorkMode('pauseAll');
+                var domSpecName = document.getElementById('f2etest-vars-type');
+                showDialog('插入用例：', arrHtmls.join(''), {
+                    onInit: function(){
+                       domSpecName = document.getElementById('f2etest-spec-name');
+                    },
+                    onOk: function(){
+                        setGlobalWorkMode('pauseRecord');
+                        var specName = domSpecName.value;
+                        specName && callback(specName);
                     },
                     onCancel: function(){
                         setGlobalWorkMode('record');

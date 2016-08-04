@@ -37,7 +37,7 @@ if %proxyurl% neq "" (
 )
 
 rem 打开应用
-start /MAX "" "C:\360\360Chrome\Chrome\Application\360chrome.exe" %url% --user-data-dir="%APPDATA%\360chrome\User Data"
+start /MAX "" "C:\360\360Chrome\Chrome\Application\360chrome.exe" --allow-no-sandbox-job %url% --user-data-dir="%APPDATA%\360chrome\User Data"
 
 rem 打点统计
 start "" curl "http://%f2etestDomain%/applog?userid=%USERNAME%&appid=%appid%&isweb=%isWeb%"

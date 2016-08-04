@@ -37,7 +37,7 @@ if %proxyurl% neq "" (
 )
 
 rem 打开应用
-start /MAX "" "C:\360\360se6\Application\360se.exe" %url% --user-data-dir="%APPDATA%\360se6\User Data"
+start /MAX "" "C:\360\360se6\Application\360se.exe" --allow-no-sandbox-job %url% --user-data-dir="%APPDATA%\360se6\User Data"
 
 rem 打点统计
 start "" curl "http://%f2etestDomain%/applog?userid=%USERNAME%&appid=%appid%&isweb=%isWeb%"

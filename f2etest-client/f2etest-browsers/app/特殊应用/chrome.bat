@@ -38,7 +38,7 @@ if %proxyurl% neq "" (
 
 rem 打开应用
 taskkill /fi "username eq %username%" /s %computername% /u %username% /f -IM chrome.exe >nul
-start /MAX "" "C:\Program Files (x86)\Google\Chrome\Application\chrome.exe" %url% %proxyParam%
+start /MAX "" "C:\Program Files (x86)\Google\Chrome\Application\chrome.exe" --allow-no-sandbox-job %url% %proxyParam%
 
 rem 打点统计
 start "" curl "http://%f2etestDomain%/applog?userid=%USERNAME%&appid=%appid%&isweb=%isWeb%"

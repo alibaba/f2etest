@@ -122,7 +122,7 @@
 
     提示及注意事项：
 
-    1. chrome由于和远程桌面有点小冲突，必需安装在2003操作系统中
+    1. chrome必需要安装standalone版本：[https://www.google.com/chrome/browser/desktop/index.html?system=true&standalone=1](https://www.google.com/chrome/browser/desktop/index.html?system=true&standalone=1)
     2. 使用频率比较低的浏览器，建议硬件配置可以适当降低
     3. 2008如果默认安装的是IE10浏览器，可以从安装补丁上卸载，从而降级到IE8，但是没办法降级到IE6或IE7
     4. 建议在任务计划程序中添加每周磁盘碎片整理，以保持最高工作性能

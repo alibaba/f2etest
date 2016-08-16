@@ -7,308 +7,51 @@
     <title><%=siteName + ' - ' + siteAbout%></title>
     <link rel="icon" type="image/icon" href="<%=siteIcon%>">
     <link rel="stylesheet" type="text/css" href="css/index.css" />
-    <style type="text/css">
-        @font-face {
-            font-family:'anticon';src:url('/font/anticon.woff') format('woff');
-        }
-        table {
-            border-collapse: collapse;
-            border: 1px solid #eee;
-            border-bottom: 2px solid #00cccc;
-
-        }
-        table th, table td {
-            color: #666;
-            border: 1px solid #eee;
-            padding: 12px 35px;
-            border-collapse: collapse;
-        }
-        table th {
-            background: #00cccc;
-            color: #fff;
-            text-transform: uppercase;
-            font-size: 12px;
-        }
-        table th.last {
-            border-right: none;
-        }
-        tbody tr{
-            cursor: pointer;
-            opacity: 1;
-            background: #fff;
-        }
-        tbody tr:hover{
-            opacity: 0.8;
-        }
-        .browser{
-            width: 30px;
-            height: 30px;
-            vertical-align: middle;
-        }
-        .tester{
-            width: 30px;
-            height: 30px;
-        }
-        .status{
-            width: 24px;
-            height: 24px;
-            vertical-align: middle;
-        }
-        .passed{
-            color: green;
-        }
-        .failed{
-            color: #990000;
-        }
-
-        .pagination {
-            -webkit-user-select: none;
-            -moz-user-select: none;
-            -ms-user-select: none;
-            user-select: none;
-            font-size: 12px
-        }
-
-        .pagination:after {
-            content: " ";
-            display: block;
-            height: 0;
-            clear: both;
-            overflow: hidden;
-            visibility: hidden
-        }
-
-        .pagination-item {
-            cursor: pointer;
-            border-radius: 6px;
-            text-align: center;
-            list-style: none;
-            float: left;
-            border: 1px solid #d9d9d9;
-            background-color: #fff;
-            margin-right: 8px;
-            font-family: Arial
-        }
-
-        .pagination-item a {
-            text-decoration:none;
-            color: #666;
-            -webkit-transition: none;
-            transition: none;
-            display: block;
-            min-width: 28px;
-            height: 28px;
-            line-height: 28px;
-        }
-
-        #doc-area .pagination a{
-            text-decoration:none;
-        }
-
-        .pagination-item:hover {
-            -webkit-transition: all .3s ease;
-            transition: all .3s ease;
-            border-color: #2db7f5;
-        }
-
-        .pagination-item:hover a {
-            color: #2db7f5
-        }
-
-        .pagination-item-active {
-            background-color: #2db7f5;
-            border-color: #2db7f5
-        }
-
-        .pagination-item-active a,.pagination-item-active:hover a {
-            color: #fff
-        }
-
-        .pagination-more:after {
-            content: "\2022\2022\2022";
-            display: block;
-            letter-spacing: 2px;
-            color: #ccc;
-            width: 28px;
-            text-align: center
-        }
-
-        .pagination-prev,.pagination-more {
-            margin-right: 8px
-        }
-
-        .pagination-prev,.pagination-next,.pagination-more {
-            font-family: Arial;
-            color: #fff;
-            border-radius: 6px;
-            list-style: none;
-            float: left;
-            text-align: center;
-            transition: all .3s ease;
-            display: inline-block
-        }
-
-        .pagination-prev,.pagination-next {
-            border: 1px solid #d9d9d9
-        }
-
-        .pagination-prev a,.pagination-next a {
-            display: block;
-            min-width: 28px;
-            height: 28px;
-            line-height: 28px;
-            color: #fff;
-        }
-
-        .pagination-prev a:after,.pagination-next a:after {
-            display: inline-block;
-            font-size: 12px;
-            transform: scale(.66666667) rotate(0deg);
-            display: block;
-            height: 26px;
-            line-height: 26px;
-            font-family: "anticon";
-            text-align: center;
-        }
-
-        :root .pagination-prev a:after,:root .pagination-next a:after {
-            filter: none
-        }
-
-        :root .pagination-prev a:after,:root .pagination-next a:after {
-            font-size: 12px
-        }
-
-        .pagination-prev:hover,.pagination-next:hover {
-            border-color: #2db7f5
-        }
-
-        .pagination-prev:hover a,.pagination-next:hover a {
-            color: #2db7f5;
-        }
-
-        .pagination-prev a:after {
-            margin-top: -0.5px;
-            content: "\E601";
-            display: block
-        }
-
-        .pagination-next a:after {
-            content: "\E600";
-            display: block
-        }
-    </style>
+    <link rel="stylesheet" type="text/css" href="css/hljs.min.css" />
     <script type="text/javascript" src="js/jquery-1.8.3.min.js"></script>
+    <script type="text/javascript" src="js/highlight.min.js"></script>
 </head>
 <body>
     <% include header.html %>
     <div id="doc-container">
         <div id="doc-bg"></div>
         <div id="doc-area">
-            <h3>Js单元测试云</h3>
-            <p>这是基于F2etest WebDriver云实现的一款前端Js单元测试持续集成的云平台，调用我们的客户端或API，即可简单的在云端运行您的Js单元测试，并且在云上可视化的查看测试结果及代码覆盖率。</p>
-            <p>具有以下特点：</p>
+            <h3>Js单元测试</h3>
+            <p>JS单元测试对于JS组件是最基础的质量覆盖手段，逻辑越复杂，使用率越高，单元测试的编写价值就越大。</p>
+            <p>这里我们介绍下基于Karma配合F2etest的执行机来实现JS单元测试的多浏览器持续集成：</p>
             <ol>
-                <li>真实WebDriver执行机：每次运行均为空白的真实浏览器环境，多个任务间完全隔离，不会相互影响</li>
-                <li>便携的远程可视化调试：可以直接远程连接到执行机，进行可视化的调试</li>
-                <li>支持用例详情查看：可以在云端方便的查看用例测试详情，对测试结果了如指掌</li>
-                <li>支持JS代码覆盖率：云端可视化查看覆盖率结果，支持压缩代码美化，方便对压缩代码的覆盖率检测</li>
-                <li>支持hosts绑定：每个任务可运行在自己的hosts环境下，互不影响</li>
-                <li>支持以下主流JS单元测试框架：<a href="https://mochajs.org/" target="_blank">Mocha</a>, <a href="http://jasmine.github.io/" target="_blank">Jasmine</a>, <a href="https://qunitjs.com/" target="_blank">QUnit</a>，将来可以方便的适配更多单测框架</li>
+                <li>安装开发依赖：> npm i mocha karma karma-mocha karma-mocha-reporter karma-expect karma-coverage karma-chrome-launcher karma-webdriver-launcher --save-dev</li>
+                <li>下载：<a href="/karma.conf.js">karma.conf.js</a></li>
+                <li>
+                    编辑:package.json
+                    <pre><code>{
+  ...
+  "scripts": {
+    "test": "./node_modules/.bin/karma start",
+    "f2etest": "./node_modules/.bin/karma start --single-run --browsers f2etest-chrome,f2etest-firefox,f2etest-ie8,f2etest-ie9,f2etest-ie10,f2etest-ie11"
+  }
+  ...
+}</code></pre>
+                </li>
+                <li>
+                    新建测试用例：test/test.spec.js
+                    <pre><code>describe('测试用例', function () {
+    it('1等于1', function () {
+        expect(1).to.equal(1);
+        console.log('logtest');
+    });
+});</code></pre>
+                </li>
+                <li>开发运行：> npm run test (连接本地Chrome浏览器，监听文件变更并自动触发单元测试，并显示覆盖率情况)</li>
+                <li>持续集成运行：> npm run f2etest (在远端多个浏览器中同时执行单元测试，并获取覆盖率数据)</li>
             </ol>
-            <h3>怎么使用？</h3>
-            <ol>
-                <li>NodeJs客户端：您可以非常简单的使用我们的功能，使用方法请查看<a href="/jsunit_nodejs">NodeJs客户端</a></li>
-                <li>其它语言场景：其它语言场景，请参考<a href="https://github.com/alibaba/f2etest/blob/master/f2etest-jsunit/index.js" target="_blank">我们的代码</a>实现方式，自行调用我们的<a href="/jsunit_api">开放API</a></li>
-                <li>支持的浏览器列表：请查看<a href="/webdriver#wdListTitle">WebDriver云</a></li>
-            </ol>
-            <h3>JsUnit任务队列：</h3>
-            <table>
-                <thead>
-                    <tr>
-                        <th>任务id</th>
-                        <th>单测Url</th>
-                        <th>浏览器</th>
-                        <th>测试框架</th>
-                        <th>测试结果</th>
-                        <th>覆盖率 ( 行 / 分支 / 函数 )</th>
-                        <th>任务时间</th>
-                    </tr>
-                </thead>
-                <tbody id="taskList">
-                    <%taskList.forEach(function(testResult){%>
-                    <tr data-id="<%=testResult.task_id%>">
-                        <td><%=testResult.task_id%></td>
-                        <td><%=testResult.url%></td>
-                        <td><img src="/imgs/app/<%=testResult.appId%>.png" class="browser" title="<%=testResult.appName%>"> <%=testResult.appName%></td>
-                        <td>
-                            <%if(testResult.run_status===1){%>
-                                <img src="/imgs/test/<%=testResult.test_type%>.png" class="tester" title="<%=testResult.test_type%>">
-                            <%}else if(testResult.run_status===2){%>
-                                <img src="/imgs/test/failed.png" title="status">
-                            <%}else{%>
-                                <img src="/imgs/test/running.gif" class="tester" title="status">
-                            <%}%>
-                        <td class="<%=testResult.test_success===1?'passed':'failed'%>">
-                            <%if(testResult.run_status===1){%>
-                                <img src="/imgs/test/<%=testResult.test_success===1?'passed':'failed'%>.png" class="status" /> <%=testResult.test_ratio%>% ( <%=testResult.test_passed_count%> / <%=testResult.test_all_count%> )
-                            <%}else if(testResult.run_status===2){%>
-                                <img src="/imgs/test/failed.png" title="status">
-                            <%}else{%>
-                                <img src="/imgs/test/running.gif" class="tester" title="status">
-                            <%}%>
-                        </td>
-                        <td>
-                            <%if(testResult.run_status===1){%>
-                                <%=testResult.line_cover%>% / <%=testResult.branch_cover%>% / <%=testResult.function_cover%>%
-                            <%}else if(testResult.run_status===2){%>
-                                <img src="/imgs/test/failed.png" title="status">
-                            <%}else{%>
-                                <img src="/imgs/test/running.gif" class="tester" title="status">
-                            <%}%>
-                        </td>
-                        <td><%=testResult.add_time%></td>
-                    </tr>
-                    <%})%>
-                </tbody>
-            </table>
-            <ul class="pagination" unselectable="unselectable">
-                <%if(page>1){%>
-                <li title="上一页" class="pagination-prev"><a href="/jsunit?page=<%=page-1%>"></a></li>
-                <%}%>
-                <%if(leftPage>1){%>
-                <li title="1" class="pagination-item"><a href="/jsunit?page=1">1</a></li>
-                <%}%>
-                <%if(leftPage>2){%>
-                <li class="pagination-more"></li>
-                <%}%>
-                <%for(var p=leftPage;p<page;p++){%>
-                <li title="<%=p%>" class="pagination-item"><a href="/jsunit?page=<%=p%>"><%=p%></a></li>
-                <%}%>
-                <li title="<%=page%>" class="pagination-item pagination-item-active"><a href="/jsunit?page=<%=page%>"><%=page%></a></li>
-                <%for(var p=page+1;p<=rightPage;p++){%>
-                <li title="<%=p%>" class="pagination-item"><a href="/jsunit?page=<%=p%>"><%=p%></a></li>
-                <%}%>
-                <%if(page+5<maxPage){%>
-                <li class="pagination-more"></li>
-                <%}%>
-                <%if(rightPage<maxPage){%>
-                <li title="<%=maxPage%>" class="pagination-item"><a href="/jsunit?page=<%=maxPage%>"><%=maxPage%></a></li>
-                <%}%>
-                <%if(page<maxPage){%>
-                <li title="下一页" class="pagination-next"><a href="/jsunit?page=<%=page+1%>"></a></li>
-                <%}%>
-                
-            </ul>
-            <script type="text/javascript">
-                var jTaskList = $('#taskList');
-                jTaskList.on('click', 'tr', function(){
-                    var taskId = $(this).data('id');
-                    window.open('/jsunit_result?id='+taskId);
-                });
-            </script>
         </div>
     </div>
+    <script type="text/javascript">
+        $('pre code').each(function(i, block) {
+            hljs.highlightBlock(block);
+        });    
+    </script>
     <% include footer.html %>
 </body>
 </html>

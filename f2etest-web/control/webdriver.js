@@ -38,10 +38,8 @@ module.exports = function(app, config) {
                 }
                 var baseUrl = 'http://'+req.headers.host+req._parsedUrl.pathname.replace(/\/[^\/]+$/,'\/');
                 var icon = baseUrl+'imgs/app/'+browserFilename+'.png';
-                var program = 'c:\\f2etest-webdriver\\webdriver\\opennode.bat '+nodeName+'';
 
                 var guacamoleUrl = siteInfo.guacamoleApi + '?id=c%2F'+nodeIp+'&username='+encodeURIComponent(userid)+'&password='+encodeURIComponent(password)+'&title='+encodeURIComponent(browserName)+'&icon='+encodeURIComponent(icon);
-                guacamoleUrl += '&program='+encodeURIComponent(program);
 
                 res.status(302).redirect(guacamoleUrl);
             }

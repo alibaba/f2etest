@@ -116,26 +116,33 @@ function newWdSession(headers, json, callback){
                     var hostsServerName = 'wdnodes_'+browserId;
                     // 初始化hosts&proxy
                     arrTasks.push(function(callback){
-                        if(proxy){
-                            var arrProxy = proxy.split(':');
-                            hostsServer.setForward(hostsServerName, arrProxy[0], arrProxy[1]);
+                        if(proxy || hosts){
+                            if(proxy){
+                                var arrProxy = proxy.split(':');
+                                hostsServer.setForward(hostsServerName, arrProxy[0], arrProxy[1]);
+                            }
+                            else{
+                                hostsServer.setHosts(hostsServerName, hosts || '');
+                            }
+                            hostsServer.getProxyPort(hostsServerName, function(localIp, workPort){
+                                callback(null, localIp+':'+workPort);
+                            });
                         }
                         else{
-                            hostsServer.setHosts(hostsServerName, hosts || '');
+                            callback(null, null);
                         }
-                        hostsServer.getProxyPort(hostsServerName, function(localIp, workPort){
-                            callback(null, localIp+':'+workPort);
-                        });
                     });
                     // 初始化session
                     arrTasks.push(function(proxy, callback){
                         browserName = browserName === 'ie' ? 'internet explorer' : browserName.toLowerCase();
                         desiredCapabilities.browserName = browserName;
-                        desiredCapabilities.proxy = {
-                            'proxyType': 'manual',
-                            'httpProxy': proxy,
-                            'sslProxy': proxy
-                        };
+                        if(proxy){
+                            desiredCapabilities.proxy = {
+                                'proxyType': 'manual',
+                                'httpProxy': proxy,
+                                'sslProxy': proxy
+                            };
+                        }
                         body = JSON.stringify(json);
                         headers['content-length'] = body.length;
                         headers.host = wdHost+':'+wdPort;

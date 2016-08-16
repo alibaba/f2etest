@@ -127,7 +127,7 @@
     3. 2008如果默认安装的是IE10浏览器，可以从安装补丁上卸载，从而降级到IE8，但是没办法降级到IE6或IE7
     4. 建议在任务计划程序中添加每周磁盘碎片整理，以保持最高工作性能
 
-    IE浏览器安全级别低解决方案：
+    IE浏览器安全级别低解决方案(此步骤非常重要，如果不操作，会出现cookie无法写入)：
 
     1. 以桌面模式连接一个User用户
     2. 按照需要自由配置IE
@@ -182,14 +182,13 @@
 
     hostsShare-client的bat可直接复制f2etest-client/app/中的：`禁用代理.bat`
 
-部署WebDriver云 & JS单元测试云 & 单测云
+部署WebDriver云
 ===========================
 
-1. 开启WebDriver功能：`conf/site.json`中的`wdEnabled`为`true`，此时重启f2etest-web，可以在上方菜单栏上看到：JS单测云 | WebDriver云
+1. 开启WebDriver功能：`conf/site.json`中的`wdEnabled`为`true`，此时重启f2etest-web，可以在上方菜单栏上看到：WebDriver云
 2. 初始化执行机节点：详细安装请查看[f2etest-client/f2etest-webdriver/节点部署教程.md](f2etest-client/f2etest-webdriver/节点部署教程.md)
 
-经过上面的安装过程，我们的WebDriver云及JS单测云即已经部署完成，可以对外服务了。
-
+经过上面的安装过程，我们的WebDriver云即已经部署完成，可以对外服务了。
 
 f2etest v1.0.0系列如何升级到v2.0.0 v3.0.0
 ========================

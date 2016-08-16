@@ -7,44 +7,12 @@ var path = require('path');
 
 module.exports = function(app, config) {
     app.get('/jsunit', function(req, res){
-        var pageSize = 10;
-        var query = req.query;
-        var page = query['page'] || 1;
-        page = parseInt(page, 10);
-        page = page > 0 ? page: 1;
-        var endOffset = pageSize * page;
-        var startOffset = endOffset - pageSize;
-        pool.query('select count(0) as count from wd_jsunit', function(error, rows){
-            var taskCount = rows[0].count;
-            var maxPage = Math.ceil( taskCount / pageSize );
-            pool.query('select task_id,url,browser_name,browser_version,run_status,test_type,test_success,test_passed_count,test_all_count,test_ratio,line_cover,branch_cover,function_cover,add_time from wd_jsunit order by task_id desc limit ?,?', [startOffset, pageSize], function(error, rows){
-                rows.forEach(function(row){
-                    var appId = row.browser_name.toLowerCase() + (row.browser_version || '');
-                    var appName = row.browser_name;
-                    if(row.browser_version){
-                        appName += ' ' + row.browser_version;
-                    }
-                    row.appId = appId;
-                    row.appName = appName;
-                    row.add_time = utils.dateFormat(row.add_time, 'yyyy-MM-dd hh:mm:ss');
-                });
-                var viewData = req.viewData;
-                var user = req.session.user;
-                viewData.userid = user.userid;
-                viewData.navTab = 'jsunit';
-                viewData.navPage = '';
-                viewData.taskList = rows;
-                var leftPage = page - 5;
-                leftPage = leftPage > 0 ? leftPage : 1
-                var rightPage = page + 4;
-                rightPage = rightPage <= maxPage ? rightPage: maxPage;
-                viewData.page = page;
-                viewData.maxPage = maxPage;
-                viewData.leftPage = leftPage;
-                viewData.rightPage = rightPage;
-                res.render('jsunit', viewData);
-            });
-        });
+        var viewData = req.viewData;
+        var user = req.session.user;
+        viewData.userid = user.userid;
+        viewData.navTab = 'jsunit';
+        viewData.navPage = '';
+        res.render('jsunit', viewData);
     });
 
     app.get('/jsunit_result', function(req, res){

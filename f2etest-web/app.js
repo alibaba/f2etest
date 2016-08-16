@@ -87,21 +87,26 @@ app.use(function(req ,res, next){
             wdEnabled: siteInfo.wdEnabled
         };
         pool.query('select RemotePassword,ApiKey from appUsers where UserId = ?;', userid, function(err, rows){
-            if(rows.length > 0){
-                var remotePassword = rows[0].RemotePassword;
-                user.remotePassword = remotePassword;
-                user.apiKey = rows[0].ApiKey;
-                req.viewData.remoteInited = remotePassword?true:false;
-                pool.query('update appUsers set LastTime = now(),LastIp = ? where UserId = ?', [req.ip,userid]);
-                next();
+            if(rows){
+                if(rows.length > 0){
+                    var remotePassword = rows[0].RemotePassword;
+                    user.remotePassword = remotePassword;
+                    user.apiKey = rows[0].ApiKey;
+                    req.viewData.remoteInited = remotePassword?true:false;
+                    pool.query('update appUsers set LastTime = now(),LastIp = ? where UserId = ?', [req.ip,userid]);
+                    next();
+                }
+                else{
+                    user.remotePassword = null;
+                    req.viewData.remoteInited = false;
+                    // 创建新用户
+                    pool.query('insert into appUsers set ?', {UserId: userid}, function(){
+                        next();
+                    });
+                }
             }
             else{
-                user.remotePassword = null;
-                req.viewData.remoteInited = false;
-                // 创建新用户
-                pool.query('insert into appUsers set ?', {UserId: userid}, function(){
-                    next();
-                });
+                console.log(err);
             }
         });
     }

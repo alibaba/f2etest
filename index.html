@@ -28,7 +28,10 @@
 
 <p>注：F2e test = Front to End Test = 前端测试</p>
 
-<p>在之前，我们一般有三种解决方案：</p>
+<h1>
+<a id="浏览器云" class="anchor" href="#%E6%B5%8F%E8%A7%88%E5%99%A8%E4%BA%91" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>浏览器云</h1>
+
+<p>在之前，多浏览器兼容性人肉测试，我们一般有三种解决方案：</p>
 
 <ol>
 <li>本机安装大量的虚拟机，一个浏览器一个虚拟机，优点：真实，缺点：消耗硬盘资源，消耗CPU资源，打开慢，无法同时打开多个虚拟机</li>
@@ -61,312 +64,7 @@
 </ol>
 
 <h1>
-<a id="成功案例" class="anchor" href="#%E6%88%90%E5%8A%9F%E6%A1%88%E4%BE%8B" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>成功案例</h1>
-
-<p><a href="http://www.alibabagroup.com/"><img src="https://raw.githubusercontent.com/alibaba/f2etest/master/imgs/alibaba.png" alt="imgs/alibaba.png"></a></p>
-
-<p>如果您使用了我们的解决方案，请联系我们添加在此处。</p>
-
-<h1>
-<a id="产品截图" class="anchor" href="#%E4%BA%A7%E5%93%81%E6%88%AA%E5%9B%BE" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>产品截图</h1>
-
-<p><img src="https://raw.githubusercontent.com/alibaba/f2etest/master/imgs/screenshot1.jpg" alt="imgs/screenshot1.jpg"></p>
-
-<p><img src="https://raw.githubusercontent.com/alibaba/f2etest/master/imgs/screenshot2.jpg" alt="imgs/screenshot2.jpg"></p>
-
-<p>Chrome插件:</p>
-
-<p><img src="https://raw.githubusercontent.com/alibaba/f2etest/master/imgs/chrome.png" alt="imgs/chrome.png"></p>
-
-<p>Windows:</p>
-
-<p><img src="https://raw.githubusercontent.com/alibaba/f2etest/master/imgs/windows.jpg" alt="imgs/windows.jpg"></p>
-
-<p>Mac:</p>
-
-<p><img src="https://raw.githubusercontent.com/alibaba/f2etest/master/imgs/mac.jpg" alt="imgs/mac.jpg"></p>
-
-<h1>
-<a id="安全风险警示非常重要" class="anchor" href="#%E5%AE%89%E5%85%A8%E9%A3%8E%E9%99%A9%E8%AD%A6%E7%A4%BA%E9%9D%9E%E5%B8%B8%E9%87%8D%E8%A6%81" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>安全风险警示(非常重要)</h1>
-
-<p>由于本系统基于Windows Server体系搭建，因此系统的安全性完全取决于部署人的安全部署能力。</p>
-
-<p>如果您希望部署本系统，请确保以下几点：</p>
-
-<ol>
-<li>严禁将本系统部署在公网环境，仅可部署在内网环境中使用，作为内部测试用途</li>
-<li>请将Windows Server服务端升级到最新版本及补丁，以保证没有出现安全漏洞</li>
-<li>请将User用户之间做到完全隔离，仅提供User用户文件的访问权限，别的任何权限请勿多余授权</li>
-<li>请将f2etest-client仅设置为管理员拥有权限，防止API接口被恶意访问</li>
-</ol>
-
-<h1>
-<a id="安装" class="anchor" href="#%E5%AE%89%E8%A3%85" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>安装</h1>
-
-<p>安装前请加QQ交流群： 416221937 有任何问题请至群中咨询。(加入群时验证信息请填写：城市名+公司名，例如：杭州+阿里巴巴)</p>
-
-<ol>
-<li>
-<p>安装nodejs</p>
-
-<p>安装请访问官网：<a href="https://nodejs.org/">https://nodejs.org/</a>，如果已安装好，请略过。</p>
-</li>
-<li>
-<p>下载f2etest代码</p>
-
-<pre><code>git clone https://github.com/alibaba/f2etest.git
-</code></pre>
-
-<p>clone后，会发现以下几个目录：</p>
-
-<ol>
-<li>
-<code>f2etest-web</code>: f2etest的WEB站点，用来提供f2etest服务，用户最终就是访问这个站点使用f2etest</li>
-<li>
-<code>f2etest-guacamole</code>: 这是我们定制过的开源版本，方便f2etest进行调用</li>
-<li>
-<code>f2etest-client</code>: f2etest的执行机客户端站点，主要提供API给f2etest-web使用，用来同步用户账号</li>
-<li>
-<code>hostsShare-client</code>: 安装在f2etest远程环境中的客户端，用来修改f2etest-web上的hosts绑定</li>
-<li>
-<code>f2etest-local</code>: 用来在本机安装代理服务器，并将f2etest所有访问反向代理到本地，以共享本机的hosts绑定，本组件已发布至npm，无需安装，详细使用请至系统内查看帮助</li>
-<li>
-<code>f2etest-chrome</code>: chrome浏览器下的客户端，无需打开f2etest网站，即可访问f2etest中的所有APP，本组件已发布至chrome官方市场，无需安装，详细使用请至系统内查看帮助</li>
-</ol>
-
-<p>下面分别针对前4个组件，会有针对性的安装教程。</p>
-
-<p>我们建议将1，2组件安装在同一台Linux服务器上，操作系统为CentOs。</p>
-</li>
-<li>
-<p>安装f2etest-guacamole</p>
-
-<p>f2etest-guacamole是定制版本的guacamole，安装方法请查看：<a href="./f2etest-guacamole/Install.md">Install Guacamole</a></p>
-</li>
-<li>
-<p>安装mysql</p>
-
-<p>安装mysql: <a href="https://www.mysql.com/">https://www.mysql.com/</a>，如果已安装好，请略过安装步骤。</p>
-
-<p>新建库：f2etest</p>
-
-<p>初始化表结构：f2etest-web/f2etest.sql</p>
-</li>
-<li>
-<p>配置f2etest-web</p>
-
-<p>初始化f2etest-web</p>
-
-<pre><code>cd f2etest-web
-npm install
-</code></pre>
-
-<p>修改conf/site.json：</p>
-
-<ol>
-<li>port: 站点监听端口号</li>
-<li>name: 站点名称，修改为自己站点名称</li>
-<li>about: 站点介绍，显示在网页title后面，修改为自己的站点介绍</li>
-<li>icon: 站点icon，默认不需要修改</li>
-<li>dbHost: 数据库连接信息，修改为mysql服务器IP地址</li>
-<li>dbUser: 同上</li>
-<li>dbPass: 同上</li>
-<li>dbTable: 同上</li>
-<li>clientApiKey: f2etest远程桌面客户端的ApiKey，正确的ApiKey才能访问远程的API，用来创建当前用户的账号，请更改为随机值，并保持和f2etest-client中的值一致</li>
-<li>guacamoleApi: guacamole的API，请修改为上面第3步安装完成的API</li>
-<li>footer: 根据需要修改</li>
-<li>statNav: 如果需要自行扩展统计页面，根据需要修改</li>
-</ol>
-
-<p>修改conf/server.json：</p>
-
-<blockquote>
-<p>这里的id必需要与f2etest-guacamole中的名字保持一致</p>
-
-<p>2003系统不支持remoteApp，2008以上Server系统支持</p>
-</blockquote>
-
-<p>修改conf/app.json：</p>
-
-<blockquote>
-<p>这里的server必需为server.json中已配置的id。program为可选参数，如果不填则直接连接桌面。</p>
-</blockquote>
-
-<p>修改<code>lib/sso.js</code>：</p>
-
-<blockquote>
-<p>由于f2etest系统要求必需是登录用户才能访问，因此必需要对接SSO系统才能工作。</p>
-
-<p>请参考现有的<code>sso.js</code>文件进行修改，对接到您公司内部SSO系统。</p>
-</blockquote>
-
-<p>启动f2etest-web服务：</p>
-
-<pre><code>node app.js
-</code></pre>
-
-<p>启动成功后，可以发现WEB服务默认工作在：3000端口号</p>
-
-<p>小建议：</p>
-
-<ol>
-<li>为了方便用户使用，建议安装nginx等软件做反向代理，将80端口反向到3000端口，以将3000端口号隐藏起来。</li>
-<li>建议使用pm2或forever等组件实现系统开机自动运行。</li>
-</ol>
-</li>
-<li>
-<p>安装windows server机群</p>
-
-<ul>
-<li>1号机：Server 2003: IE6</li>
-<li>2号机：Server 2003: IE7</li>
-<li>3号机：Server 2008: IE8</li>
-<li>4号机：Server 2008: IE9</li>
-<li>5号机：Server 2008: IE10</li>
-<li>6号机：Server 2008: IE11</li>
-</ul>
-
-<p>将来如果出现新的浏览器，可以即时增加新的服务器，用来部署新浏览器或软件。</p>
-
-<p>如果在现有运行一段时间的系统中部署新服务器，请访问以下URL来同步所有账号：<code>http://f2etest.xxx.com/syncAllRemoteUsers</code></p>
-
-<p>由于Server 2008可安装的最低IE版本是8，因此IE6和IE7只能安装在Server 2003系统中。</p>
-
-<p>安装软件及配置：</p>
-
-<ol>
-<li>远程桌面会话主机：授权模式请选择按用户，会话请选择5分钟自动结束，空闲会话不允许超过6小时，颜色限制最大24位色</li>
-<li>远程桌面授权：必需要进行正确激活并安装授权，安装时请选择企业授权，并按用户授权</li>
-<li>IIS：用来部署f2etest-client，由于我们的脚本使用asp编写，因此请安装asp相关支持组件</li>
-<li>设置当前主机每天凌晨自动重启：防止开机久了，系统出现不稳定</li>
-<li>用户组配置：请将Authenticated Users添加到Remote Desktop Users，允许普通用户可以登录远程</li>
-<li>配置Remote App：如果是2008操作系统，需要将被远程的程序添加到Remote App，否则无法远程，添加快捷方式时请选择：允许任何命令行参数</li>
-<li>安装周边软件：输入法，Flash等</li>
-</ol>
-
-<p>提示及注意事项：</p>
-
-<ol>
-<li>chrome由于和远程桌面有点小冲突，必需安装在2003操作系统中</li>
-<li>使用频率比较低的浏览器，建议硬件配置可以适当降低</li>
-<li>2008如果默认安装的是IE10浏览器，可以从安装补丁上卸载，从而降级到IE8，但是没办法降级到IE6或IE7</li>
-<li>建议在任务计划程序中添加每周磁盘碎片整理，以保持最高工作性能</li>
-</ol>
-
-<p>IE浏览器安全级别低解决方案：</p>
-
-<ol>
-<li>以桌面模式连接一个User用户</li>
-<li>按照需要自由配置IE</li>
-<li>打开<code>regedit</code>，导出<code>HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Internet Settings\</code>为<code>c:\ie.reg</code>
-</li>
-<li>切换为<code>administrator</code>用户</li>
-<li>用文本软件打开<code>c:\ie.reg</code>，替换<code>HKEY_CURRENT_USER</code>为<code>HKEY_Users\Default</code>
-</li>
-<li>打开<code>regedit</code>，注册表编辑器中选择节点：<code>HKEY_USERS</code>，文件菜单-&gt;<code>加载配置单元</code>，选择<code>C:\Users\Default\NTUser.dat</code>，项名称输入：<code>Default</code>
-</li>
-<li>双击<code>c:\ie.reg</code>导入注册表</li>
-<li>在注册表编辑器中选择刚才加载的配置单元：<code>Default</code>，文件菜单-&gt;<code>卸载配置单元</code>，并确认上载</li>
-</ol>
-
-<p>如何在每台服务器全局添加可信的根证书：</p>
-
-<ol>
-<li>命令行打开<code>mmc</code>
-</li>
-<li>菜单-&gt;<code>添加/删除管理单元</code>, 并选择：<code>证书</code>
-</li>
-<li>下一步选择：<code>计算机帐户</code>，再点击下一步</li>
-<li>在<code>受信任的根证书颁发机构</code>的<code>证书</code>栏目中添加CA即可</li>
-</ol>
-</li>
-<li>
-<p>部署<code>f2etest-client\f2etest-browsers</code></p>
-
-<p>请将<code>f2etest-client\f2etest-browsers</code>复制到<code>c:\f2etest-browsers\</code>。</p>
-
-<p>确保如下路径：<code>c:\f2etest-browsers\www\</code></p>
-
-<p>然后做如下操作：</p>
-
-<ol>
-<li>将curl的路径添加到系统变量的PATH路径中，以供APP快捷方式调用</li>
-<li>添加IIS站点：<code>c:\f2etest-browsers\www\</code>, 站点必需设置为administrator权限，否则无法工作，并且www目录设置为仅管理员有权限，防止任何人都可以创建账号</li>
-<li>修改setuser.asp中的apiKey，保持和f2etest-web中一致。</li>
-</ol>
-
-<p>每台Server服务器上都需要部署<code>f2etest-client\f2etest-browsers</code>，实现以下两个功能：</p>
-
-<ol>
-<li>提供API给f2etest-web调用，用来初始化用户账号</li>
-<li>远程桌面连接时，需要打开指定的浏览器或软件，并统计相应软件的使用次数</li>
-</ol>
-
-<p>请根据需要选择合适的bat模板，模板中需要修改3处地方：</p>
-
-<ol>
-<li>
-<code>f2etestDomain</code>: 修改为内部部署的f2etest域名</li>
-<li>
-<code>appid</code>: 修改为f2etest-web中配置的相同应用id</li>
-<li>
-<code>打开应用</code>： 替换为应用的程序路径</li>
-</ol>
-
-<p>2008中必需要安装Remote App，并且要在Remote App的设置中：允许任何命令行参数。</p>
-
-<p>如何确定f2etest-client安装成功？</p>
-
-<p>请确保在服务器上访问以下URL(key改为配置好的key)，返回值是ok：<a href="http:/127.0.0.1/setuser.asp?username=test&amp;password=hello123&amp;key=xxx">http:/127.0.0.1/setuser.asp?username=test&amp;password=hello123&amp;key=xxx</a></p>
-</li>
-<li>
-<p>安装hostsShare-client</p>
-
-<p>hostsShare-client基于node-webkit开发，默认已经提供了一个编译版本在build目录中，可以直接部署使用。</p>
-
-<p>本应用使用频率较高，建议选择CPU比较空闲的机器上部署。</p>
-
-<p>hostsShare-client的bat可直接复制f2etest-client/app/中的：<code>禁用代理.bat</code></p>
-</li>
-</ol>
-
-<h1>
-<a id="使用" class="anchor" href="#%E4%BD%BF%E7%94%A8" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>使用</h1>
-
-<ol>
-<li>
-<p>WEB方式</p>
-
-<p>我们基于guacamole实现WEB方式的使用，没有任何学习成本。</p>
-
-<p>详细教程请参考f2etest-web中的帮助信息</p>
-</li>
-<li>
-<p>桌面方式</p>
-
-<p>桌面方式基于TSWF Schema协议实现的分发，目前Windows和MAC下都有完美的协议实现软件。</p>
-
-<p>Win7天然就支持远程TSWF分发技术，Mac下仅需安装<a href="https://itunes.apple.com/us/app/microsoft-remote-desktop/id715768417">Microsoft Remote Desktop</a>，也可完美支持TSWF，注意此软件需要使用英文市场下的id才能安装。</p>
-
-<p>无论是Win7还是Mac，目前都已经完美支持Remote APP技术，实现远程应用本地化的完美体验。</p>
-
-<p>相比较之下，由于桌面方式属于直连，性能上会更加理想，因此我们建议用户使用桌面方式。</p>
-</li>
-</ol>
-
-<h1>
-<a id="初步了解-webdriver云--js单元测试云" class="anchor" href="#%E5%88%9D%E6%AD%A5%E4%BA%86%E8%A7%A3-webdriver%E4%BA%91--js%E5%8D%95%E5%85%83%E6%B5%8B%E8%AF%95%E4%BA%91" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>初步了解 WebDriver云 &amp; JS单元测试云</h1>
-
-<p>f2etest v2.0.0我们添加了WebDriver云 &amp; JS单元测试云两个重要子产品。</p>
-
-<p>在这之前，我们一直都仅仅是一个手工测试的提效平台。</p>
-
-<p>现在，我们终于开始有自动化的功能了。</p>
-
-<h2>
-<a id="我们首先了解下webdriver云" class="anchor" href="#%E6%88%91%E4%BB%AC%E9%A6%96%E5%85%88%E4%BA%86%E8%A7%A3%E4%B8%8Bwebdriver%E4%BA%91" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>我们首先了解下WebDriver云：</h2>
-
-<p><img src="https://raw.githubusercontent.com/alibaba/f2etest/master/imgs/webdriver1.jpg" alt="imgs/webdriver1.jpg"></p>
+<a id="webdriver云" class="anchor" href="#webdriver%E4%BA%91" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>WebDriver云</h1>
 
 <p>WebDriver云利用Windows Server多用户的特性，将执行机的使用效率提升10倍以上。</p>
 
@@ -384,56 +82,93 @@ npm install
 <li>所有节点支持远程在线调试：利用Guacamole的在线远程功能，当自动化出现问题时，我们能非常便利的对自动化进展进行即时监控和调试</li>
 </ol>
 
+<h1>
+<a id="ui-recorder" class="anchor" href="#ui-recorder" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>UI Recorder</h1>
+
+<p>UI Recorder是一款几乎零成本的整体自动化测试解决方案，一次自测等于多次测试，测一个浏览器等于测多个浏览器！</p>
+
+<p>我们的目标：让自测不要重复测！让自动化变成零成本！让自动化持续保障您的业务！</p>
+
+<p>以下是本产品的特点：</p>
+
+<ol>
+<li>自测 = 自动化测试：对于开发人员来讲，自测是开发流程中缺一不可的过程，我们要实现的目标就是自测过程中即可同步的录制出自动化脚本，实现真正的零成本自动化</li>
+<li>无干扰录制：所作操作均无需交互干扰，鼠标、键盘、alert弹框、文件上传，完全按照正常自测流程操作即可(以下操作除外：悬停事件、断言、变量)</li>
+<li>本地生成脚本：录制的脚本存储在用户本机，用户可以自行在录制的基础上进行修改定制，更自由更开放</li>
+<li>丰富的断言：支持以下断言类型，val、text、displayed、enabled、selected、attr、css、url、title、cookie、localStorage、sessionStorage</li>
+<li>支持数据Mock：我们支持Faker变量功能，支持强大的数据Mock</li>
+<li>支持公共用例: 用例之间允许相互引用，可以将某些公用的操作步骤录制为公用用例，以进一步提升录制效率</li>
+<li>支持执行截图：每次执行后，允许生成截图日志，以方便出问题时排查诊断</li>
+</ol>
+
+<p>要了解详细细节，可以查看我们的视频教程：<a href="http://v.youku.com/v_show/id_XMTY4NTk5NjI4MA==.html">http://v.youku.com/v_show/id_XMTY4NTk5NjI4MA==.html</a></p>
+
+<p>UI Recorder目前已经对F2etest进行了解偶，在非F2etest环境下也可以使用，只要是标准WebDriver协议就行。</p>
+
+<p>仓库地址： <a href="https://github.com/alibaba/uirecorder">https://github.com/alibaba/uirecorder</a></p>
+
+<h1>
+<a id="成功案例" class="anchor" href="#%E6%88%90%E5%8A%9F%E6%A1%88%E4%BE%8B" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>成功案例</h1>
+
+<p><a href="http://www.alibabagroup.com/"><img src="https://raw.githubusercontent.com/alibaba/f2etest/master/imgs/alibaba.png" alt="imgs/alibaba.png"></a></p>
+
+<p>如果您使用了我们的解决方案，请联系我们添加在此处。</p>
+
+<h1>
+<a id="产品截图" class="anchor" href="#%E4%BA%A7%E5%93%81%E6%88%AA%E5%9B%BE" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>产品截图</h1>
+
 <h2>
-<a id="再来了解下js单元测试云" class="anchor" href="#%E5%86%8D%E6%9D%A5%E4%BA%86%E8%A7%A3%E4%B8%8Bjs%E5%8D%95%E5%85%83%E6%B5%8B%E8%AF%95%E4%BA%91" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>再来了解下JS单元测试云：</h2>
+<a id="浏览器云-1" class="anchor" href="#%E6%B5%8F%E8%A7%88%E5%99%A8%E4%BA%91-1" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>浏览器云</h2>
 
-<p>任务队列：</p>
+<p><img src="https://raw.githubusercontent.com/alibaba/f2etest/master/imgs/screenshot1.jpg" alt="imgs/screenshot1.jpg"></p>
 
-<p><img src="https://raw.githubusercontent.com/alibaba/f2etest/master/imgs/jsunit1.jpg" alt="imgs/jsunit1.jpg"></p>
+<p><img src="https://raw.githubusercontent.com/alibaba/f2etest/master/imgs/screenshot2.jpg" alt="imgs/screenshot2.jpg"></p>
 
-<p>任务详情页面：</p>
+<p>Chrome插件:</p>
 
-<p><img src="https://raw.githubusercontent.com/alibaba/f2etest/master/imgs/jsunit2.jpg" alt="imgs/jsunit2.jpg"></p>
+<p><img src="https://raw.githubusercontent.com/alibaba/f2etest/master/imgs/chrome.png" alt="imgs/chrome.png"></p>
 
-<p>代码覆盖率：</p>
+<p>Windows:</p>
 
-<p><img src="https://raw.githubusercontent.com/alibaba/f2etest/master/imgs/jsunit3.jpg" alt="imgs/jsunit3.jpg"></p>
+<p><img src="https://raw.githubusercontent.com/alibaba/f2etest/master/imgs/windows.jpg" alt="imgs/windows.jpg"></p>
 
-<p>命令行客户端：</p>
+<p>Mac:</p>
 
-<p><img src="https://raw.githubusercontent.com/alibaba/f2etest/master/imgs/jsunit4.jpg" alt="imgs/jsunit4.jpg"></p>
+<p><img src="https://raw.githubusercontent.com/alibaba/f2etest/master/imgs/mac.jpg" alt="imgs/mac.jpg"></p>
 
-<p>f2etest JS单测云，相比较互联网上现有的JS单测自动化解决方案，我们具有以下特点：</p>
+<h2>
+<a id="webdriver云-1" class="anchor" href="#webdriver%E4%BA%91-1" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>WebDriver云</h2>
+
+<p><img src="https://raw.githubusercontent.com/alibaba/f2etest/master/imgs/webdriver1.jpg" alt="imgs/webdriver1.jpg"></p>
+
+<h2>
+<a id="karma--f2etest" class="anchor" href="#karma--f2etest" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Karma + F2etest</h2>
+
+<p><img src="https://raw.githubusercontent.com/alibaba/f2etest/master/imgs/jsunit.png" alt="imgs/jsunit.png"></p>
+
+<h2>
+<a id="ui-recorder-1" class="anchor" href="#ui-recorder-1" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>UI Recorder</h2>
+
+<p>UI Recorder请查看视频教程：<a href="http://v.youku.com/v_show/id_XMTY4NTk5NjI4MA==.html">http://v.youku.com/v_show/id_XMTY4NTk5NjI4MA==.html</a></p>
+
+<h1>
+<a id="安全风险警示非常重要" class="anchor" href="#%E5%AE%89%E5%85%A8%E9%A3%8E%E9%99%A9%E8%AD%A6%E7%A4%BA%E9%9D%9E%E5%B8%B8%E9%87%8D%E8%A6%81" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>安全风险警示(非常重要)</h1>
+
+<p>由于本系统基于Windows Server体系搭建，因此系统的安全性完全取决于部署人的安全部署能力。</p>
+
+<p>如果您希望部署本系统，请确保以下几点：</p>
 
 <ol>
-<li>真实WebDriver执行机：每次运行均为空白的真实浏览器环境，多个任务间完全隔离，不会相互影响</li>
-<li>便携的远程可视化调试：可以直接远程连接到执行机，进行可视化的调试</li>
-<li>支持用例详情查看：可以在云端方便的查看用例测试详情，对测试结果了如指掌</li>
-<li>支持JS代码覆盖率：云端可视化查看覆盖率结果，支持压缩代码美化，方便对压缩代码的覆盖率检测</li>
-<li>支持hosts绑定：每个任务可运行在自己的hosts环境下，互不影响</li>
-<li>支持以下主流JS单元测试框架：Mocha, Jasmine, QUnit，将来可以方便的适配更多单测框架</li>
+<li>严禁将本系统部署在公网环境，仅可部署在内网环境中使用，作为内部测试用途</li>
+<li>请将Windows Server服务端升级到最新版本及补丁，以保证没有出现安全漏洞</li>
+<li>请将User用户之间做到完全隔离，仅提供User用户文件的访问权限，别的任何权限请勿多余授权</li>
+<li>请将f2etest-client仅设置为管理员拥有权限，防止API接口被恶意访问</li>
 </ol>
 
 <h1>
-<a id="如何部署webdriver云--js单元测试云" class="anchor" href="#%E5%A6%82%E4%BD%95%E9%83%A8%E7%BD%B2webdriver%E4%BA%91--js%E5%8D%95%E5%85%83%E6%B5%8B%E8%AF%95%E4%BA%91" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>如何部署WebDriver云 &amp; JS单元测试云？</h1>
+<a id="安装教程" class="anchor" href="#%E5%AE%89%E8%A3%85%E6%95%99%E7%A8%8B" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>安装教程</h1>
 
-<ol>
-<li>开启WebDriver功能：<code>conf/site.json</code>中的<code>wdEnabled</code>为<code>true</code>，此时重启f2etest-web，可以在上方菜单栏上看到：JS单测云 | WebDriver云</li>
-<li>初始化执行机节点：详细安装请查看<a href="f2etest-client/f2etest-webdriver/%E8%8A%82%E7%82%B9%E9%83%A8%E7%BD%B2%E6%95%99%E7%A8%8B.md">f2etest-client/f2etest-webdriver/节点部署教程.md</a>
-</li>
-<li>将安装好的节点以及浏览器添加至数据库中：wd_nodes, wd_browsers</li>
-</ol>
-
-<p>经过上面的安装过程，我们的WebDriver云及JS单测云即已经部署完成，可以对外服务了。</p>
-
-<h1>
-<a id="f2etest-v100系列如何升级到v200" class="anchor" href="#f2etest-v100%E7%B3%BB%E5%88%97%E5%A6%82%E4%BD%95%E5%8D%87%E7%BA%A7%E5%88%B0v200" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>f2etest v1.0.0系列如何升级到v2.0.0</h1>
-
-<ol>
-<li>导入<code>f2etest-web/f2etest.sql</code>中的wd_开头的表初始化代码</li>
-<li>更新f2etest-web到v2.0.0版本</li>
-<li>按照上面的部署教程进行部署</li>
-</ol>
+<p>安装请前往安装教程页面：<a href="INSTALL.md">INSTALL.md</a></p>
 
 <h1>
 <a id="感谢" class="anchor" href="#%E6%84%9F%E8%B0%A2" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>感谢</h1>
@@ -452,8 +187,6 @@ npm install
 <li>jwebdriver: <a href="https://github.com/yaniswang/jWebDriver">https://github.com/yaniswang/jWebDriver</a>
 </li>
 <li>mysql: <a href="https://github.com/felixge/node-mysql">https://github.com/felixge/node-mysql</a>
-</li>
-<li>pagejsunit: <a href="https://github.com/yaniswang/pageJsUnit">https://github.com/yaniswang/pageJsUnit</a>
 </li>
 <li>request: <a href="https://github.com/request/request">https://github.com/request/request</a>
 </li>

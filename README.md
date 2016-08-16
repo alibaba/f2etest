@@ -113,7 +113,7 @@ WebDriver云
 Karma + F2etest
 --------------------
 
-![imgs/jsunit.png](imgs/jsunit.png)
+![imgs/jsunit.png](https://raw.githubusercontent.com/alibaba/f2etest/master/imgs/jsunit.png)
 
 UI Recorder
 ---------------------

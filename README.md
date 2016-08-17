@@ -72,9 +72,22 @@ UI Recorder是一款几乎零成本的整体自动化测试解决方案，一次
 
 要了解详细细节，可以查看我们的视频教程：[http://v.youku.com/v_show/id_XMTY4NTk5NjI4MA==.html](http://v.youku.com/v_show/id_XMTY4NTk5NjI4MA==.html)
 
-UI Recorder目前已经对F2etest进行了解偶，在非F2etest环境下也可以使用，只要是标准WebDriver协议就行。
+UI Recorder目前已经对F2etest进行了解偶，在非F2etest环境下也可以使用，只要是标准WebDriver协议就可以支持。
+
+但是，我们更建议UI Recorder配合F2etest的WebDriver云来使用，更低的执行机成本，更强大的调试功能。
+
+具体如何配合使用，F2etest部署完成，打开F2etest-Web后，可以看到详细使用说明。
 
 仓库地址： [https://github.com/alibaba/uirecorder](https://github.com/alibaba/uirecorder)
+
+Karma + F2etest
+=================================
+
+Karma是由Google开源的JS单元测试执行过程管理工具，这是一款异常强大并且高可扩展性的测试工具，拥有一个非常活跃且完善的生态圈。
+
+Karma支持运行在任何WebDriver协议的浏览器上，因此结合F2etest提供的WebDriver云，就可以批量快速的运行在大量的浏览器上，从而满足单元测试的多浏览器测试需求。
+
+具体如何配置，F2etest-Web中可以看到详细的教程，并且我们提供了完整的配置文件下载。
 
 成功案例
 =================================

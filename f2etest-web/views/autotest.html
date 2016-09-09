@@ -81,6 +81,12 @@
                 <li>标准业务用例，文件名建议使用：<strong>xxx.spec.js</strong></li>
                 <li>批量执行业务用例：<strong>mocha test/*.spec.js</strong></li>
             </ol>
+            <h3>如何录制文件上传？</h3>
+            <ol>
+                <li>UI Recorder仅支持原生file控件，不支持FLASH</li>
+                <li>原生file控件必需处在顶层，不允许被别的div等DOM覆盖</li>
+                <li>文件约定路径: c:\uploadFiles\，请保证录制机的文件列表和执行机的文件列表一致</li>
+            </ol>
         </div>
     </div>
     <script type="text/javascript">

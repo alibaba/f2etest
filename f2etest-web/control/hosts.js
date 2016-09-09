@@ -125,7 +125,7 @@ module.exports = function(app, config) {
     });
 
     // pac接口，为浏览器提供动态代理
-    app.all('/getHostsPac', function(req, res) {
+    app.all(['/getHostsPac','/getHosts.pac'], function(req, res) {
         var query = req.query;
         var body = req.body;
         var name = query['name'] || '';

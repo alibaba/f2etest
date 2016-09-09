@@ -19,7 +19,7 @@ if exist "\\tsclient\G\Download" (
 rem 开启代理
 set proxypath="HKCU\Software\Microsoft\Windows\CurrentVersion\Internet Settings"
 reg add %proxypath% /v "ProxyEnable" /t REG_DWORD /d 0 /f>nul 
-set proxyurl="http://%f2etestDomain%/getHostsPac?name=%USERNAME%"
+set proxyurl="http://%f2etestDomain%/getHosts.pac?name=%USERNAME%"
 reg add %proxypath% /v "AutoConfigURL" /d %proxyurl% /f >nul
 
 rem 打开应用

@@ -24,7 +24,7 @@ set proxydef=
 if %proxyurl% equ "" set proxydef=1
 if %proxyurl% equ default set proxydef=1
 if %proxyurl% equ "default" set proxydef=1
-if defined proxydef set proxyurl="http://%f2etestDomain%/getHostsPac?name=%USERNAME%"
+if defined proxydef set proxyurl="http://%f2etestDomain%/getHosts.pac?name=%USERNAME%"
 if %proxymode% equ "noproxy" (
 	set proxyurl=""
 )

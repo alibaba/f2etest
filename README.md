@@ -150,6 +150,11 @@ UI Recorder请查看视频教程：[http://v.youku.com/v_show/id_XMTY4NTk5NjI4MA
 
 安装请前往安装教程页面：[INSTALL.md](INSTALL.md)
 
+第3方安装及使用教程：
+
+1. [http://shaofan.org/f2etest/](http://shaofan.org/f2etest/)
+2. [http://shaofan.org/ui-recorder/](http://shaofan.org/ui-recorder/)
+
 感谢
 ===================
 

@@ -64,12 +64,14 @@ var server = http.createServer(function(req, res){
 					desiredCapabilities.browserName = 'chrome';
 					desiredCapabilities.chromeOptions = desiredCapabilities.chromeOptions || {};
 					desiredCapabilities.chromeOptions.binary = 'c:\\360\\360se6\\Application\\360se.exe';
+					desiredCapabilities.chromeOptions.args = ['--allow-no-sandbox-job'];
 					body = JSON.stringify(json);
 				}
 				else if(browserName === '360chrome'){
 					desiredCapabilities.browserName = 'chrome';
 					desiredCapabilities.chromeOptions = desiredCapabilities.chromeOptions || {};
 					desiredCapabilities.chromeOptions.binary = 'c:\\360\\360Chrome\\Chrome\\Application\\360chrome.exe';
+					desiredCapabilities.chromeOptions.args = ['--allow-no-sandbox-job'];
 					body = JSON.stringify(json);
 				}
 				else if(browserName === 'chrome'){

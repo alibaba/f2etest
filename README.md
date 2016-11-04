@@ -148,7 +148,7 @@ UI Recorder请查看视频教程：[http://v.youku.com/v_show/id_XMTY4NTk5NjI4MA
 安装教程
 ===================
 
-安装请前往安装教程页面：[INSTALL.md](INSTALL.md)
+安装请前往安装教程页面：[INSTALL.md](https://github.com/alibaba/f2etest/blob/master/INSTALL.md)
 
 第3方安装及使用教程：
 

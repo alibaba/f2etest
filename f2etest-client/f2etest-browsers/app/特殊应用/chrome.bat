@@ -1,23 +1,23 @@
 @echo off
 
-rem è¯·è¿™é‡Œé…ç½®f2etestçš„åŸŸå
+rem ÇëÕâÀïÅäÖÃf2etestµÄÓòÃû
 set f2etestDomain=f2etest.xxx.com
 set appid=chrome
 
-rem å‘½ä»¤è¡Œå‚æ•°
+rem ÃüÁîÐÐ²ÎÊý
 set proxymode="%1"
 set proxyurl=%2
 set url=%3
 set apiKey=%4
 
-rem æŽ¢æµ‹æ¡Œé¢æ¨¡å¼
+rem Ì½²â×ÀÃæÄ£Ê½
 set isWeb=1
 if %url% equ desktop (
 	set url="about:blank"
 	set isWeb=0
 )
 
-rem è®¾ç½®ä»£ç†
+rem ÉèÖÃ´úÀí
 set proxypath="HKCU\Software\Microsoft\Windows\CurrentVersion\Internet Settings"
 reg add %proxypath% /v "ProxyEnable" /t REG_DWORD /d 0 /f>nul 
 set proxydef=
@@ -29,16 +29,16 @@ if %proxymode% equ "noproxy" (
 	set proxyurl=""
 )
 if %proxyurl% neq "" (
-	rem å¼€å¯ä»£ç†
+	rem ¿ªÆô´úÀí
 	reg add %proxypath% /v "AutoConfigURL" /d %proxyurl% /f >nul
 ) else (
-	rem å…³é—­ä»£ç†
+	rem ¹Ø±Õ´úÀí
 	reg delete %proxypath% /v "AutoConfigURL" /f > nul
 )
 
-rem æ‰“å¼€åº”ç”¨
+rem ´ò¿ªÓ¦ÓÃ
 taskkill /fi "username eq %username%" /s %computername% /u %username% /f -IM chrome.exe >nul
 start /MAX "" "C:\Program Files (x86)\Google\Chrome\Application\chrome.exe" --allow-no-sandbox-job %url% %proxyParam%
 
-rem æ‰“ç‚¹ç»Ÿè®¡
+rem ´òµãÍ³¼Æ
 start "" curl "http://%f2etestDomain%/applog?userid=%USERNAME%&appid=%appid%&isweb=%isWeb%"

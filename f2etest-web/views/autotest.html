@@ -19,7 +19,7 @@
             <h3>什么是UI Recorder？</h3>
             <p>UI Recorder是一款几乎零成本的整体自动化测试解决方案，一次自测等于多次测试，测一个浏览器等于测多个浏览器！</p>
             <p>我们的目标：<strong>让自测不要重复测！让自动化变成零成本！让自动化持续保障您的业务！</strong></p>
-            <p>以下是本产品的特点：</p>
+            <h3>产品的特点：</h3>
             <ol>
                 <li><strong>自测 = 自动化测试</strong>：对于开发人员来讲，自测是开发流程中缺一不可的过程，我们要实现的目标就是自测过程中即可同步的录制出自动化脚本，实现真正的零成本自动化</li>
                 <li><strong>无干扰录制</strong>：所作操作均无需交互干扰，鼠标、键盘、alert弹框、文件上传，完全按照正常自测流程操作即可(以下操作除外：悬停事件、断言、变量)</li>
@@ -27,13 +27,18 @@
                 <li><strong>丰富的断言</strong>：支持以下断言类型，val、text、displayed、enabled、selected、attr、css、url、title、cookie、localStorage、sessionStorage</li>
                 <li><strong>支持数据Mock</strong>：我们支持<a href="https://github.com/marak/Faker.js/" target="_blank">Faker变量</a>功能，支持强大的数据Mock</li>
                 <li><strong>支持公共用例</strong>: 用例之间允许相互引用，可以将某些公用的操作步骤录制为公用用例，以进一步提升录制效率</li>
-                <li><strong>支持执行截图</strong>：每次执行后，允许生成截图日志，以方便出问题时排查诊断</li>
+                <li><strong>支持单步截图</strong>：每个步骤执行后会自动保存截图，以方便出问题时排查诊断</li>
             </ol>
+            <h3>产品截图：</h3>
+            <p><img src="https://raw.github.com/alibaba/uirecorder/master/screenshot/shot1.png" /></p>
+            <p><img src="https://raw.github.com/alibaba/uirecorder/master/screenshot/shot2.png" /></p>
+            <p><img src="https://raw.github.com/alibaba/uirecorder/master/screenshot/shot3.png" /></p>
+            <p><img src="https://raw.github.com/alibaba/uirecorder/master/screenshot/shot4.png" /></p>
             <h3>我如何快速开始？</h3>
             <ol>
                 <li><strong>安装Nodejs</strong>: <a href="https://nodejs.org/" target="_blank">https://nodejs.org/</a></li>
-                <li><strong>安装关键依赖</strong>：npm install uirecorder mocha -g</li>
-                <li><strong>安装相关依赖</strong>：npm install jwebdriver expect.js mocha-generators faker --save-dev</li>
+                <li><strong>安装全局依赖</strong>：npm install uirecorder mocha -g</li>
+                <li><strong>安装执行依赖</strong>：npm install mocha jwebdriver chai faker mochawesome-uirecorder --save-dev</li>
                 <li><strong>初始化配置</strong>：uirecorder init
                     <ol>
                         <li>WebDriver域名: <strong><%=host%></strong></li>
@@ -53,7 +58,7 @@
 }</code></pre>
                 </li>
                 <li><strong>开始录制</strong>：uirecorder start</li>
-                <li><strong>运行用例</strong>：mocha *.spec.js</li>
+                <li><strong>运行用例</strong>：mocha **/*.spec.js --reporter mochawesome-uirecorder</li>
             </ol>
             <p>视频教程：<a href="http://v.youku.com/v_show/id_XMTY4NTk5NjI4MA==.html" target="_blank"><img src="/imgs/video.png"></a></p>
             <h3>录制注意事项：</h3>
@@ -87,6 +92,7 @@
                 <li>原生file控件必需处在顶层，不允许被别的div等DOM覆盖</li>
                 <li>文件约定路径: c:\uploadFiles\，请保证录制机的文件列表和执行机的文件列表一致</li>
             </ol>
+            <p>了解更多使用教程，请访问官网：<a href="http://uirecorder.com/" target="_blank">http://uirecorder.com/</a></p>
         </div>
     </div>
     <script type="text/javascript">

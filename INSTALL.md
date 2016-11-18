@@ -80,11 +80,7 @@
 
     启动成功后，可以发现WEB服务默认工作在：3000端口号
 
-    小建议：
-
-    1. 为了方便用户使用，建议安装nginx等软件做反向代理，将80端口反向到3000端口，以将3000端口号隐藏起来。
-    2. 建议使用pm2或forever等组件实现系统开机自动运行。
-    3. 安装快捷方式到Windows桌面 (Win7)功能，需要让f2etest-web支持HTTPS协议，否则此功能无法正常使用
+    为了方便用户使用，建议安装nginx等软件做反向代理，将80端口反向到3000端口，以将3000端口号隐藏起来。
 
     nginx反向配置如下：
 
@@ -95,6 +91,12 @@
             proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
             proxy_buffering off;
         }
+
+    小建议：
+
+    1. 建议使用pm2或forever等组件实现系统开机自动运行。
+    2. 安装快捷方式到Windows桌面 (Win7)功能，需要让f2etest-web支持HTTPS协议，否则此功能无法正常使用
+
 
 6. 安装windows server机群
 

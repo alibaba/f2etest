@@ -64,19 +64,28 @@ var server = http.createServer(function(req, res){
 					desiredCapabilities.browserName = 'chrome';
 					desiredCapabilities.chromeOptions = desiredCapabilities.chromeOptions || {};
 					desiredCapabilities.chromeOptions.binary = 'c:\\360\\360se6\\Application\\360se.exe';
-					desiredCapabilities.chromeOptions.args = ['--allow-no-sandbox-job'];
+					desiredCapabilities.chromeOptions.args = ['--allow-no-sandbox-job', '--disable-bundled-ppapi-flash'];
+                    desiredCapabilities.chromeOptions.prefs = {
+                        'plugins.plugins_disabled': ['Adobe Flash Player']
+                    };
 					body = JSON.stringify(json);
 				}
 				else if(browserName === '360chrome'){
 					desiredCapabilities.browserName = 'chrome';
 					desiredCapabilities.chromeOptions = desiredCapabilities.chromeOptions || {};
 					desiredCapabilities.chromeOptions.binary = 'c:\\360\\360Chrome\\Chrome\\Application\\360chrome.exe';
-					desiredCapabilities.chromeOptions.args = ['--allow-no-sandbox-job'];
+					desiredCapabilities.chromeOptions.args = ['--allow-no-sandbox-job', '--disable-bundled-ppapi-flash'];
+                    desiredCapabilities.chromeOptions.prefs = {
+                        'plugins.plugins_disabled': ['Adobe Flash Player']
+                    };
 					body = JSON.stringify(json);
 				}
 				else if(browserName === 'chrome'){
 					desiredCapabilities.chromeOptions = desiredCapabilities.chromeOptions || {};
-					desiredCapabilities.chromeOptions.args = ['--allow-no-sandbox-job'];
+					desiredCapabilities.chromeOptions.args = ['--allow-no-sandbox-job', '--disable-bundled-ppapi-flash'];
+                    desiredCapabilities.chromeOptions.prefs = {
+                        'plugins.plugins_disabled': ['Adobe Flash Player']
+                    };
 					body = JSON.stringify(json);
 				}
             }

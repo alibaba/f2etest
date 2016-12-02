@@ -36,10 +36,9 @@
             <p><img src="https://raw.github.com/alibaba/uirecorder/master/screenshot/shot4.png" /></p>
             <h3>我如何快速开始？</h3>
             <ol>
-                <li><strong>安装Nodejs</strong>: <a href="https://nodejs.org/" target="_blank">https://nodejs.org/</a></li>
+                <li><strong>安装Nodejs和Chrome浏览器</strong>: <a href="https://nodejs.org/" target="_blank">https://nodejs.org/</a> & <a href="https://www.google.com/chrome/" target="_blank">https://www.google.com/chrome/</a></li>
                 <li><strong>安装全局依赖</strong>：npm install uirecorder mocha -g</li>
-                <li><strong>安装执行依赖</strong>：npm install mocha jwebdriver chai faker mochawesome-uirecorder --save-dev</li>
-                <li><strong>初始化配置</strong>：uirecorder init
+                <li><strong>创建空白文件夹，并初始化配置</strong>：uirecorder init
                     <ol>
                         <li>WebDriver域名: <strong><%=host%></strong></li>
                         <li>WebDriver端口: <strong>4444</strong></li>
@@ -57,8 +56,9 @@
     }
 }</code></pre>
                 </li>
-                <li><strong>开始录制</strong>：uirecorder start</li>
-                <li><strong>运行用例</strong>：mocha **/*.spec.js --reporter mochawesome-uirecorder</li>
+                <li><strong>安装项目依赖</strong>：npm install</li>
+                <li><strong>开始录制</strong>：uirecorder start sample/test.spec.js</li>
+                <li><strong>运行用例</strong>：source run.sh 或 run.bat</li>
             </ol>
             <p>视频教程：<a href="http://v.youku.com/v_show/id_XMTY4NTk5NjI4MA==.html" target="_blank"><img src="/imgs/video.png"></a></p>
             <h3>录制注意事项：</h3>
@@ -78,19 +78,6 @@
                 <li>DOM尽量按照功能来规划区块，并为之设置业务相关的独立id</li>
                 <li>每个表单项如果设置label标签，将会使生成的用例可读性更高</li>
                 <li>事件绑定尽量使用click，不要使用mousedown来触发行为，mousedown会导致mouseup事件漏触发到背景DOM</li>
-            </ol>
-            <h3>公共用例如何使用？</h3>
-            <ol>
-                <li>用例之间可以相互引用，公共用例实际上就是普通用例，仅需要在文件名上对用例进行区分</li>
-                <li>对于公共用例，文件名建议使用：<strong>xxx.mod.js</strong></li>
-                <li>标准业务用例，文件名建议使用：<strong>xxx.spec.js</strong></li>
-                <li>批量执行业务用例：<strong>mocha test/*.spec.js</strong></li>
-            </ol>
-            <h3>如何录制文件上传？</h3>
-            <ol>
-                <li>UI Recorder仅支持原生file控件，不支持FLASH</li>
-                <li>原生file控件必需处在顶层，不允许被别的div等DOM覆盖</li>
-                <li>文件约定路径: c:\uploadFiles\，请保证录制机的文件列表和执行机的文件列表一致</li>
             </ol>
             <p>了解更多使用教程，请访问官网：<a href="http://uirecorder.com/" target="_blank">http://uirecorder.com/</a></p>
         </div>

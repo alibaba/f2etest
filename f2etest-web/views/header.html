@@ -8,7 +8,7 @@
             <% if (navTab=='browser') { %>
                | <a href="/help" class="<%=navPage=='help'?'cur':'';%>"><%=__('Help')%></a> | <a href="/install" class="<%=navPage=='install'?'cur':'';%>"><%=__('Install')%></a> | <a href="/local" class="<%=navPage=='local'?'cur':'';%>"><%=__('Proxy to local')%></a> | <a href="/stat" class="<%=navPage=='stat'?'cur':'';%>"><%=__('Statistics')%></a> | <a href="/api" class="<%=navPage=='api'?'cur':'';%>">API</a>
             <% } else if(navTab=='webdriver') { %>
-                  | <a href="/wd_nodejs" class="<%=navPage=='wdnodejs'?'cur':'';%>">NodeJs</a> | <a href="/wd_api" class="<%=navPage=='wdapi'?'cur':'';%>">API</a>
+                  | <a href="/wd_nodejs" class="<%=navPage=='wdnodejs'?'cur':'';%>">NodeJs</a> | <a href="/wd_stat" class="<%=navPage=='stat'?'cur':'';%>"><%=__('Statistics')%></a> | <a href="/wd_api" class="<%=navPage=='wdapi'?'cur':'';%>">API</a>
             <% } %>
              | <a href="https://github.com/alibaba/f2etest" target="_blank">源代码</a>
         </div>

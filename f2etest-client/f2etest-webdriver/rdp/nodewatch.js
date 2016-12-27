@@ -35,7 +35,7 @@ function checkAllNodeAlive(){
 			reOpenNode(nodeid);
 		}
 	});
-	setTimeout(checkAllNodeAlive, 1000);
+	setTimeout(checkAllNodeAlive, 5000);
 }
 
 function reOpenNode(nodeId){

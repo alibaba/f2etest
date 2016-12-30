@@ -128,7 +128,7 @@ var server = http.createServer(function(req, res){
 
 server.listen(proxyPort, function(){
     console.log('F2etest WebDriver proxy is ready: %s', proxyPort);
-    var jarPath = path.resolve(__dirname, './selenium-server-standalone-2.53.0.jar');
+    var jarPath = path.resolve(__dirname, './selenium-server-standalone-2.53.1.jar');
     cp.spawn('java', [
             '-jar',
             jarPath,

@@ -46,7 +46,7 @@ function reOpenNode(nodeId){
 		cp.execSync('tskill '+match[1]);
 		console.log('Old mstsc killed!');
 	}
-	cp.exec('mstsc '+nodeName+'.rdp');
+	cp.exec('start /min "" mstsc '+nodeName+'.rdp');
 	console.log(nodeName+' reopen successed!');
 }
 

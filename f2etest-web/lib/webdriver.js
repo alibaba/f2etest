@@ -20,7 +20,7 @@ var applyQueue = async.queue(function(applyInfo, next) {
     }
     pool.query('select count(0) as count from wd_browsers as b where '+strBrowserSql+';', arrBrowserInfo, function(err, rows){
         if(rows &&  rows[0].count > 0){
-            pool.query('select b.browser_id,b.browser_name,b.browser_version,b.node_id,n.node_ip,n.node_name from wd_browsers as b left join wd_nodes as n on b.node_id = n.node_id where n.work_status = 1 and '+strBrowserSql+' order by b.browser_id limit 1;', arrBrowserInfo, function(err, rows){
+            pool.query('select b.browser_id,b.browser_name,b.browser_version,b.node_id,n.node_ip,n.node_name from wd_browsers as b left join wd_nodes as n on b.node_id = n.node_id where n.work_status = 1 and '+strBrowserSql+' order by RAND() limit 1;', arrBrowserInfo, function(err, rows){
                 if(rows.length === 1){
                     var row = rows[0];
                     var browserId = row.browser_id;

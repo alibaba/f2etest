@@ -18,41 +18,48 @@ var applyQueue = async.queue(function(applyInfo, next) {
         callback(error, result);
         next();
     }
-    pool.query('select b.browser_id,b.browser_name,b.browser_version,b.node_id,n.node_ip,n.node_name from wd_browsers as b left join wd_nodes as n on b.node_id = n.node_id where n.work_status = 1 and '+strBrowserSql+' order by b.browser_id limit 1;', arrBrowserInfo, function(err, rows){
-        if(rows.length === 1){
-            var row = rows[0];
-            var browserId = row.browser_id;
-            var browserName = row.browser_name;
-            var browserVersion = row.browser_version;
-            var browserNameId = browserName + browserVersion;
-            if(browserName === 'IE'){
-                function endIeApply(){
-                    mapNodeWait[browserNameId] = true;
-                    doNodeCallback(userid, row, function(error, result){
-                        endApply(error, result);
-                        setTimeout(function(){
-                            mapNodeWait[browserNameId] = false;
-                        }, 6000);
-                    });
-                }
-                if(mapNodeWait[browserNameId]){
-                    var _waitTimer = setInterval(function(){
-                        if(mapNodeWait[browserNameId] === false){
-                            clearInterval(_waitTimer);
+    pool.query('select count(0) as count from wd_browsers as b where '+strBrowserSql+';', arrBrowserInfo, function(err, rows){
+        if(rows &&  rows[0].count > 0){
+            pool.query('select b.browser_id,b.browser_name,b.browser_version,b.node_id,n.node_ip,n.node_name from wd_browsers as b left join wd_nodes as n on b.node_id = n.node_id where n.work_status = 1 and '+strBrowserSql+' order by b.browser_id limit 1;', arrBrowserInfo, function(err, rows){
+                if(rows.length === 1){
+                    var row = rows[0];
+                    var browserId = row.browser_id;
+                    var browserName = row.browser_name;
+                    var browserVersion = row.browser_version;
+                    var browserNameId = browserName + browserVersion;
+                    if(browserName === 'IE'){
+                        function endIeApply(){
+                            mapNodeWait[browserNameId] = true;
+                            doNodeCallback(userid, row, function(error, result){
+                                endApply(error, result);
+                                setTimeout(function(){
+                                    mapNodeWait[browserNameId] = false;
+                                }, 6000);
+                            });
+                        }
+                        if(mapNodeWait[browserNameId]){
+                            var _waitTimer = setInterval(function(){
+                                if(mapNodeWait[browserNameId] === false){
+                                    clearInterval(_waitTimer);
+                                    endIeApply();
+                                }
+                            }, 1000);
+                        }
+                        else{
                             endIeApply();
                         }
-                    }, 1000);
+                    }
+                    else{
+                        doNodeCallback(userid, row, endApply);
+                    }
                 }
                 else{
-                    endIeApply();
+                    endApply('No matched idle browser, please try again later.');
                 }
-            }
-            else{
-                doNodeCallback(userid, row, endApply);
-            }
+            });
         }
         else{
-            endApply('No matched idle browser, please try again later.');
+            endApply('No matched browser name and version, please try another.');
         }
     });
 }, 1);
@@ -63,7 +70,16 @@ function applyWdNode(userid, browserName, browserVersion, callback){
         userid:userid,
         browserName:browserName,
         browserVersion:browserVersion,
-        callback: callback
+        callback: function(error, nodeInfo){
+            if(/No matched idle browser/.test(error)){
+                setTimeout(function(){
+                    applyWdNode(userid, browserName, browserVersion, callback);
+                }, 1000);
+            }
+            else{
+                callback(error, nodeInfo);
+            }
+        }
     });
 }
 

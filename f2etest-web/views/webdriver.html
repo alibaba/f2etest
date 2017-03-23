@@ -21,7 +21,6 @@
             <ol>
                 <li><strong>10倍以上硬件利用率</strong>：传统WebDriver 1台执行机仅能跑1个Job，而我们一台机器可以高并发跑N个Job，这个N取决于机器配置，理论上硬件利用率相当于传统节点的10倍以上</li>
                 <li><strong>支持独立hosts绑定</strong>：每次申请节点时，可以指定不同的hosts绑定，保证同一台机器上不同节点的Job不会相互干扰</li>
-                <li><strong>所有节点支持远程在线调试</strong>：利用Guacamole的在线远程功能，我们能非常便利的对自动化进展进行即时监控和调试</li>
             </ol>
             <h3>我如何使用？</h3>
             <p>我们使用标准的WebDriver协议，所有支持WebDriver协议的客户端，都可以直接使用。</p>
@@ -112,7 +111,7 @@
                                     1: '休息中……',
                                     2: '玩命工作中……'
                                 }
-                                arrLine.push('<a href="/openWdBrowser?browserId='+browserId+'" target="_blank"><span class="browser '+mapClass[status]+'" title="'+mapTitle[status]+'"><span></span><img src="/imgs/app/'+appId+'.png"></span></a> ');
+                                arrLine.push('<span class="browser '+mapClass[status]+'" title="'+mapTitle[status]+'"><span></span><img src="/imgs/app/'+appId+'.png"></span> ');
                             });
                             arrLine.push('</p>')
                             arrHtml.push(arrLine.join(''));

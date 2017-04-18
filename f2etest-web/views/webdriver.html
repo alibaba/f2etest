@@ -68,7 +68,7 @@
                                 browserName += ' ' + browserVersion;
                                 if(appId === 'ie')appId += browserVersion;
                             }
-                            var arrLine = ['<p><span class="name">'+browserName+':</span>'];
+                            var arrLine = ['<div class="browserLine"><span class="name">'+browserName+':</span><div class="browser">'];
                             var workStatus = browser.workStatus;
                             var arrNodes = workStatus.split(',');
                             arrNodes.sort(function(a, b){
@@ -111,9 +111,9 @@
                                     1: '休息中……',
                                     2: '玩命工作中……'
                                 }
-                                arrLine.push('<span class="browser '+mapClass[status]+'" title="'+mapTitle[status]+'"><span></span><img src="/imgs/app/'+appId+'.png"></span> ');
+                                arrLine.push('<span class="'+mapClass[status]+'" title="'+mapTitle[status]+'"><span></span><img src="/imgs/app/'+appId+'.png"></span> ');
                             });
-                            arrLine.push('</p>')
+                            arrLine.push('</div></div>')
                             arrHtml.push(arrLine.join(''));
                         });
                         jWdBrowserList.html(arrHtml.join(''));

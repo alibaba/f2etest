@@ -300,9 +300,17 @@ kbd {
 #wdListTitle span{
     color: #c00;
 }
+#wdBrowserList{
+    clear: both;
+}
+#wdBrowserList .browserLine{
+    clear: both;
+    padding: 20px 0;
+}
 #wdBrowserList span.name{
+    float: left;
     display: inline-block;
-    width: 120px;
+    width: 8%;
     text-align: right;
     padding-right:10px;
     font-weight: bold;
@@ -312,7 +320,12 @@ kbd {
     height: 30px;
     vertical-align: middle;
 }
-#wdBrowserList span.browser{
+#wdBrowserList .browser{
+    float: right;
+    display: inline-block;
+    width: 90%;
+}
+#wdBrowserList .browser span{
     display: inline-block;
     position: relative;
 }

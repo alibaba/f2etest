@@ -25,7 +25,6 @@
                 <li><strong>无干扰录制</strong>：所作操作均无需交互干扰，鼠标、键盘、alert弹框、文件上传，完全按照正常自测流程操作即可(以下操作除外：悬停事件、断言、变量)</li>
                 <li><strong>本地生成脚本</strong>：录制的脚本存储在用户本机，用户可以自行在录制的基础上进行修改定制，更自由更开放</li>
                 <li><strong>丰富的断言</strong>：支持以下断言类型，val、text、displayed、enabled、selected、attr、css、url、title、cookie、localStorage、sessionStorage</li>
-                <li><strong>支持数据Mock</strong>：我们支持<a href="https://github.com/marak/Faker.js/" target="_blank">Faker变量</a>功能，支持强大的数据Mock</li>
                 <li><strong>支持公共用例</strong>: 用例之间允许相互引用，可以将某些公用的操作步骤录制为公用用例，以进一步提升录制效率</li>
                 <li><strong>支持单步截图</strong>：每个步骤执行后会自动保存截图，以方便出问题时排查诊断</li>
             </ol>
@@ -34,9 +33,11 @@
             <p><img src="https://raw.github.com/alibaba/uirecorder/master/screenshot/shot2.png" /></p>
             <p><img src="https://raw.github.com/alibaba/uirecorder/master/screenshot/shot3.png" /></p>
             <p><img src="https://raw.github.com/alibaba/uirecorder/master/screenshot/shot4.png" /></p>
+            <p><img src="http://wx1.sinaimg.cn/mw1024/7f3afc78gy1fdf5gass5rg20sg0g0kjo.gif" /></p>
+            <p><img src="http://wx2.sinaimg.cn/mw1024/7f3afc78gy1fdf5hb8anig20sg0g0u12.gif" /></p>
             <h3>我如何快速开始？</h3>
             <ol>
-                <li><strong>安装Nodejs和Chrome浏览器</strong>: <a href="https://nodejs.org/" target="_blank">https://nodejs.org/</a> & <a href="https://www.google.com/chrome/" target="_blank">https://www.google.com/chrome/</a></li>
+                <li><strong>安装Nodejs和Chrome浏览器</strong>: <a href="https://nodejs.org/" target="_blank">https://nodejs.org/</a> (要求Node v7.x以上版本) & <a href="https://www.google.com/chrome/" target="_blank">https://www.google.com/chrome/</a></li>
                 <li><strong>安装全局依赖</strong>：npm install uirecorder mocha -g</li>
                 <li><strong>创建空白文件夹，并初始化配置</strong>：uirecorder init
                     <ol>
@@ -56,8 +57,7 @@
     }
 }</code></pre>
                 </li>
-                <li><strong>安装项目依赖</strong>：npm install</li>
-                <li><strong>开始录制</strong>：uirecorder start sample/test.spec.js</li>
+                <li><strong>开始录制</strong>：uirecorder sample/test.spec.js</li>
                 <li><strong>运行用例</strong>：source run.sh 或 run.bat</li>
             </ol>
             <p>视频教程：<a href="http://v.youku.com/v_show/id_XMTY4NTk5NjI4MA==.html" target="_blank"><img src="/imgs/video.png"></a></p>

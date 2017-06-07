@@ -23,7 +23,7 @@
             <p>请按照以下操作步骤，可以直接体验整个使用过程：</p>
             <ol>
                 <li>npm install mocha -g</li>
-                <li>npm install jwebdriver chai</li>
+                <li>npm install jwebdriver chai@3.5.0</li>
                 <li>
                     新建: test.js，内容如下：
                     <pre><code>var JWebDriver = require('jwebdriver');
@@ -70,12 +70,6 @@ describe('jWebDriver test', function(){
     √ should search baidu (1549ms)
 
   1 passing (6s)</code></pre>
-                </li>
-                <li>如何在F2etest上远程查看执行过程？
-                    <ol>
-                        <li>初始化浏览器实例时，返回的参数中读取<strong>f2etest.browserId</strong></li>
-                        <li>上面的参数拼接URL，并打开：<a href="http://<%=host%>/openWdBrowser?browserId={browserId}" target="blank">http://<%=host%>/openWdBrowser?browserId={browserId}</a></li>
-                    </ol>
                 </li>
             </ol>
         </div>

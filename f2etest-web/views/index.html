@@ -9,30 +9,73 @@
 	<script type="text/javascript" src="js/jquery-1.8.3.min.js"></script>
 </head>
 <body>
-	<% include header.html %>
-	<div id="app-list">
-	</div>
+    <% include header.html %>
+    <div class="panelWrap">
+
+        <ul id="countryGoup" class="tabs group" style="display:none">
+            <li><a href="#">本地</a></li>
+            <li><a class="active" href="#">美国</a></li>
+            <li><a href="#">英国</a></li>
+        </ul>
+        
+        <div id="panelContent">
+            <div id="app-list">
+            </div>
+        </div>
+    
+    </div>
     <script type="text/javascript">
         // init app list
+        var jCountryGoup = $('#countryGoup');
         var jAppList = $('#app-list');
-        var arrAppList = <%-JSON.stringify(appList)%>
-        function initAppList(){
+        var arrCountryList = <%-JSON.stringify(counryList)%>;
+        var arrAppList = <%-JSON.stringify(appList)%>;
+        var isCountryMode = arrCountryList.length > 0;
+        var curCountry = '';
+        function showCountry(){
+            var arrHtml = ['<li><a href="#" data-country=""'+(curCountry?'':' class="active"')+' title="切换为本地代理">本地</a></li>'];
+            var country;
+            for(var i=0;i<arrCountryList.length;i++){
+                country = arrCountryList[i];
+                arrHtml.push('<li>');
+                arrHtml.push('<a href="#" data-country="'+country.name+'"'+(curCountry===country.name?' class="active"':'')+' title="切换为'+country.nick+'代理">'+country.nick+'</a>');
+                arrHtml.push('</li>');
+            }
+            jCountryGoup.html(arrHtml.join(''));
+        }
+        function showAppList(){
             var appInfo;
-            var arrHtml;
+            var arrHtml = [];
             var connectUrl;
             for(var i=0,c=arrAppList.length;i<c;i++){
                 appInfo = arrAppList[i];
+                if(curCountry && /^(hostsshare|desktop)$/.test(appInfo.id)){
+                    continue;
+                }
                 connectUrl = '/openapp?id='+encodeURIComponent(appInfo.id);
-                arrHtml = [];
                 arrHtml.push('<div class="app"><div class="app-icon-bg"></div>');
+                if(curCountry){
+                    connectUrl += '&proxyurl='+encodeURIComponent('http://<%=host%>/getCountryProxy.pac?name='+curCountry)+'&url='+encodeURIComponent('http://ip.cn/');
+                    arrHtml.push('<span class="flag" style="background: url(/imgs/flag/'+curCountry+'.png)" />');
+                }
                 arrHtml.push('<a href="'+connectUrl+'" target="_blank" class="app-icon"><img src="/imgs/app/'+appInfo.id+'.png" /></a>');
                 arrHtml.push('<a href="'+connectUrl+'" target="_blank" class="app-name">'+appInfo.name+'</a>');
                 arrHtml.push('</div>');
-                jAppList.append(arrHtml.join(''));
             }
+            jAppList.html(arrHtml.join(''));
         }
         $('#desktop').on('mousedown', function(){return false;});
-        initAppList();
+        if(isCountryMode){
+            jCountryGoup.show();
+            showCountry();
+            jCountryGoup.on('click', 'a', function(e){
+                curCountry = $(e.target).data('country');
+                showCountry();
+                showAppList();
+                return false;
+            });
+        }
+        showAppList();
     </script>
 	<% include footer.html %>
 </body>

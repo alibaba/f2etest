@@ -16,6 +16,7 @@ var config = {};
 config.siteInfo = require('./conf/site.json');
 config.arrAppList = require('./conf/app.json');
 config.arrServerList = require('./conf/server.json');
+config.arrCountryProxy = require('./conf/country.json');
 config.package = require('./package.json');
 var workerId = Number(cluster.worker && cluster.worker.id || 0);
 config.workerId = workerId;

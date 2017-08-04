@@ -1,6 +1,6 @@
 (function(){
     var bgId = localStorage.getItem('bgid') || 1;
-    var maxId = 19;
+    var maxId = 4;
     var jBackground = $('#background');
     var jPrevbg = $('#prevbg');
     var jNextbg = $('#nextbg');

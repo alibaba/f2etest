@@ -28,8 +28,10 @@
                         <li>url: 需要打开的目标URL地址</li>
                         <li>noproxy: 是否禁用代理，设置1为禁用，禁用后即访问线上</li>
                         <li>proxyurl: 代理服务器pac地址，可利用代理服务器实现自定义hosts绑定功能</li>
+                        <li>params: program的参数，如果设置了此值，上方的3个参数将失效：url、noproxy、proxyurl</li>
                     </ol>
                 </li>
+                <li>注：此接口支持自动调用initUser，调此接口前无需提前调用initUser</li>
             </ul>
             <h3>/getAllBrowsers: 获取所有浏览器列表：</h3>
             <ul>

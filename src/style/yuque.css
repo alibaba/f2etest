@@ -155,3 +155,7 @@ pre code {
     margin-bottom: 0;
     white-space: pre-wrap;
 }
+
+video {
+    width: 100%;
+}

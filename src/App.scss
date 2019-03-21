@@ -1,0 +1,33 @@
+@import "~antd/dist/antd.css";
+@import "./style/yuque.css";
+
+/*
+ * custmize config code highlight theme
+ * @see /node_modules/highlight.js/styles
+ */
+@import '~highlight.js/styles/solarized-light.css';
+
+.app-logo {
+  height: 40px;
+}
+.github-logo {
+  height: 30px;
+}
+.font-weight{
+  font-weight: 700;
+}
+
+.flex-container {
+  display: flex;
+}
+.flex-sidebar{
+  flex: 0 0 auto;
+  width: 256px;
+}
+.flex-sidebar .default-link-text {
+  color: rgba(0, 0, 0, 0.65);
+}
+.flex-content {
+  flex: 1 1 auto;
+  padding: 30px 200px 30px 50px;
+}

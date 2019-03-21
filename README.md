@@ -165,4 +165,14 @@ UI Recorder请查看视频教程：[http://v.youku.com/v_show/id_XMTY4NTk5NjI4MA
 * express: [https://github.com/expressjs/express](https://github.com/expressjs/express)
 * jwebdriver: [https://github.com/yaniswang/jWebDriver](https://github.com/yaniswang/jWebDriver)
 * mysql: [https://github.com/felixge/node-mysql](https://github.com/felixge/node-mysql)
-* request: [https://github.com/request/request](https://github.com/request/request)
+* request: [https://github.com/request/request](https://github.com/request/request)<!-- GITCONTRIBUTOR_START -->
+
+## Contributors
+
+|[<img src="https://avatars1.githubusercontent.com/u/970390?v=4" width="100px;"/><br/><sub><b>yaniswang</b></sub>](https://github.com/yaniswang)<br/>|
+| :---: |
+
+
+This project follows the git-contributor [spec](https://github.com/xudafeng/git-contributor), auto updated at `Thu Mar 21 2019 12:04:57 GMT+0800`.
+
+<!-- GITCONTRIBUTOR_END -->

@@ -169,10 +169,10 @@ UI Recorder请查看视频教程：[http://v.youku.com/v_show/id_XMTY4NTk5NjI4MA
 
 ## Contributors
 
-|[<img src="https://avatars1.githubusercontent.com/u/970390?v=4" width="100px;"/><br/><sub><b>yaniswang</b></sub>](https://github.com/yaniswang)<br/>|
-| :---: |
+|[<img src="https://avatars1.githubusercontent.com/u/970390?v=4" width="100px;"/><br/><sub><b>yaniswang</b></sub>](https://github.com/yaniswang)<br/>|[<img src="https://avatars2.githubusercontent.com/u/18617837?v=4" width="100px;"/><br/><sub><b>Stngle</b></sub>](https://github.com/Stngle)<br/>|
+| :---: | :---: |
 
 
-This project follows the git-contributor [spec](https://github.com/xudafeng/git-contributor), auto updated at `Thu Mar 21 2019 12:04:57 GMT+0800`.
+This project follows the git-contributor [spec](https://github.com/xudafeng/git-contributor), auto updated at `Thu Mar 21 2019 12:10:44 GMT+0800`.
 
 <!-- GITCONTRIBUTOR_END -->

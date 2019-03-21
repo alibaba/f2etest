@@ -1,0 +1,8 @@
+title: F2etest
+description: F2etest是一个面向前端、测试、产品等岗位的多浏览器兼容性测试整体解决方案。
+google_analytics:
+show_downloads: true
+theme: jekyll-theme-architect
+
+gems:
+- jekyll-mentions

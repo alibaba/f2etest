@@ -1,0 +1,161 @@
+h2 {
+    font-size: 24px;
+    line-height: 32px;
+    padding: 7px 0;
+}
+
+code {
+    position: relative;
+    font-family: monospace;
+    font-size: inherit;
+    background-color: rgba(0,0,0,.06);
+    padding: 0 2px;
+    border: 1px solid rgba(0,0,0,.08);
+    border-radius: 2px 2px;
+    line-height: inherit;
+    word-wrap: break-word;
+    word-break: break-all;
+    text-indent: 0;
+}
+
+blockquote {
+    padding: 0 0 0 1em;
+    color: #8c8c8c;
+    border-left: 3px solid #e8e8e8;
+}
+
+.bi-table {
+    width: 100%;
+    margin-top: 24px;
+    margin-bottom: 24px;
+    overflow: auto;
+    position: relative;
+    cursor: default;
+}
+
+.bi-table table {
+    position: relative;
+    z-index: 1;
+    table-layout: fixed;
+    border-collapse: collapse;
+    border-spacing: 0;
+    word-wrap: break-word;
+    word-break: normal;
+    cursor: text;
+    min-width: 180px;
+    overflow: auto;
+    white-space: normal;
+    width: 100%;
+}
+
+colgroup {
+    display: table-column-group;
+}
+
+col {
+    display: table-column;
+}
+
+.bi-table tbody, .bi-table td, .bi-table th, .bi-table tr {
+    margin: 0;
+    font-weight: 400;
+    box-sizing: border-box;
+}
+
+tbody {
+    display: table-row-group;
+    vertical-align: middle;
+    border-color: inherit;
+}
+
+.bi-table table tr {
+    min-height: 34px;
+}
+
+table tr:nth-child(odd) {
+    background-color: #fafafa;
+}
+
+table tr {
+    background: #fff;
+    border-top: 1px solid #e8e8e8;
+}
+
+.bi-table tr {
+    margin: 0;
+    font-weight: 400;
+    box-sizing: border-box;
+}
+
+tr {
+    display: table-row;
+    vertical-align: inherit;
+    border-color: inherit;
+}
+
+table td, .typo table th {
+    padding: 6px 8px;
+    border: 1px solid #e8e8e8;
+    white-space: normal;
+    word-wrap: break-word;
+}
+
+.bi-table td, .bi-table th {
+    min-width: 90px;
+    font-size: 14px;
+    white-space: normal;
+    word-wrap: break-word;
+    vertical-align: top;
+}
+
+.bi-table table, .bi-table tbody, .bi-table td, .bi-table th, .bi-table tr {
+    margin: 0;
+    font-weight: 400;
+    box-sizing: border-box;
+}
+
+.typo-bi [data-type=p], .typo-bi p {
+    min-height: 24px;
+    line-height: 24px;
+    margin-top: 0;
+    margin-bottom: 0;
+    white-space: pre-wrap;
+}
+
+pre {
+    margin-top: 5px;
+    margin-bottom: 5px;
+    font-family: Consolas,Menlo,Courier,monospace;
+    line-height: 21px;
+    font-size: 13px;
+    overflow: auto;
+    tab-size: 4;
+    margin: 5px 0;
+    color: #595959;
+    background: #fdf6e3;
+    border-radius: 2px 2px;
+    border: 1px solid #e8e8e8;
+    padding: 16px;
+}
+
+pre code {
+    border: none;
+    background: none;
+    top: 0;
+    margin: 0;
+    padding: 0;
+    font-size: inherit;
+    line-height: inherit;
+}
+
+[data-type=p], .typo-bi p {
+    min-height: 24px;
+    line-height: 24px;
+    margin-top: 0;
+    margin-bottom: 0;
+    white-space: pre-wrap;
+}
+
+video {
+    width: 100%;
+}

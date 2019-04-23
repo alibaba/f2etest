@@ -7,6 +7,8 @@ F2etest是一个面向前端、测试、产品等岗位的多浏览器兼容性�
 
 注：F2e test = Front to End Test = 前端测试
 
+- 最新文档：[语雀文档](https://www.yuque.com/artist/f2etest)、[Github Page](https://alibaba.github.io/f2etest/build/#/linshuoting/f2etest/yvvber)
+
 浏览器云
 =================================
 

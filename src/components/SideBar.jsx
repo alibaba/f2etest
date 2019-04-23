@@ -8,13 +8,12 @@ import preorderToTree from "./util/preorderToTree";
 const { SubMenu } = Menu;
 
 class App extends React.Component {
-    state = {
-        match: {
-            params: {
-                user: {},
-                repo: {},
-            }
-        }
+    constructor(props) {
+        super(props);
+        const { match } = props;
+        this.state = {
+            match
+        };
     }
 
     componentDidMount() {
@@ -41,7 +40,7 @@ class App extends React.Component {
             node.title :
             <Link className="default-link-text" to={`/${user}/${repo}/${node.slug}`}>{node.title}</Link>;
 
-        if (childNodes.length === 0) {
+        if (!childNodes.length) {
             return (
                 <Menu.Item>
                     {link}
@@ -49,7 +48,7 @@ class App extends React.Component {
             );
         } else {
             return (
-                <SubMenu title={link} isOpen={true}>
+                <SubMenu title={link} {...this.props}>
                     {
                         childNodes.map((node) => this.renderNodes(node))
                     }
@@ -65,7 +64,7 @@ class App extends React.Component {
 
         if (Object.keys(user).length && Object.keys(repo).length) {
             const tocNamespace = `${user}-${repo}`;
-            debugger
+
             TocList = Toc[tocNamespace];
             TocList = JSON.parse(TocList);
         }
@@ -75,16 +74,14 @@ class App extends React.Component {
         return (
             <Menu
                 className="flex-sidebar"
-                onClick={this.handleClick}
                 style={{ minHeight: `${window.screen.availHeight}px` }}
                 mode="inline"
-                isOpen={true}
             >
                 {
                     tree.map((node, index) => this.renderNodes(node, index))
                 }
             </Menu>
-        )
+        );
     }
 }
 

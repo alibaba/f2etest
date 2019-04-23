@@ -29,10 +29,10 @@ class App extends React.Component {
         return (
             <Row>
                 <Col span={6}>
-                    <Menu mode="horizontal" style={{ lineHeight: '64px', paddingLeft: '20px' }}>
+                    <div style={{ lineHeight: '64px', paddingLeft: '20px', borderBottom: '1px solid #e8e8e8' }}>
                         <img src={logo} className="app-logo" alt="logo" />
                         <span className="font-weight">{config.title}</span>
-                    </Menu>
+                    </div>
                 </Col>
                 <Col span={16}>
                     <Menu
@@ -48,11 +48,11 @@ class App extends React.Component {
                     </Menu>
                 </Col>
                 <Col span={2}>
-                    <Menu mode="horizontal" style={{ lineHeight: '64px' }}>
+                    <div style={{ lineHeight: '64px', borderBottom: '1px solid #e8e8e8' }}>
                         <a href={config.githubUrl} target="_blank" rel="noopener noreferrer">
                             <img src={github} className="github-logo" alt="logo" />
                         </a>
-                    </Menu>
+                    </div>
                 </Col>
             </Row>
         );

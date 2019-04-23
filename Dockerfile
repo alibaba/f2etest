@@ -119,6 +119,7 @@ RUN npm i
 
 # 拷贝初始化脚本（初始化数据库表、`pm2` 启动 Web、启动 Nginx）
 COPY f2etest-docker/setup.sh ./
+RUN chmod 777 setup.sh
 
 EXPOSE 80
 

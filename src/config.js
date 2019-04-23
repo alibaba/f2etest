@@ -8,7 +8,7 @@ const config = {
     repos: [
         {
             name: 'F2etest',
-            namespace: 'https://www.yuque.com/linshuoting/f2etest',
+            namespace: 'https://www.yuque.com/artist/f2etest/intro',
         },
     ],
     githubUrl: 'https://github.com/alibaba/f2etest',

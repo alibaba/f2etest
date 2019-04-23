@@ -1,32 +1,32 @@
 [
     {
         "id": "f2etest-ie6",
-        "ip": "x.x.x.1",
+        "ip": "10.0.0.1",
         "remoteApp": false
     },
     {
         "id": "f2etest-ie7",
-        "ip": "x.x.x.2",
+        "ip": "10.0.0.2",
         "remoteApp": false
     },
     {
         "id": "f2etest-ie8",
-        "ip": "x.x.x.3",
+        "ip": "10.0.0.3",
         "remoteApp": true
     },
     {
         "id": "f2etest-ie9",
-        "ip": "x.x.x.4",
+        "ip": "10.0.0.4",
         "remoteApp": true
     },
     {
         "id": "f2etest-ie10",
-        "ip": "x.x.x.5",
+        "ip": "10.0.0.5",
         "remoteApp": true
     },
     {
         "id": "f2etest-ie11",
-        "ip": "x.x.x.6",
+        "ip": "10.0.0.6",
         "remoteApp": true
     }
 ]

@@ -1,0 +1,8 @@
+<configs>
+    <config name="f2etest-ie8" protocol="rdp">
+        <param name="hostname" value="192.168.1.102" />
+        <param name="port" value="3389" />
+        <param name="enable-drive" value="true" />
+        <param name="drive-path" value="/home/guacdshare" />
+    </config>
+</configs>

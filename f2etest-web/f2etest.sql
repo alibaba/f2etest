@@ -1,3 +1,7 @@
+create database `f2etest` default character set utf8 collate utf8_general_ci;
+
+use f2etest;
+
 SET FOREIGN_KEY_CHECKS=0;
 
 -- ----------------------------

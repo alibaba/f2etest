@@ -6,6 +6,7 @@
     "dbHost": "127.0.0.1",
     "dbUser": "root",
     "dbPass": "",
+    "dbPort": "3306",
     "dbTable": "f2etest",
     "clientApiKey":"f2etest",
     "guacamoleApi": "http://192.168.1.101/guacamole/client.xhtml",

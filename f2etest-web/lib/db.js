@@ -4,6 +4,7 @@ var siteInfo = require('../conf/site.json');
 
 pool = mysql.createPool({
   host     : siteInfo.dbHost,
+  port     : siteInfo.dbPort,
   user     : siteInfo.dbUser,
   password : siteInfo.dbPass,
   database : siteInfo.dbTable

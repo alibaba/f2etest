@@ -58,7 +58,15 @@
                     connectUrl += '&proxyurl='+encodeURIComponent('http://<%=host%>/getCountryProxy.pac?name='+curCountry)+'&url='+encodeURIComponent('http://ip.cn/');
                     arrHtml.push('<span class="flag" style="background: url(/imgs/flag/'+curCountry+'.png)" />');
                 }
-                arrHtml.push('<a href="'+connectUrl+'" target="_blank" class="app-icon"><img src="/imgs/app/'+appInfo.id+'.png" /></a>');
+		var imgName = appInfo.id;
+                if(appInfo.id.indexOf('chrome') > -1) {
+                    imgName = 'chrome';
+                }
+		
+                if(appInfo.id.indexOf('firefox') > -1) {
+                    imgName = 'firefox';
+                }
+                arrHtml.push('<a href="'+connectUrl+'" target="_blank" class="app-icon"><img src="/imgs/app/'+imgName+'.png" /></a>');
                 arrHtml.push('<a href="'+connectUrl+'" target="_blank" class="app-name">'+appInfo.name+'</a>');
                 arrHtml.push('</div>');
             }

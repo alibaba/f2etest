@@ -98,7 +98,9 @@ RUN wget https://nodejs.org/dist/v10.15.1/node-v10.15.1-linux-x64.tar.xz \
 # 下载安装 MySQL
 RUN wget http://dev.mysql.com/get/mysql-community-release-el7-5.noarch.rpm \
   && yum localinstall -y mysql-community-release-el7-5.noarch.rpm \
-  && yum install -y mysql-community-server
+  && yum install -y mysql-community-server \
+  && chown -R mysql /var/lib/mysql \
+  && chgrp -R mysql /var/lib/mysql
 
 ## Nginx ##
 # 拷贝 nginx 源配置

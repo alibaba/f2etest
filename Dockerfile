@@ -1,4 +1,4 @@
-FROM centos
+FROM centos:7
 
 ### Guacamole Server ###
 # 更多详细安装信息可参考 Guacamole 官方 <https://guacamole.apache.org/doc/gug/installing-guacamole.html>
@@ -8,12 +8,12 @@ ADD f2etest-guacamole/guacamole-server-0.9.3.tar.gz /home/guacdshare
 WORKDIR /home/guacdshare
 
 # 安装需要使用到的依赖包
-RUN yum install -y wget gcc initscripts sudo lsof automake autoconf libtool make \
+RUN yum install -y wget vim gcc initscripts sudo lsof automake autoconf libtool make \
   # 安装 `guacd` 依赖
   cairo-devel libpng-devel uuid-devel freerdp* libvncserver-devel openssl-devel \
   # 编译前创建 `freerdp` 的软连接
-  && ln -s /usr/local/lib/freerdp/guacsnd.so /usr/lib64/freerdp/ \
-  && ln -s /usr/local/lib/freerdp/guacdr.so /usr/lib64/freerdp/
+  && ln -s /usr/local/lib/freerdp/guacsnd.so /usr/lib64/freerdp2/ \
+  && ln -s /usr/local/lib/freerdp/guacdr.so /usr/lib64/freerdp2/
 
 WORKDIR /home/guacdshare/guacamole-server-0.9.3
 
@@ -53,9 +53,9 @@ ENV CLASSPATH .:$JAVA_HOME/lib
 WORKDIR /usr/local
 
 # 下载并解压 Tomcat
-RUN wget http://mirrors.hust.edu.cn/apache/tomcat/tomcat-8/v8.5.38/bin/apache-tomcat-8.5.38.tar.gz \
-  && tar -xzvf apache-tomcat-8.5.38.tar.gz \
-  && mv apache-tomcat-8.5.38 tomcat8
+RUN wget http://mirrors.hust.edu.cn/apache/tomcat/tomcat-8/v8.5.50/bin/apache-tomcat-8.5.50.tar.gz \
+  && tar -xzvf apache-tomcat-8.5.50.tar.gz \
+  && mv apache-tomcat-8.5.50 tomcat8
 
 # 拷贝定制过的 WAR 包
 COPY f2etest-guacamole/guacamole-0.9.3.war /usr/local/tomcat8/webapps/guacamole.war

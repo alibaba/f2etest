@@ -196,16 +196,49 @@ function reportToF2etest(wdStatus){
     });
 }
 
+function validateProxyHost(proxyHost){
+    if(typeof proxyHost !== 'string'){
+        throw new Error('Invalid proxy host');
+    }
+
+    // allow common host:port style values only
+    // examples: 127.0.0.1:8080, proxy.example.com:3128
+    if(!/^[a-zA-Z0-9.\-:]+$/.test(proxyHost)){
+        throw new Error('Unsafe proxy host value');
+    }
+
+    if(proxyHost.length > 255){
+        throw new Error('Proxy host too long');
+    }
+}
+
+function validatePacUrl(pacUrl){
+    if(typeof pacUrl !== 'string'){
+        throw new Error('Invalid PAC url');
+    }
+
+    if(pacUrl.length > 2048){
+        throw new Error('PAC url too long');
+    }
+
+    // only allow http / https URLs
+    if(!/^https?:\/\/[^\s]+$/i.test(pacUrl)){
+        throw new Error('Unsafe PAC url value');
+    }
+}
+
 function setProxy(proxyHost){
-    cp.execSync('reg add "'+proxyPath+'" /v "ProxyEnable" /t REG_DWORD /d "1" /f >nul');
-    cp.execSync('reg add "'+proxyPath+'" /v "AutoConfigURL" /d "" /f >nul');
-    cp.execSync('reg add "'+proxyPath+'" /v "ProxyServer" /d "'+proxyHost+'" /f >nul');
+    validateProxyHost(proxyHost);
+    cp.execSync('reg add "' + proxyPath + '" /v "ProxyEnable" /t REG_DWORD /d "1" /f >nul');
+    cp.execSync('reg add "' + proxyPath + '" /v "AutoConfigURL" /d "" /f >nul');
+    cp.execSync('reg add "' + proxyPath+'" /v "ProxyServer" /d "'+proxyHost+'" /f >nul');
     console.log('System proxy inited:', proxyHost);
 }
 
 function setPac(pacUrl){
-    cp.execSync('reg add "'+proxyPath+'" /v "ProxyEnable" /t REG_DWORD /d "0" /f >nul');
-    cp.execSync('reg add "'+proxyPath+'" /v "AutoConfigURL" /d "'+pacUrl+'" /f >nul');
+    validatePacUrl(pacUrl);
+    cp.execSync('reg add "' + proxyPath + '" /v "ProxyEnable" /t REG_DWORD /d "0" /f >nul');
+    cp.execSync('reg add "' + proxyPath + '" /v "AutoConfigURL" /d "' + pacUrl + '" /f >nul');
     console.log('System proxy inited:', pacUrl);
 }
 
